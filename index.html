@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>OFFICE Montage</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#/">
+      <img class="logo" src="img/brand/laengle-logo-schwarz.webp" alt="Längle">
+      <span class="divider"></span>
+      <span class="product" id="crumb">Montageanleitungen</span>
+    </a>
+    <div class="controls" id="guideControls" hidden>
+      <a class="btn i18n" id="variantLink" href="#/">Variante wechseln</a>
+      <div class="opts">
+        <label class="toggle"><input type="checkbox" data-opt="corner"> <span class="i18n">Ecklösung</span></label>
+        <label class="toggle"><input type="checkbox" data-opt="frameT"> <span class="i18n">Glasstoß</span></label>
+        <label class="toggle" id="optTopLight"><input type="checkbox" data-opt="topLight"> <span>Top Light</span></label>
+        <label class="toggle" id="optSwing"><input type="checkbox" data-opt="swing"> <span>Swing Door</span></label>
+      </div>
+      <button id="guideBtn" class="btn primary i18n">▶ Schritt für Schritt</button>
+      <button id="resetBtn" class="btn icon" data-i18n-title="Ansicht zurücksetzen" title="Ansicht zurücksetzen" aria-label="Ansicht zurücksetzen">⟲</button>
+    </div>
+    <div class="lang-switch" role="group" aria-label="Sprache / Language"><button data-lang="de" title="Deutsch">DE</button><button data-lang="en" title="English">EN</button></div>
+  </header>
+
+  <!-- Startseite: nur fertig ausgearbeitete Produkte -->
+  <main class="page" id="view-start" hidden>
+    <div class="page-inner">
+      <div class="start-head">
+        <h1 class="i18n">Interaktive Montageanleitung</h1>
+      </div>
+      <p class="lead i18n">Wählen Sie das Produkt, das Sie montieren.</p>
+      <div class="tiles" id="productTiles"></div>
+    </div>
+  </main>
+
+  <!-- Variantenwahl -->
+  <main class="page" id="view-variants" hidden>
+    <div class="page-inner">
+      <a class="back i18n" href="#/">← Produkte</a>
+      <h1 class="i18n">OFFICE – Variante wählen</h1>
+      <p class="lead i18n">Welche Variante bauen Sie ein? Optionen wie Glasstoß, Top Light und Swing Door wählen Sie danach direkt in der Anleitung.</p>
+      <div class="mount-choice">
+        <span class="i18n">Einbausituation</span>
+        <div class="seg" id="mountSeg">
+          <button data-corner="0" class="active i18n">Gerade (Wand zu Wand)</button>
+          <button data-corner="1" class="i18n">Ecklösung</button>
+        </div>
+      </div>
+      <div class="tiles variants" id="variantTiles"></div>
+    </div>
+  </main>
+
+  <!-- Interaktive Anleitung -->
+  <main class="layout" id="view-guide" hidden>
+    <section class="stage" id="stage">
+      <canvas id="c"></canvas>
+      <div id="hotspots"></div>
+      <div class="hint i18n" id="hint">Ziehen = drehen · Scrollen / 2 Finger = zoomen · Rechtsklick / 2 Finger ziehen = verschieben · <b>Punkte anklicken</b></div>
+    </section>
+    <aside class="panel" id="panel">
+      <div class="sheet-handle" id="sheetHandle" title="Ziehen oder antippen, um Anleitung und 3D-Ansicht zu vergrößern" data-i18n-title="Ziehen oder antippen, um Anleitung und 3D-Ansicht zu vergrößern">
+        <button class="sh-btn" id="sheetDown" aria-label="3D-Ansicht vergrößern" data-i18n-title="3D-Ansicht vergrößern">▼</button>
+        <span class="sh-mid"><span class="grip"></span><span class="sh-label" id="sheetLabel">Anleitung öffnen</span></span>
+        <button class="sh-btn" id="sheetUp" aria-label="Anleitung vergrößern" data-i18n-title="Anleitung vergrößern">▲</button>
+      </div>
+      <div id="panelBody"></div>
+    </aside>
+  </main>
+
+  <div class="lightbox" id="lightbox" hidden>
+    <div class="lb-inner"></div>
+    <button class="btn icon close" aria-label="Schließen">✕</button>
+  </div>
+
+  <script src="vendor/three.min.js"></script>
+  <script src="vendor/OrbitControls.js"></script>
+  <script src="data.js"></script>
+  <script src="brand.js"></script>
+  <script src="en.js"></script>
+  <script src="figures.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

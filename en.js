@@ -1,0 +1,284 @@
+// Englische Übersetzung der Montageanleitung OFFICE.
+// Schlüssel = deutscher Originaltext (genau wie in data.js / figures.js / Oberfläche), Wert = englischer Text.
+// Fehlt ein Eintrag, zeigt die App den deutschen Text.
+window.I18N_EN = {
+  // ---------------------------------------------------------------- Oberfläche
+  'Montageanleitungen': 'Assembly instructions',
+  'Interaktive Montageanleitung': 'Interactive assembly instructions',
+  'Wählen Sie das Produkt, das Sie montieren.': 'Select the product you are installing.',
+  'Glastrennwand-System · 6 Varianten': 'Glass partition system · 6 variants',
+  '← Produkte': '← Products',
+  'OFFICE – Variante wählen': 'OFFICE – select variant',
+  'Welche Variante bauen Sie ein? Optionen wie Glasstoß, Top Light und Swing Door wählen Sie danach direkt in der Anleitung.': 'Which variant are you installing? Options such as glass joint, top light and swing door can be selected afterwards directly in the instructions.',
+  'Einbausituation': 'Installation',
+  'Gerade (Wand zu Wand)': 'Straight (wall to wall)',
+  'Ecklösung': 'Corner solution',
+  'gerade': 'straight',
+  'Glasstoß': 'Glass joint',
+  'Variante wechseln': 'Change variant',
+  '▶ Schritt für Schritt': '▶ Step by step',
+  'Ansicht zurücksetzen': 'Reset view',
+  'Ziehen = drehen · Scrollen / 2 Finger = zoomen · Rechtsklick / 2 Finger ziehen = verschieben · <b>Punkte anklicken</b>': 'Drag = rotate · Scroll / 2 fingers = zoom · Right-click / 2-finger drag = pan · <b>Click the points</b>',
+  'Montageablauf': 'Assembly sequence',
+  'Bauteile': 'Parts',
+  'Hinweise': 'Notes',
+  '← Montageablauf': '← Assembly sequence',
+  'Benötigte Teile': 'Required parts',
+  'Montage': 'Assembly',
+  '← Zurück': '← Back',
+  'Weiter →': 'Next →',
+  'Fertig ✓': 'Done ✓',
+  'Option': 'Option',
+  'Schritt': 'Step',
+  'von': 'of',
+  'Schritte. Klicken Sie auf einen Punkt im Modell oder einen Schritt – oder starten Sie mit <b>„Schritt für Schritt“</b>.': 'steps. Click a point in the model or a step – or start with <b>“Step by step”</b>.',
+  'Bauteile für': 'Parts for',
+  'Antippen zum Vergrößern.': 'Tap to enlarge.',
+  'Antippen zum Vergrößern': 'Tap to enlarge',
+  'Zeichnung vergrößern': 'Enlarge drawing',
+  'Top Light ist nur bei C2–C4 möglich': 'Top light is only available for C2–C4',
+  'Nicht mit Swing Door kombinierbar': 'Cannot be combined with swing door',
+  'Oberlicht im Türrahmen': 'Transom light in the door frame',
+  'Nicht mit Top Light kombinierbar': 'Cannot be combined with top light',
+  'Pendeltür': 'Swing door',
+  'Anleitung öffnen': 'Open instructions',
+  'Ziehen: Anleitung ↕ 3D-Ansicht': 'Drag: instructions ↕ 3D view',
+  '3D-Ansicht vergrößern': 'Enlarge 3D view',
+  'Anleitung vergrößern': 'Enlarge instructions',
+  'Ziehen oder antippen, um Anleitung und 3D-Ansicht zu vergrößern': 'Drag or tap to enlarge the instructions or the 3D view',
+  'richtig': 'correct',
+  'falsch': 'wrong',
+  'Sprache wählen': 'Choose language',
+  'Bitte wählen Sie Ihre Sprache.': 'Please choose your language.',
+
+  // ---------------------------------------------------------------- Varianten und Abschnitte
+  'Tür links mit Oberlicht': 'Door left with transom',
+  'Tür mittig mit Oberlicht': 'Door centre with transom',
+  'Tür rechts mit Oberlicht': 'Door right with transom',
+  'Tür links bis zur Decke': 'Door left, full height',
+  'Tür mittig bis zur Decke': 'Door centre, full height',
+  'Tür rechts bis zur Decke': 'Door right, full height',
+  'Vorbereitung': 'Preparation',
+  'Rahmen liegend vormontieren': 'Pre-assemble the frame on the floor',
+  'Rahmen aufstellen und befestigen': 'Erect and fix the frame',
+  'Verglasen': 'Glazing',
+  'Tür montieren': 'Install the door',
+  'Abschluss': 'Finish',
+
+  // ---------------------------------------------------------------- Bauteile
+  'Türzargenprofil': 'Door frame profile',
+  'Basisrahmenprofil': 'Base frame profile',
+  'Clipprofil': 'Clip profile',
+  'Deckenbasisrahmenprofil': 'Ceiling base frame profile',
+  'Glasstoßprofil': 'Glass joint profile',
+  'Fixierdichtung': 'Fixing gasket',
+  'Anschlagdichtung 16 mm': 'Stop gasket 16 mm',
+  'Zargendichtung': 'Door frame gasket',
+  'Anschlagdichtung 8/10/12 mm': 'Stop gasket 8/10/12 mm',
+  'T-Verbinder (Basis und Top Frame oder Frame Verbinder)': 'T-connector (base and top frame or frame connector)',
+  'CL-Verbinder (Top Frame und Frame Verbinder)': 'CL-connector (top frame and frame connector)',
+  '90°-Eckverbinder (Boden- und Deckenprofilverbinder)': '90° corner connector (floor and ceiling profile connector)',
+  'C-Verbinder (Boden- und Eckverbinder)': 'C-connector (floor and corner connector)',
+  'Hammerkopfmutter 8–10 mm Glas': 'Hammer head nut 8–10 mm glass',
+  'Hammerkopfmutter 12 mm Glas': 'Hammer head nut 12 mm glass',
+  'Schließblech 8–12 mm Glas': 'Strike plate 8–12 mm glass',
+  '180°-Verbinder': '180° connector',
+  'Glas-Auflage-Winkel links & rechts (Oberlicht)': 'Glass support angle left & right (transom)',
+  'Clipprofil Oberlicht 10 mm Glas': 'Transom clip profile 10 mm glass',
+  'Clipprofil Oberlicht 8 mm Glas': 'Transom clip profile 8 mm glass',
+  'Block für Pendeltür': 'Swing door block',
+  'Clipprofil Pendeltür': 'Swing door clip profile',
+
+  // ---------------------------------------------------------------- Montageschritte
+  'Profile vorbereiten und Bohrungen setzen': 'Prepare profiles and drill holes',
+  'Profile auf einer weichen Unterlage am Boden auslegen, damit nichts verkratzt. Der Rahmen wird <b>liegend vormontiert</b>.': 'Lay the profiles out on a soft surface on the floor so nothing gets scratched. The frame is <b>pre-assembled lying flat</b>.',
+  'In Basisrahmenprofil <b>(2)</b> und Deckenprofil <b>(4)</b> Befestigungslöcher bohren: an beiden Profilenden und entlang des Profils alle <b>30–60 cm</b>.': 'Drill fixing holes in the base frame profile <b>(2)</b> and ceiling profile <b>(4)</b>: at both profile ends and along the profile every <b>30–60 cm</b>.',
+  'Ebenso im Türzargenprofil <b>(1)</b> an der Wandseite.': 'Do the same in the door frame profile <b>(1)</b> on the wall side.',
+  'Lochgröße und Abstand richten sich nach Untergrund und Schrauben.': 'Hole size and spacing depend on the substrate and the screws used.',
+  'Profile (2) oder (4) länger als 6 m werden mit dem 180°-Verbinder 41AL-OFFICE-CS verbunden.': 'Profiles (2) or (4) longer than 6 m are joined with the 180° connector 41AL-OFFICE-CS.',
+  'Zargendichtung aus dem Türrahmen entfernen': 'Remove the door frame gasket',
+  'Zargendichtung <b>(8)</b> links und rechts aus den senkrechten Türzargenprofilen <b>(1)</b> herausziehen.': 'Pull the door frame gasket <b>(8)</b> out of the vertical door frame profiles <b>(1)</b> on the left and right.',
+  'Dichtung aufbewahren – sie wird am Ende ausgeklinkt und wieder eingedrückt.': 'Keep the gasket – it is notched and pressed back in at the end.',
+  'Türrahmen-Ecken auf Gehrung verbinden': 'Join the door frame corners (mitre)',
+  'Waagrechtes und senkrechtes Türzargenprofil <b>(1)</b> auf Gehrung (45°) zusammenlegen. Je Ecke <b>zwei</b> C-Verbinder <b>(13)</b> in beide Profile einschieben.': 'Place the horizontal and vertical door frame profiles <b>(1)</b> together at a mitre (45°). Insert <b>two</b> C-connectors <b>(13)</b> into both profiles at each corner.',
+  'Gehrung dicht zusammenschieben und die Madenschrauben festziehen – kein Versatz.': 'Push the mitre tightly together and tighten the grub screws – no offset.',
+  'Türrahmen-Ecke mit Wandprofil darüber verbinden': 'Join the door frame corner to the wall profile above',
+  'An der wandseitigen Türrahmen-Ecke einen C-Verbinder <b>(13)</b> und einen T-Verbinder <b>(10)</b> in die Gehrung der Türzargenprofile <b>(1)</b> einschieben.': 'At the wall-side door frame corner, insert one C-connector <b>(13)</b> and one T-connector <b>(10)</b> into the mitre of the door frame profiles <b>(1)</b>.',
+  'Senkrechtes Basisrahmenprofil <b>(2)</b> von oben auf den T-Verbinder schieben – dieser läuft dann an der Wand bis zur Decke.': 'Slide the vertical base frame profile <b>(2)</b> onto the T-connector from above – it then runs along the wall up to the ceiling.',
+  'Alles ausrichten und die Madenschrauben festziehen.': 'Align everything and tighten the grub screws.',
+  'Türrahmen mit Deckenprofil verbinden': 'Join the door frame to the ceiling profile',
+  'An der Türrahmen-Ecke zum Seitenteil je <b>einen</b> C-Verbinder <b>(13)</b> und T-Verbinder <b>(10)</b> in die Gehrung der Türzargenprofile <b>(1)</b> einschieben.': 'At the door frame corner towards the side panel, insert <b>one</b> C-connector <b>(13)</b> and <b>one</b> T-connector <b>(10)</b> into the mitre of the door frame profiles <b>(1)</b>.',
+  'Deckenprofil <b>(4)</b> des Seitenteils seitlich auf den T-Verbinder schieben.': 'Slide the ceiling profile <b>(4)</b> of the side panel sideways onto the T-connector.',
+  'Alles bündig ausrichten und die Madenschrauben festziehen.': 'Align everything flush and tighten the grub screws.',
+  'Deckenprofil mit Wandprofil verbinden': 'Join the ceiling profile to the wall profile',
+  'CL-Verbinder <b>(11)</b> mit dem kurzen Schenkel in das Deckenprofil <b>(4)</b> schieben, das senkrechte Basisrahmenprofil <b>(2)</b> von unten aufschieben.': 'Slide the short leg of the CL-connector <b>(11)</b> into the ceiling profile <b>(4)</b>, then slide the vertical base frame profile <b>(2)</b> on from below.',
+  'Profile <b>stumpf</b> stoßen (nicht auf Gehrung), ausrichten und die Madenschrauben festziehen.': 'Butt-join the profiles (<b>no</b> mitre), align them and tighten the grub screws.',
+  'Bodenprofil mit Türrahmen verbinden': 'Join the floor profile to the door frame',
+  'C-Verbinder <b>(13)</b> in das Ende des Basisrahmenprofils <b>(2)</b> schieben und das Türzargenprofil <b>(1)</b> von oben aufstecken.': 'Slide the C-connector <b>(13)</b> into the end of the base frame profile <b>(2)</b> and fit the door frame profile <b>(1)</b> on from above.',
+  'Bodenprofil stumpf an den Türrahmen schieben, ausrichten und die Madenschrauben festziehen.': 'Butt the floor profile against the door frame, align it and tighten the grub screws.',
+  'Bodenprofil mit Wandprofil verbinden': 'Join the floor profile to the wall profile',
+  'C-Verbinder <b>(13)</b> in das Bodenprofil <b>(2)</b> schieben und das senkrechte Basisrahmenprofil <b>(2)</b> von oben aufstecken – Ecke auf <b>Gehrung</b>.': 'Slide the C-connector <b>(13)</b> into the floor profile <b>(2)</b> and fit the vertical base frame profile <b>(2)</b> on from above – <b>mitred</b> corner.',
+  'Ecke schließen und die Madenschrauben festziehen.': 'Close the corner and tighten the grub screws.',
+  'Rahmen aufstellen': 'Erect the frame',
+  'Den vormontierten Rahmen zu zweit (bei Bedarf mit mehreren Personen) gleichmäßig vom Boden aufheben.': 'Lift the pre-assembled frame evenly off the floor with two people (more if needed).',
+  'An der vorgesehenen Position aufstellen.': 'Stand it up in the intended position.',
+  'Ecke 90° verbinden (Ecklösung)': 'Join the 90° corner (corner solution)',
+  'Rahmen der Rückwand an den Hauptrahmen stellen.': 'Place the frame of the return wall against the main frame.',
+  'Oben die Deckenprofile <b>(4)</b> und unten die Basisrahmenprofile <b>(2)</b> jeweils mit einem 90°-Eckverbinder <b>(12)</b> auf Gehrung verbinden.': 'Join the ceiling profiles <b>(4)</b> at the top and the base frame profiles <b>(2)</b> at the bottom, each at a mitre with a 90° corner connector <b>(12)</b>.',
+  'Je Verbinder die vier Madenschrauben festziehen.': 'Tighten the four grub screws of each connector.',
+  'Rahmen ausrichten': 'Align the frame',
+  'Rahmen mit Wasserwaage oder Linienlaser ausrichten: Er muss <b>lotrecht, waagrecht und rechtwinklig</b> stehen und darf nicht verdreht sein. Sind Boden, Wände oder Decke schief oder uneben, den Rahmen an den Befestigungspunkten entsprechend unterlegen bzw. hinterlegen – nicht dem Bauwerk folgen.': 'Align the frame with a spirit level or line laser: it must be <b>plumb, level and square</b> and must not be twisted. If the floor, walls or ceiling are out of true or uneven, shim the frame at the fixing points accordingly – do not follow the building.',
+  'Ausnahme: Manche Anlagen sind bewusst so geplant, dass sie dem Wand- bzw. Deckenverlauf folgen. Dann den Rahmen <b>nicht</b> lotrecht, waagrecht und rechtwinklig unterlegen – je nach Anlage immer mit dem Plan abgleichen.': 'Exception: some installations are deliberately planned to follow the line of the wall or ceiling. In that case do <b>not</b> shim the frame plumb, level and square – always check against the plan for the specific installation.',
+  'Standardkonfiguration: Verglasungsblöcke <b>5 mm</b>. Ist es erforderlich, die Gläser ins Lot zu bringen, kann bzw. muss die Klotzung entsprechend angepasst werden.': 'Standard configuration: <b>5 mm</b> setting blocks. If the glass has to be brought plumb, the blocking can or must be adjusted accordingly.',
+  'Rahmen befestigen': 'Fix the frame',
+  'Deckenprofil <b>(4)</b> an der Decke verschrauben.': 'Screw the ceiling profile <b>(4)</b> to the ceiling.',
+  'Basisrahmenprofile <b>(2)</b> an Wand und Boden verschrauben.': 'Screw the base frame profiles <b>(2)</b> to the wall and floor.',
+  'Türzargenprofil <b>(1)</b> an der Wand verschrauben – die Zargendichtung deckt die Schrauben später ab.': 'Screw the door frame profile <b>(1)</b> to the wall – the door frame gasket covers the screws later.',
+  'Nur zur Info: Die Zargendichtung (8) wird erst später ausgeklinkt und danach wieder eingedrückt.': 'For information only: the door frame gasket (8) is notched later and then pressed back in.',
+  'Befestigungspunkte alle <b>30–60 cm</b>; Schrauben und Dübel passend zum Untergrund wählen.': 'Fixing points every <b>30–60 cm</b>; choose screws and plugs to suit the substrate.',
+  'Schraubenköpfe müssen bündig sitzen. Spalt zwischen Profil und Mauerwerk gegebenenfalls hinterfüllen.': 'Screw heads must sit flush. Fill the gap between profile and masonry if necessary.',
+  'Anschlagdichtung einsetzen': 'Insert the stop gasket',
+  'Lippen der Anschlagdichtung <b>(9)</b> je nach Glasdicke entfernen (Tabelle unten).': 'Remove lips of the stop gasket <b>(9)</b> according to the glass thickness (table below).',
+  'Anschlagdichtung in Deckenprofil <b>(4)</b> und Basisrahmenprofile <b>(2)</b> einziehen. Beim Türzargenprofil <b>(1)</b> die Anschlagdichtung in das Türzargenprofil bzw. in das Clipprofil <b>(3)</b> einziehen.': 'Insert the stop gasket into the ceiling profile <b>(4)</b> and base frame profiles <b>(2)</b>. On the door frame profile <b>(1)</b>, insert the stop gasket into the door frame profile or into the clip profile <b>(3)</b>.',
+  'Anschlagdichtung nach Glasdicke': 'Stop gasket by glass thickness',
+  'Verglasungsblöcke setzen': 'Place setting blocks',
+  'Verglasungsblöcke ca. <b>10 cm</b> von der linken und rechten Glaskante entfernt in das Bodenprofil <b>(2)</b> legen.': 'Place setting blocks in the floor profile <b>(2)</b> approx. <b>10 cm</b> from the left and right glass edges.',
+  'Für das Oberlicht ebenso Blöcke auf das waagrechte Türzargenprofil <b>(1)</b> legen.': 'For the transom, also place blocks on the horizontal door frame profile <b>(1)</b>.',
+  'Verglasungsblöcke: 80 × 20 mm, Höhe 1,5–5 mm je nach benötigtem Abstand.': 'Setting blocks: 80 × 20 mm, height 1.5–5 mm depending on the required clearance.',
+  'Seitenteil verglasen': 'Glaze the side panel',
+  'Seitenteile verglasen': 'Glaze the side panels',
+  'Glas zuerst <b>oben</b> in das Deckenprofil <b>(4)</b> einführen und bis an die Anschlagdichtung schieben.': 'First insert the glass at the <b>top</b> into the ceiling profile <b>(4)</b> and push it up against the stop gasket.',
+  'Dann <b>unten</b> in das Bodenprofil <b>(2)</b> einschwenken und auf die Verglasungsblöcke absetzen.': 'Then swing it in at the <b>bottom</b> into the floor profile <b>(2)</b> and set it down on the setting blocks.',
+  'Glas gerade einsetzen – nicht verkanten.': 'Insert the glass straight – do not tilt it.',
+  'Nur ESG oder VSG aus ESG verwenden.': 'Use only toughened safety glass (ESG) or laminated safety glass made of ESG (VSG).',
+  'Oberlicht verglasen': 'Glaze the transom',
+  'Oberlichtglas oben in das Deckenprofil <b>(4)</b> einführen.': 'Insert the transom glass at the top into the ceiling profile <b>(4)</b>.',
+  'Unten in das waagrechte Türzargenprofil <b>(1)</b> einschwenken und auf die Verglasungsblöcke absetzen.': 'Swing it in at the bottom into the horizontal door frame profile <b>(1)</b> and set it down on the setting blocks.',
+  'Glasstoß zum Seitenteil: <b>3 mm</b> Fuge, mit Glasfugenband oder Silikon schließen. Glas lotrecht ausrichten.': 'Glass joint to the side panel: <b>3 mm</b> gap, close with glass joint tape or silicone. Align the glass plumb.',
+  'Glasstoß zum Seitenteil: Abstand der Glaskanten <b>21 mm</b> für das Glasstoßprofil <b>(5)</b> – Einbau im nächsten Schritt. Glas lotrecht ausrichten.': 'Glass joint to the side panel: <b>21 mm</b> between the glass edges for the glass joint profile <b>(5)</b> – installed in the next step. Align the glass plumb.',
+  'Glasstoßprofil einsetzen (Option)': 'Insert the glass joint profile (option)',
+  'Glasstoßprofile <b>(5)</b> an allen Glasstößen setzen: im Seitenteil sowie zwischen Oberlicht und Seitenteil.': 'Fit glass joint profiles <b>(5)</b> at all glass joints: in the side panel and between transom and side panel.',
+  'Glasstoßprofile <b>(5)</b> an allen Glasstößen setzen: im Seitenteil sowie zwischen Oberlicht und Seitenteil (links und rechts der Tür).': 'Fit glass joint profiles <b>(5)</b> at all glass joints: in the side panel and between transom and side panel (left and right of the door).',
+  'Anschlagdichtungen <b>(9)</b> beidseitig in das Glasstoßprofil <b>(5)</b> einziehen.': 'Insert stop gaskets <b>(9)</b> on both sides of the glass joint profile <b>(5)</b>.',
+  'Glasstoßprofil zwischen die beiden Glasscheiben setzen (Abstand der Glaskanten <b>21 mm</b>), Clipprofile <b>(3)</b> von der Gegenseite einclipsen und Fixierdichtungen <b>(6)</b> eindrücken.': 'Place the glass joint profile between the two glass panes (<b>21 mm</b> between the glass edges), clip in the clip profiles <b>(3)</b> from the opposite side and press in the fixing gaskets <b>(6)</b>.',
+  'Fertig montierter Glasstoß. An den Enden des Glasstoßprofils (markiert) ist kein Verbinder notwendig.': 'Finished glass joint. No connector is needed at the ends of the glass joint profile (marked).',
+  'Fixierdichtung und Clipprofil einsetzen': 'Insert fixing gasket and clip profile',
+  '<b>Deckenprofil (4):</b> Fixierdichtung <b>(6)</b> von unten zwischen Glas und Profil eindrücken.': '<b>Ceiling profile (4):</b> press the fixing gasket <b>(6)</b> in from below between glass and profile.',
+  '<b>Bodenprofil (2):</b> zuerst Clipprofil <b>(3)</b> einclipsen, dann Fixierdichtung <b>(6)</b> zwischen Glas und Clipprofil eindrücken.': '<b>Floor profile (2):</b> first clip in the clip profile <b>(3)</b>, then press the fixing gasket <b>(6)</b> in between glass and clip profile.',
+  '<b>Türzargenprofil (1):</b> ebenso Clipprofil <b>(3)</b> und Fixierdichtung <b>(6)</b>.': '<b>Door frame profile (1):</b> likewise clip profile <b>(3)</b> and fixing gasket <b>(6)</b>.',
+  'Tipp: Glasreiniger und eine Andrückrolle erleichtern das Einsetzen der Dichtung.': 'Tip: glass cleaner and a pressure roller make it easier to insert the gasket.',
+  'Top Light: Glas-Auflage-Winkel einsetzen und positionieren': 'Top light: insert and position the glass support angles',
+  'Glas-Auflage-Winkel links und rechts in die Nut der senkrechten Türzargenprofile <b>(1)</b> einsetzen, eindrehen und mit der Madenschraube (im Lieferumfang) fixieren.': 'Insert the glass support angles left and right into the groove of the vertical door frame profiles <b>(1)</b>, turn them in and fix them with the grub screw (supplied).',
+  '<b>Option 1:</b> Glas-Auflage-Winkel nach Maß laut Planung positionieren.': '<b>Option 1:</b> position the glass support angles to the dimension in the plans.',
+  '<b>Option 2:</b> Glas-Auflage-Winkel mit Hilfe der Oberlicht-Clipprofile positionieren. Die Clipprofile vor dem nächsten Schritt wieder entfernen.': '<b>Option 2:</b> position the glass support angles using the transom clip profiles. Remove the clip profiles again before the next step.',
+  'Top Light: Dichtung im Oberlicht einsetzen': 'Top light: insert the gasket in the transom',
+  'Dichtung vorbereiten.': 'Prepare the gasket.',
+  'Beide Dichtungslippen abreißen – unabhängig von der Glasdicke.': 'Tear off both gasket lips – regardless of the glass thickness.',
+  'Dichtung im Bereich des Oberlichts oben und seitlich in den Türrahmen einsetzen.': 'Insert the gasket into the door frame at the top and sides in the transom area.',
+  'Top Light: Oberlicht verglasen': 'Top light: glaze the transom',
+  'Glas einsetzen und auf die Glas-Auflage-Winkel setzen. Clipprofil passend zur Glasdicke wählen: <b>10 mm → 41AL-CLIP-TL-10</b>, <b>8 mm → 41AL-CLIP-TL-8</b>.': 'Insert the glass and set it on the glass support angles. Choose the clip profile to suit the glass thickness: <b>10 mm → 41AL-CLIP-TL-10</b>, <b>8 mm → 41AL-CLIP-TL-8</b>.',
+  'Einsteckdichtung je nach Oberlicht-Glasdicke wählen.': 'Choose the insert gasket according to the transom glass thickness.',
+  'Das Glas wird auf die Flügel der Glas-Auflage-Winkel gesetzt.': 'The glass is set on the wings of the glass support angles.',
+  'Clipprofil in der gezeigten Reihenfolge (oben, dann seitlich) einsetzen und das Glas mit passender Fixierdichtung sichern – vor Ort zuschneiden.': 'Insert the clip profile in the order shown (top, then sides) and secure the glass with the matching fixing gasket – cut to size on site.',
+  'Schraubenköpfe der Türrahmenbefestigung dürfen nicht überstehen – sonst das Clipprofil im Bereich der Befestigungspunkte einkerben.': 'Screw heads of the door frame fixing must not protrude – otherwise notch the clip profile at the fixing points.',
+  'Türbänder montieren': 'Install the door hinges',
+  'Pro Band zwei Hammerkopfmuttern in die Nut des Türzargenprofils <b>(1)</b> an der Bandseite einsetzen und eindrehen. Einbauposition laut Tabelle (ganz unten).': 'For each hinge, insert two hammer head nuts into the groove of the door frame profile <b>(1)</b> on the hinge side and turn them in. Installation position according to the table (at the bottom).',
+  'A12/B12 = Hammerkopfmutter 8–10 mm (14) · C13/D13 = 12 mm (15)': 'A12/B12 = hammer head nut 8–10 mm (14) · C13/D13 = 12 mm (15)',
+  'Rahmenteil des Bandes mit zwei Senkkopfschrauben befestigen – <b>max. 6 Nm</b>.': 'Fix the frame part of the hinge with two countersunk screws – <b>max. 6 Nm</b>.',
+  'Einbauposition Hammerkopfmutter': 'Installation position of hammer head nut',
+  'Schließblech montieren': 'Install the strike plate',
+  'Die Ausfräsung für das Schloss im Türrahmen wird vor Ort gefräst.': 'The cut-out for the lock in the door frame is milled on site.',
+  'Zwei Hammerkopfmuttern in die Nut des Türzargenprofils <b>(1)</b> an der Schlossseite einsetzen und eindrehen – Einbauposition laut Tabelle (ganz unten). Schließblech <b>(16)</b> mit zwei Senkkopfschrauben befestigen – <b>max. 6 Nm</b>.': 'Insert two hammer head nuts into the groove of the door frame profile <b>(1)</b> on the lock side and turn them in – installation position according to the table (at the bottom). Fix the strike plate <b>(16)</b> with two countersunk screws – <b>max. 6 Nm</b>.',
+  'Swing Door: Block für Pendeltür befestigen': 'Swing door: fix the swing door block',
+  'Block für Pendeltür im oberen Türzargenprofil <b>(1)</b> links- oder rechtsbündig mit Hammerkopfmuttern befestigen.': 'Fix the swing door block in the upper door frame profile <b>(1)</b>, flush left or flush right, with hammer head nuts.',
+  'Der Steg der Hammerkopfmuttern zeigt beim Einsetzen immer nach rechts.': 'When inserting the hammer head nuts, the web always points to the right.',
+  'Swing Door: oberen Drehzapfen montieren': 'Swing door: install the top pivot',
+  'Oberen, mittig gehängten, frei schwingenden Drehzapfen am Block befestigen.': 'Fix the top, centre-hung, free-swinging pivot to the block.',
+  'Systemkompatible Beschläge: 1NT401, PH21, CRL380 – Montageanleitung des Beschlagherstellers beachten.': 'Compatible hardware: 1NT401, PH21, CRL380 – follow the hardware manufacturer’s installation instructions.',
+  'Swing Door: Clipprofil einsetzen': 'Swing door: insert the clip profile',
+  'Clipprofil Pendeltür bauseits auf Maß zuschneiden und seitlich und oben in die Türzargenprofile <b>(1)</b> einclipsen – es ersetzt bei der Pendeltür die Zargendichtung.': 'Cut the swing door clip profile to size on site and clip it into the door frame profiles <b>(1)</b> at the sides and top – on the swing door it replaces the door frame gasket.',
+  'Bei Nachrüstung einer bestehenden OFFICE-Tür: vorher die Zargendichtung entfernen.': 'When retrofitting an existing OFFICE door: remove the door frame gasket first.',
+  'Türblatt einsetzen': 'Install the door leaf',
+  'Montierte Bänder öffnen.': 'Open the installed hinges.',
+  'Türblatt nach Anleitung des Beschlagherstellers auf Boden- und Drehlager setzen.': 'Set the door leaf on the floor and pivot bearings according to the hardware manufacturer’s instructions.',
+  'Türglas in die vorgesehene Position stellen. Abstand Boden–Glas laut Plan mit passenden Holzkeilen unterlegen.': 'Place the door glass in the intended position. Set the floor-to-glass gap as per plan using suitable wooden wedges.',
+  'Spalt zwischen Glas und Profil laut Plan mit Holzkeilen vorübergehend fixieren (danach entfernen).': 'Temporarily fix the gap between glass and profile as per plan with wooden wedges (remove afterwards).',
+  'Mit Top Light: Abstand Türblatt–Oberlichtglas <b>5 mm</b>; Zargendichtung einlegen.': 'With top light: gap between door leaf and transom glass <b>5 mm</b>; insert the door frame gasket.',
+  'Bänder schließen und Schloss montieren': 'Close the hinges and install the lock',
+  'Türgriff montieren': 'Install the door handle',
+  'Bänder auf das Türglas schließen; Gegenplatten auf der Gegenseite nach Herstellerangabe montieren.': 'Close the hinges onto the door glass; install the counter plates on the opposite side as specified by the manufacturer.',
+  'Die zur Positionierung verwendeten Holzkeile entfernen, sobald die Bänder am Türglas montiert sind.': 'Remove the wooden wedges used for positioning as soon as the hinges are mounted on the door glass.',
+  'Die zur Positionierung verwendeten Holzkeile entfernen, sobald das Türblatt in den Lagern sitzt.': 'Remove the wooden wedges used for positioning as soon as the door leaf sits in the bearings.',
+  'Schloss nach Herstellerangabe montieren.': 'Install the lock as specified by the manufacturer.',
+  'Türgriff nach Herstellerangabe montieren.': 'Install the door handle as specified by the manufacturer.',
+  'Tür auf leichten Lauf und gleichmäßige Fugen prüfen.': 'Check the door for smooth operation and even gaps.',
+  'Zargendichtung ausklinken und eindrücken': 'Notch and press in the door frame gasket',
+  'Dichtung an jedem Band und am Schließblech bis zur gedachten Linie (strichliert) einschneiden – <b>2 Schnitte</b> je Band bzw. Schließblech.': 'Cut into the gasket up to the imaginary (dashed) line at each hinge and at the strike plate – <b>2 cuts</b> per hinge or strike plate.',
+  'Dichtung umdrehen und den eingeschnittenen Teil entlang der Linie wegschneiden.': 'Turn the gasket over and cut away the cut-in piece along the line.',
+  'Hohlkammer aufklappen, den inneren Lappen an den Enden einschneiden und wegschneiden.': 'Open the hollow chamber, cut into the inner flap at the ends and cut it away.',
+  'Zargendichtung wieder in das Türzargenprofil <b>(1)</b> eindrücken.': 'Press the door frame gasket back into the door frame profile <b>(1)</b>.',
+  'Anlage reinigen': 'Clean the installation',
+  'Gesamte Anlage und Glas reinigen.': 'Clean the entire installation and the glass.',
+  'Zement, Gips oder Mörtelreste auf dem Aluminium sofort mit Wasser und milder Seife entfernen – keine scharfen oder alkalischen Reiniger.': 'Remove cement, plaster or mortar residues from the aluminium immediately with water and mild soap – no harsh or alkaline cleaners.',
+
+  // ---------------------------------------------------------------- Beschriftungen in Zeichnungen
+  'Verglasungsblock': 'Setting block',
+  'Glas': 'Glass',
+  'Markierte Stellen: kein Verbinder notwendig': 'Marked points: no connector needed',
+  'Steg': 'Web',
+  'links': 'left',
+  'rechts': 'right',
+  'wie geliefert': 'as supplied',
+  'wie montiert': 'as installed',
+  'linksbündig': 'flush left',
+  'rechtsbündig': 'flush right'
+};
+
+// Tabellen (extraHtml): Wortersetzungen
+window.I18N_EN_HTML = [
+  ['Glasdicke', 'Glass thickness'], ['Schließblech', 'Strike plate'], ['Türband', 'Door hinge'],
+  ['DIN links', 'DIN left'], ['DIN rechts', 'DIN right'],
+  ['Gewicht Türblatt', 'Door leaf weight'], ['Anzahl Türbänder', 'Number of hinges'],
+  ['Richtwerte nach Höhe: über 2.400 mm = 3 Bänder, über 2.800 mm = 4 Bänder.', 'Guide values by height: over 2,400 mm = 3 hinges, over 2,800 mm = 4 hinges.'],
+  ['Anschlagdichtung (9)', 'Stop gasket (9)'], ['beide Lippen abziehen', 'remove both lips'], ['1 Lippe abziehen', 'remove 1 lip'], ['komplett', 'complete']
+];
+
+window.I18N_EN_GENERAL = `
+<h4>General installation notes</h4>
+<ul>
+  <li>Install only with components planned and approved by Längle for the installation situation. The approved planning or system drawing takes precedence.</li>
+  <li>Installation by qualified personnel only; use undamaged products only.</li>
+  <li>Install components plumb, level and square; use only the intended fixings.</li>
+  <li>Use only toughened safety glass (ESG) or laminated safety glass made of ESG (VSG).</li>
+  <li>For indoor use only – not for showers, saunas, swimming or brine pools or rooms where chemicals (e.g. chlorine) are used.</li>
+  <li>Sealants must be compatible with all adjacent materials.</li>
+</ul>
+<h4>Handling aluminium</h4>
+<ul>
+  <li>Store profiles protected and dry; keep away from water, mud and splashes.</li>
+  <li>Check the goods for completeness immediately on delivery; report defects within 8 working days.</li>
+  <li>Protect after installation: remove cement, plaster or cleaning agents immediately with water and mild soap.</li>
+</ul>
+<h4>Maximum dimensions (guide values)</h4>
+<ul>
+  <li>Doors: width 1,000 mm, height 3,000 mm</li>
+  <li>Fixed panels: width unlimited, height 3,400 mm</li>
+</ul>
+<h4>Number of hinges</h4>
+<table class="tbl">
+  <thead><tr><th>Door leaf weight</th><th>Number of hinges</th></tr></thead>
+  <tbody>
+    <tr><td>&lt; 57.5 kg</td><td>2</td></tr>
+    <tr><td>57.5 – 78.5 kg</td><td>3</td></tr>
+    <tr><td>&gt; 78.5 kg</td><td>4</td></tr>
+  </tbody>
+</table>
+<p class="small">Guide values by height: over 2,400 mm = 3 hinges, over 2,800 mm = 4 hinges.</p>
+<h4>Site survey</h4>
+<ol>
+  <li>Set up a self-levelling line laser.</li>
+  <li>Measure heights on the left, centre and right – the smallest clear height and width are decisive.</li>
+  <li>Install the system and backfill the gap to the masonry if necessary.</li>
+</ol>
+<p class="small">Warranty: 5 years from handover.</p>
+`;
