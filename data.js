@@ -24,14 +24,21 @@
     14: { name: 'Hammerkopfmutter 8–10 mm Glas',   nr: '41AL-OFFICE-H 8/10',        crl: 'FHHN' },
     15: { name: 'Hammerkopfmutter 12 mm Glas',     nr: '41AL-OFFICE-H 12',          crl: 'FHHN12' },
     16: { name: 'Schließblech 8–12 mm Glas',       nr: '41AL-OFFICE-CP',            crl: 'FSP' },
-    CS:     { name: '180°-Verbinder',              nr: '41AL-OFFICE-CS',            crl: 'FCS', img: 'CS' },
-    TL3:    { pos: 18, name: 'Glas-Auflage-Winkel links & rechts (Oberlicht)', nr: '41AL-OFFICE-H-TL-L+R', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3' },
+    // Schließblech für hohe Schlösser (Name „DORMA“ bleibt, kein Dorma-Produkt) – nur Längle, in Amerika nicht verwendet
+    CP:     { pos: 17, name: 'Schließblech CP DORMA (für hohe Schlösser)', nr: '41AL-OFFICE-CP DORMA', img: 'CP', optional: true, brand: 'laengle' },
+    CS:     { name: '180°-Verbinder',              nr: '41AL-OFFICE-CS',            crl: 'FCS', img: 'CS', optional: true },
+    // Glas-Auflage-Winkel: bei Längle links und rechts getrennt, bei CRL als Set (brand = nur für diese Marke)
+    TL3L:   { pos: 18, name: 'Glas-Auflage-Winkel links (Oberlicht)', nr: '41AL-OFFICE-H-TL-L', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3L', brand: 'laengle' },
+    TL3R:   { pos: 18, name: 'Glas-Auflage-Winkel rechts (Oberlicht)', nr: '41AL-OFFICE-H-TL-R', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3R', brand: 'laengle' },
+    TL3:    { pos: 18, name: 'Glas-Auflage-Winkel links & rechts (Oberlicht)', nr: '41AL-OFFICE-H-TL-L+R', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3', brand: 'crl' },
     TL4:    { pos: 19, name: 'Clipprofil Oberlicht 10 mm Glas', nr: '41AL-CLIP-TL-10',       crl: 'FCLPT3SA / FCLPT3MBL', img: 'TL4' },
     TL5:    { pos: 20, name: 'Clipprofil Oberlicht 8 mm Glas',  nr: '41AL-CLIP-TL-8',        crl: 'FCLPT3SA / FCLPT3MBL', img: 'TL5' },
     SDBL:   { pos: 21, name: 'Block für Pendeltür',         nr: '41AL-OFFICE-SD-BL',         crl: 'FCPDB1SA / FCPDB1MBL', img: 'SDBL' },
     CLIPSD: { pos: 22, name: 'Clipprofil Pendeltür',        nr: '41AL-CLIP-SD STOCK',        crl: 'FCLPCP6SA / FCLPCP6MBL', img: 'CLIPSD' }
   };
-  Object.keys(PARTS).forEach(k => { PARTS[k].img = 'img/profiles/' + (PARTS[k].img || 'p' + k) + '.jpg'; });
+  Object.keys(PARTS).forEach(k => { if (PARTS[k].img !== false) PARTS[k].img = 'img/profiles/' + (PARTS[k].img || 'p' + k) + '.jpg'; });
+  // Reihenfolge in der Teileliste: Profile, Dichtungen, Verbinder, Kleinteile
+  const PART_ORDER = [1, 2, 3, 4, 5, 'CLIPSD', 'TL4', 'TL5', 6, 7, 8, 9, 10, 11, 12, 13, 'CS', 14, 15, 16, 'CP', 'TL3L', 'TL3R', 'TL3', 'SDBL'];
 
   // ---------------------------------------------------------------- Varianten
   // B = Tür mit Oberlicht (Festteil über der Tür), C = Tür bis zur Decke
@@ -54,17 +61,21 @@
     end:   'Abschluss'
   };
 
-  const TABLE_HKM = `
+// Einbauposition Hammerkopfmutter je Glasdicke: [DIN links, DIN rechts]
+  const HKM_POS = { s: { 8: ['A12', 'B12'], 10: ['B12', 'A12'], 12: ['D13', 'C13'] }, b: { 8: ['B12', 'A12'], 10: ['A12', 'B12'], 12: ['C13', 'D13'] } };
+  const glassList = c => c.topLight ? [8, 10] : [8, 10, 12];
+  const TABLE_HKM = c => {
+    const g = glassList(c);
+    const row = (lbl, i) => `<tr><th>${lbl}</th>${['s', 'b'].map(k => g.map(x => `<td>${HKM_POS[k][x][i]}</td>`).join('')).join('')}</tr>`;
+    return `
 <table class="tbl">
   <thead>
-    <tr><th rowspan="2">Glasdicke</th><th colspan="3">Schließblech</th><th colspan="3">Türband</th></tr>
-    <tr><th>8 mm</th><th>10 mm</th><th>12 mm</th><th>8 mm</th><th>10 mm</th><th>12 mm</th></tr>
+    <tr><th rowspan="2">Glasdicke</th><th colspan="${g.length}">Schließblech</th><th colspan="${g.length}">Türband</th></tr>
+    <tr>${[0, 1].map(() => g.map(x => `<th>${x} mm</th>`).join('')).join('')}</tr>
   </thead>
-  <tbody>
-    <tr><th>DIN links</th><td>A12</td><td>B12</td><td>D13</td><td>B12</td><td>A12</td><td>C13</td></tr>
-    <tr><th>DIN rechts</th><td>B12</td><td>A12</td><td>C13</td><td>A12</td><td>B12</td><td>D13</td></tr>
-  </tbody>
+  <tbody>${row('DIN links', 0)}${row('DIN rechts', 1)}</tbody>
 </table>`;
+  };
 
   const TABLE_BAENDER = `
 <table class="tbl">
@@ -77,11 +88,15 @@
 </table>
 <p class="small">Richtwerte nach Höhe: über 2.400 mm = 3 Bänder, über 2.800 mm = 4 Bänder.</p>`;
 
-  const TABLE_LIPPEN = `
+  const LIPPEN = { 8: 'komplett', 10: '1 Lippe abziehen', 12: 'beide Lippen abziehen' };
+  const TABLE_LIPPEN = c => {
+    const g = [8, 10, 12];
+    return `
 <table class="tbl">
-  <thead><tr><th>Glasdicke</th><th>8 mm</th><th>10 mm</th><th>12 mm</th></tr></thead>
-  <tbody><tr><th>Anschlagdichtung (9)</th><td>komplett</td><td>1 Lippe abziehen</td><td>beide Lippen abziehen</td></tr></tbody>
+  <thead><tr><th>Glasdicke</th>${g.map(x => `<th>${x} mm</th>`).join('')}</tr></thead>
+  <tbody><tr><th>Anschlagdichtung (9)</th>${g.map(x => `<td>${LIPPEN[x]}</td>`).join('')}</tr></tbody>
 </table>`;
+  };
 
   const B = c => c.type === 'B', C = c => c.type === 'C';
   const f = n => 'img/fig/' + n + '.jpg';
@@ -89,6 +104,13 @@
   const fx = n => c => f(n) + (c.door === 'L' ? '#flip' : '');
   // Gehrungsecke der Türzarge: bei B liegt sie zum Seitenteil hin, bei C an der Wandseite – Spiegelung entsprechend
   const fxK = n => c => f(n) + ((c.type === 'B' ? c.door === 'L' : c.door === 'R') ? '#flip' : '');
+  // Hammerkopfmuttern: mit Top Light ist das Türglas immer 8 oder 10 mm → nur 8–10 mm (14)
+  const hkm = c => c.topLight ? [14] : [14, 15];
+  // CRL-Verbindungsstreifen (auch bei OFFICE mit CRL-Nummer – noch keine eigene Längle-Nummer)
+  const STRIP = {
+    c180: { img: 'img/tools/ezcc.jpg', name: 'CRL-Verbindungsstreifen 180°', nr: 'EZCC', crl: 'EZCC' },
+    c90: { img: 'img/tools/ezcl.jpg', name: 'CRL-Verbindungsstreifen 90° Ecke', nr: 'EZCL', crl: 'EZCL' }
+  };
   const pdfKey = c => c.type.toLowerCase() + (c.door === 'M' ? '3' : '24');
 
   // ---------------------------------------------------------------- Montageschritte
@@ -123,7 +145,7 @@
       title: 'Türrahmen-Ecken auf Gehrung verbinden',
       parts: [1, 13],
       text: [
-        { t: 'Waagrechtes und senkrechtes Türzargenprofil <b>(1)</b> auf Gehrung (45°) zusammenlegen. Je Ecke <b>zwei</b> C-Verbinder <b>(13)</b> in beide Profile einschieben.', fig: [fxK('K'), f('K_ok')] },
+        { t: 'Waagrechtes und senkrechtes Türzargenprofil <b>(1)</b> auf Gehrung (45°) zusammenstecken. Je Ecke <b>zwei</b> C-Verbinder <b>(13)</b> in beide Profile einschieben – einer davon wird <b>ohne Madenschrauben</b> eingesetzt und dient zur Stabilisierung der Ecke.', fig: [fxK('K'), f('K_ok')] },
         'Gehrung dicht zusammenschieben und die Madenschrauben festziehen – kein Versatz.'
       ],
       spots: ['K'], hl: ['p1']
@@ -162,20 +184,20 @@
     },
     {
       id: 'i', phase: 'frame', view: 'detail',
-      title: 'Bodenprofil mit Türrahmen verbinden',
+      title: 'Basisrahmenprofil mit Türrahmen verbinden',
       parts: [2, 1, 13],
       text: [
         { t: 'C-Verbinder <b>(13)</b> in das Ende des Basisrahmenprofils <b>(2)</b> schieben und das Türzargenprofil <b>(1)</b> von oben aufstecken.', fig: [fx('I')] },
-        'Bodenprofil stumpf an den Türrahmen schieben, ausrichten und die Madenschrauben festziehen.'
+        'Basisrahmenprofil stumpf an den Türrahmen schieben, ausrichten und die Madenschrauben festziehen.'
       ],
       spots: ['I'], hl: ['p2floor', 'p1']
     },
     {
       id: 'h', phase: 'frame', view: 'detail',
-      title: 'Bodenprofil mit Wandprofil verbinden',
+      title: 'Basisrahmenprofil mit Wandprofil verbinden',
       parts: [2, 13],
       text: [
-        { t: 'C-Verbinder <b>(13)</b> in das Bodenprofil <b>(2)</b> schieben und das senkrechte Basisrahmenprofil <b>(2)</b> von oben aufstecken – Ecke auf <b>Gehrung</b>.', fig: [fx('H')] },
+        { t: 'C-Verbinder <b>(13)</b> in das waagrechte Basisrahmenprofil <b>(2)</b> schieben und das senkrechte Basisrahmenprofil <b>(2)</b> von oben aufstecken – Ecke auf <b>Gehrung</b>.', fig: [fx('H')] },
         'Ecke schließen und die Madenschrauben festziehen.'
       ],
       spots: ['H'], hl: ['p2floor', 'p2wall']
@@ -207,7 +229,7 @@
       parts: [],
       text: [
         { t: 'Rahmen mit Wasserwaage oder Linienlaser ausrichten: Er muss <b>lotrecht, waagrecht und rechtwinklig</b> stehen und darf nicht verdreht sein. Sind Boden, Wände oder Decke schief oder uneben, den Rahmen an den Befestigungspunkten entsprechend unterlegen bzw. hinterlegen – nicht dem Bauwerk folgen.', fig: c => [f('align_' + pdfKey(c))] },
-        'Ausnahme: Manche Anlagen sind bewusst so geplant, dass sie dem Wand- bzw. Deckenverlauf folgen. Dann den Rahmen <b>nicht</b> lotrecht, waagrecht und rechtwinklig unterlegen – je nach Anlage immer mit dem Plan abgleichen.'
+        '<b>Ausnahme:</b> Manche Anlagen sind bewusst so geplant, dass sie dem Wand- bzw. Deckenverlauf folgen. In diesen Fällen den Rahmen <b>nicht</b> automatisch lotrecht, waagrecht und rechtwinklig ausrichten. Die Ausrichtung ist je nach Anlage immer mit den Planvorgaben abzugleichen.'
       ],
       hl: ['p1', 'p2floor', 'p2wall', 'p4']
     },
@@ -221,7 +243,7 @@
         { t: 'Türzargenprofil <b>(1)</b> an der Wand verschrauben – die Zargendichtung deckt die Schrauben später ab.', fig: [f('fasten_frame'), { src: f('E_section'), size: 'sm', info: 'Nur zur Info: Die Zargendichtung (8) wird erst später ausgeklinkt und danach wieder eingedrückt.' }] },
         'Befestigungspunkte alle <b>30–60 cm</b>; Schrauben und Dübel passend zum Untergrund wählen.'
       ],
-      notes: ['Schraubenköpfe müssen bündig sitzen. Spalt zwischen Profil und Mauerwerk gegebenenfalls hinterfüllen.'],
+      notes: ['Schraubenköpfe müssen bündig sitzen. Spalt zwischen Profil und Mauerwerk gegebenenfalls hinterfüllen. Im Bereich der Befestigungspunkte unterlegen.'],
       hl: ['p1', 'p2floor', 'p2wall', 'p4']
     },
     {
@@ -229,8 +251,8 @@
       title: 'Anschlagdichtung einsetzen',
       parts: [9],
       text: [
-        { t: 'Lippen der Anschlagdichtung <b>(9)</b> je nach Glasdicke entfernen (Tabelle unten).', fig: [f('gp_a'), f('gp_b')], row: true },
-        { t: 'Anschlagdichtung in Deckenprofil <b>(4)</b> und Basisrahmenprofile <b>(2)</b> einziehen. Beim Türzargenprofil <b>(1)</b> die Anschlagdichtung in das Türzargenprofil bzw. in das Clipprofil <b>(3)</b> einziehen.', fig: c => [{ src: f('g9_4'), size: 'md' }, { src: f('g9_2'), size: 'md' }, { src: f('g9_1'), size: 'md' }] }
+        { t: 'Lippen der Anschlagdichtung <b>(9)</b> je nach Glasdicke der Fixverglasung entfernen: <b>8 mm</b> komplett verwenden · <b>10 mm</b> eine Lippe abziehen · <b>12 mm</b> beide Lippen abziehen.', fig: [f('gp_a'), f('gp_b')], row: true },
+        { t: 'Anschlagdichtung in Deckenprofil <b>(4)</b> und Basisrahmenprofile <b>(2)</b> einziehen. Beim Türzargenprofil <b>(1)</b> die Anschlagdichtung in das Clipprofil <b>(3)</b> einziehen.', fig: c => [{ src: f('g9_4'), size: 'md' }, { src: f('g9_2'), size: 'md' }, { src: f('g9_1'), size: 'md' }] }
       ],
       extraTitle: 'Anschlagdichtung nach Glasdicke', extraHtml: TABLE_LIPPEN,
       hl: ['p1', 'p2floor', 'p2wall', 'p4']
@@ -240,7 +262,7 @@
       title: 'Verglasungsblöcke setzen',
       parts: [],
       text: [
-        { t: 'Verglasungsblöcke ca. <b>10 cm</b> von der linken und rechten Glaskante entfernt in das Bodenprofil <b>(2)</b> legen.', fig: [f('blocks_2')] },
+        { t: 'Verglasungsblöcke ca. <b>10 cm</b> von der linken und rechten Glaskante entfernt in das Basisrahmenprofil <b>(2)</b> legen.', fig: [f('blocks_2')] },
         c => B(c) ? { t: 'Für das Oberlicht ebenso Blöcke auf das waagrechte Türzargenprofil <b>(1)</b> legen.', fig: [f('blocks_1')] } : null
       ],
       notes: ['Standardkonfiguration: Verglasungsblöcke <b>5 mm</b>. Ist es erforderlich, die Gläser ins Lot zu bringen, kann bzw. muss die Klotzung entsprechend angepasst werden.'],
@@ -252,10 +274,11 @@
       parts: [],
       text: [
         { t: 'Glas zuerst <b>oben</b> in das Deckenprofil <b>(4)</b> einführen und bis an die Anschlagdichtung schieben.', fig: [f('glass_up')] },
-        { t: 'Dann <b>unten</b> in das Bodenprofil <b>(2)</b> einschwenken und auf die Verglasungsblöcke absetzen.', fig: [f('glass_down'), f('A_glass')] },
-        { t: 'Glas gerade einsetzen – nicht verkanten.', fig: [{ src: f('glass_bad'), size: 'sm' }, { src: f('glass_good'), size: 'sm' }], row: true }
+        { t: 'Dann <b>unten</b> in das Basisrahmenprofil <b>(2)</b> einschwenken und auf die Verglasungsblöcke absetzen.', fig: [f('glass_down'), f('A_glass')] },
+        { t: 'Glas gerade einsetzen – nicht verkanten.', fig: [{ src: f('glass_bad'), size: 'sm' }, { src: f('glass_good'), size: 'sm' }], row: true },
+        c => c.corner ? 'Ecklösung: Glasfuge an der 90°-Ecke mit Silikon oder dem CRL-Verbindungsstreifen <b>EZCL</b> (90° Ecke) schließen.' : null
       ],
-      notes: ['Nur ESG oder VSG aus ESG verwenden.'],
+      notes: ['Nur ESG oder VSG aus ESG verwenden.', c => c.corner ? { t: 'Glasfuge an der Ecke: Silikonfuge oder CRL-Verbindungsstreifen (90° Ecke).', tools: [STRIP.c90] } : null],
       spots: ['glass'], hl: ['glass']
     },
     {
@@ -267,8 +290,9 @@
         { t: 'Unten in das waagrechte Türzargenprofil <b>(1)</b> einschwenken und auf die Verglasungsblöcke absetzen.', fig: [f('over_down')] },
         c => c.frameT
           ? { t: 'Glasstoß zum Seitenteil: Abstand der Glaskanten <b>21 mm</b> für das Glasstoßprofil <b>(5)</b> – Einbau im nächsten Schritt. Glas lotrecht ausrichten.', fig: [f('over_ok')] }
-          : { t: 'Glasstoß zum Seitenteil: <b>3 mm</b> Fuge, mit Glasfugenband oder Silikon schließen. Glas lotrecht ausrichten.', fig: [f('over_ok')] }
+          : { t: 'Glasstoß zum Seitenteil: <b>3 mm</b> Fuge – mit Silikon oder dem CRL-Verbindungsstreifen <b>EZCC</b> (180°) schließen. Glas lotrecht ausrichten.', fig: [f('over_ok')] }
       ],
+      notes: [c => c.frameT ? null : { t: 'Glasfuge 3 mm: Silikonfuge oder CRL-Verbindungsstreifen (180°).', tools: [STRIP.c180] }],
       spots: ['over'], hl: ['over']
     },
     {
@@ -291,17 +315,20 @@
       parts: [6, 3],
       text: [
         { t: '<b>Deckenprofil (4):</b> Fixierdichtung <b>(6)</b> von unten zwischen Glas und Profil eindrücken.', fig: [f('B_fix'), f('B_section')] },
-        { t: '<b>Bodenprofil (2):</b> zuerst Clipprofil <b>(3)</b> einclipsen, dann Fixierdichtung <b>(6)</b> zwischen Glas und Clipprofil eindrücken.', fig: [f('A_clip'), f('A_section')] },
+        { t: '<b>Basisrahmenprofil (2):</b> zuerst Clipprofil <b>(3)</b> einclipsen, dann Fixierdichtung <b>(6)</b> zwischen Glas und Clipprofil eindrücken.', fig: [f('A_clip'), f('A_section')] },
         { t: '<b>Türzargenprofil (1):</b> ebenso Clipprofil <b>(3)</b> und Fixierdichtung <b>(6)</b>.', fig: [f('D_2'), f('D_3')] }
       ],
-      notes: ['Tipp: Glasreiniger und eine Andrückrolle erleichtern das Einsetzen der Dichtung.'],
+      notes: [{ t: 'Tipp: Glasreiniger und Vinylroller erleichtern das Einsetzen der Dichtung.', tools: [
+        { img: 'img/tools/glasreiniger.jpg', name: 'Glasreiniger', nr: 'EB1701', crl: 'EB1701' },
+        { img: 'img/tools/vinylroller.jpg', name: 'Vinylroller', nr: 'AL-VINYLROLLER', crl: 'VR10' }
+      ] }],
       hl: ['p1', 'p2floor', 'p2wall', 'p4']
     },
     // ---- Option Top Light (nur C)
     {
       id: 'tl-traeger', phase: 'glass', view: 'detail', cond: c => C(c) && c.topLight, option: true,
       title: 'Top Light: Glas-Auflage-Winkel einsetzen und positionieren',
-      parts: [1, 'TL3', 'TL4', 'TL5'],
+      parts: [1, 'TL3L', 'TL3R', 'TL3', 'TL4', 'TL5'],
       text: [
         { t: 'Glas-Auflage-Winkel links und rechts in die Nut der senkrechten Türzargenprofile <b>(1)</b> einsetzen, eindrehen und mit der Madenschraube (im Lieferumfang) fixieren.', fig: [f('TL_A')] },
         { t: '<b>Option 1:</b> Glas-Auflage-Winkel nach Maß laut Planung positionieren.', fig: [f('TL_B1')] },
@@ -324,7 +351,7 @@
       title: 'Top Light: Oberlicht verglasen',
       parts: ['TL4', 'TL5', 6],
       text: [
-        { t: 'Glas einsetzen und auf die Glas-Auflage-Winkel setzen. Clipprofil passend zur Glasdicke wählen: <b>10 mm → 41AL-CLIP-TL-10</b>, <b>8 mm → 41AL-CLIP-TL-8</b>.', fig: [{ src: f('TL_D1b'), info: 'Einsteckdichtung je nach Oberlicht-Glasdicke wählen.' }, { src: f('TL_D1a'), info: 'Das Glas wird auf die Flügel der Glas-Auflage-Winkel gesetzt.' }] },
+        { t: 'Glas einsetzen und auf die Glas-Auflage-Winkel setzen. Clipprofil passend zur Glasdicke wählen – das Oberlicht hat immer dieselbe Glasstärke wie die Tür: <b>8 mm → 41AL-CLIP-TL-8</b>, <b>10 mm → 41AL-CLIP-TL-10</b>.', fig: [{ src: f('TL_D1b'), info: 'Einsteckdichtung je nach Oberlicht-Glasdicke wählen.' }, { src: f('TL_D1a'), info: 'Das Glas wird auf die Flügel der Glas-Auflage-Winkel gesetzt.' }] },
         { t: 'Clipprofil in der gezeigten Reihenfolge (oben, dann seitlich) einsetzen und das Glas mit passender Fixierdichtung sichern – vor Ort zuschneiden.', fig: [f('TL_D2')] }
       ],
       notes: ['Schraubenköpfe der Türrahmenbefestigung dürfen nicht überstehen – sonst das Clipprofil im Bereich der Befestigungspunkte einkerben.'],
@@ -334,21 +361,22 @@
     {
       id: 'baender', phase: 'door', view: 'area', cond: c => !c.swing,
       title: 'Türbänder montieren',
-      parts: [1, 14, 15],
+      parts: c => [1, ...hkm(c)],
       text: [
-        { t: 'Pro Band zwei Hammerkopfmuttern in die Nut des Türzargenprofils <b>(1)</b> an der Bandseite einsetzen und eindrehen. Einbauposition laut Tabelle (ganz unten).', fig: [{ cols: [1, 2, 3, 4].map(i => [f('Fn_v' + i), f('Fn_d' + i)]) }], cap: 'A12/B12 = Hammerkopfmutter 8–10 mm (14) · C13/D13 = 12 mm (15)' },
-        { t: 'Rahmenteil des Bandes mit zwei Senkkopfschrauben befestigen – <b>max. 6 Nm</b>.', fig: [f('G_draw')] }
+        { t: 'Die Türbänder werden mit Hammerkopfmuttern am Türzargenprofil <b>(1)</b> befestigt: Pro Band zwei Hammerkopfmuttern an der Bandseite in die Nut einsetzen und eindrehen. Einbauposition laut Tabelle (ganz unten).', fig: [{ cols: [1, 2, 3, 4].map(i => [f('Fn_v' + i), f('Fn_d' + i)]) }], cap: c => c.topLight ? 'Mit Top Light ist das Türglas 8 mm oder 10 mm: Hammerkopfmutter 8–10 mm (14), Position A12/B12' : 'Türglas 8 mm oder 10 mm: Hammerkopfmutter 8–10 mm (14), Position A12/B12 · Türglas 12 mm: Hammerkopfmutter 12 mm (15), Position C13/D13' },
+        { t: 'Türband mit zwei Senkkopfschrauben befestigen – <b>max. 6 Nm</b>.', fig: [f('G_draw')] }
       ],
-      extraTitle: 'Einbauposition Hammerkopfmutter', extraHtml: TABLE_HKM + '<h4>Anzahl Türbänder</h4>' + TABLE_BAENDER,
+      extraTitle: 'Einbauposition Hammerkopfmutter', extraHtml: c => TABLE_HKM(c) + '<h4>Anzahl Türbänder</h4>' + TABLE_BAENDER,
       spots: ['hinge'], hl: ['hinge']
     },
     {
       id: 'schliessblech', phase: 'door', view: 'detail', cond: c => !c.swing,
       title: 'Schließblech montieren',
-      parts: [1, 14, 15, 16],
+      parts: c => [1, ...hkm(c), 16, 'CP'],
       text: [
-        'Die Ausfräsung für das Schloss im Türrahmen wird vor Ort gefräst.',
-        { t: 'Zwei Hammerkopfmuttern in die Nut des Türzargenprofils <b>(1)</b> an der Schlossseite einsetzen und eindrehen – Einbauposition laut Tabelle (ganz unten). Schließblech <b>(16)</b> mit zwei Senkkopfschrauben befestigen – <b>max. 6 Nm</b>.', fig: [f('F_draw')] }
+        { t: 'Das Schließblech <b>(16)</b> wird ebenfalls mit Hammerkopfmuttern am Türzargenprofil <b>(1)</b> befestigt: Zwei Hammerkopfmuttern an der Schlossseite in die Nut einsetzen und eindrehen – Einbauposition laut Tabelle (ganz unten). Schließblech mit zwei Senkkopfschrauben befestigen – <b>max. 6 Nm</b>.', fig: [f('F_draw')], cap: c => c.topLight ? 'Mit Top Light ist das Türglas 8 mm oder 10 mm: Hammerkopfmutter 8–10 mm (14), Position A12/B12' : 'Türglas 8 mm oder 10 mm: Hammerkopfmutter 8–10 mm (14), Position A12/B12 · Türglas 12 mm: Hammerkopfmutter 12 mm (15), Position C13/D13' },
+        // nur OFFICE: in Amerika werden keine hohen Schlösser verwendet
+        () => window.BR && window.BR.id === 'crl' ? null : '<b>Option:</b> Bei hohen Schlössern wird das Schließblech CP DORMA <b>(17)</b> verwendet – Befestigung ebenfalls mit zwei Hammerkopfmuttern und Senkkopfschrauben.'
       ],
       extraTitle: 'Einbauposition Hammerkopfmutter', extraHtml: TABLE_HKM,
       spots: ['strike'], hl: ['strike']
@@ -389,9 +417,9 @@
       title: 'Türblatt einsetzen',
       parts: [],
       text: [
-        c => c.swing ? 'Türblatt nach Anleitung des Beschlagherstellers auf Boden- und Drehlager setzen.' : 'Montierte Bänder öffnen.',
-        { t: 'Türglas in die vorgesehene Position stellen. Abstand Boden–Glas laut Plan mit passenden Holzkeilen unterlegen.', fig: [f('door_floor')] },
-        { t: 'Spalt zwischen Glas und Profil laut Plan mit Holzkeilen vorübergehend fixieren (danach entfernen).', fig: [{ src: f('door_bad'), size: 'sm' }, { src: f('door_good'), size: 'sm' }], row: true },
+        c => c.swing ? 'Türblatt mit den vormontierten Beschlägen (laut Herstellerangabe) in den Rahmen einsetzen und gegebenenfalls ausrichten – dazu die Einstellmöglichkeiten des Hydraulikbandes nutzen (laut Herstellerangabe bzw. Montageanleitung des Hydraulikbandes).' : 'Montierte Bänder öffnen.',
+        c => c.swing ? null : { t: 'Türglas in die vorgesehene Position stellen. Abstand Boden–Glas laut Plan mit passenden Verglasungsklötzen unterlegen.', fig: [f('door_floor')] },
+        c => c.swing ? null : { t: 'Spalt zwischen Glas und Profil laut Plan mit Verglasungsklötzen vorübergehend fixieren.', fig: [{ src: f('door_bad'), size: 'sm' }, { src: f('door_good'), size: 'sm' }], row: true },
         c => c.topLight ? { t: 'Mit Top Light: Abstand Türblatt–Oberlichtglas <b>5 mm</b>; Zargendichtung einlegen.', fig: [f('TL_E')] } : null
       ],
       spots: ['door'], hl: ['door']
@@ -402,7 +430,7 @@
       parts: [],
       text: [
         c => c.swing ? null : { t: 'Bänder auf das Türglas schließen; Gegenplatten auf der Gegenseite nach Herstellerangabe montieren.', fig: [f('close')] },
-        c => c.swing ? 'Die zur Positionierung verwendeten Holzkeile entfernen, sobald das Türblatt in den Lagern sitzt.' : 'Die zur Positionierung verwendeten Holzkeile entfernen, sobald die Bänder am Türglas montiert sind.',
+        c => c.swing ? null : 'Die zur Positionierung verwendeten Verglasungsklötze entfernen, sobald die Bänder am Türglas montiert sind.',
         c => c.swing ? 'Türgriff nach Herstellerangabe montieren.' : 'Schloss nach Herstellerangabe montieren.',
         'Tür auf leichten Lauf und gleichmäßige Fugen prüfen.'
       ],
@@ -413,6 +441,7 @@
       title: 'Zargendichtung ausklinken und eindrücken',
       parts: [8],
       text: [
+        'Zargendichtung provisorisch in das Türzargenprofil <b>(1)</b> einsetzen und die Position der Bänder und des Schließblechs auf der Dichtung markieren. Dichtung danach wieder herausnehmen.',
         { t: 'Dichtung an jedem Band und am Schließblech bis zur gedachten Linie (strichliert) einschneiden – <b>2 Schnitte</b> je Band bzw. Schließblech.', fig: [f('DI1')] },
         { t: 'Dichtung umdrehen und den eingeschnittenen Teil entlang der Linie wegschneiden.', fig: [f('DI2')] },
         { t: 'Hohlkammer aufklappen, den inneren Lappen an den Enden einschneiden und wegschneiden.', fig: [f('DI3')] },
@@ -464,5 +493,5 @@ ${TABLE_BAENDER}
 <p class="small">Garantie: 5 Jahre ab Übergabe.</p>
 `;
 
-  window.OFFICE = { PARTS, VARIANTS, PHASES, STEPS, GENERAL };
+  window.OFFICE = { PARTS, PART_ORDER, VARIANTS, PHASES, STEPS, GENERAL };
 })();

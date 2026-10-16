@@ -4,20 +4,36 @@
 (function () {
   'use strict';
 
-const { PARTS, VARIANTS, PHASES, STEPS, GENERAL } = window.OFFICE;
+const { PARTS, PART_ORDER, VARIANTS, PHASES, STEPS, GENERAL } = window.OFFICE;
 
-// ================================================================ Sprache (de / en)
-// Die Inhalte sind deutsch hinterlegt; T() liefert die Übersetzung aus en.js (Schlüssel = deutscher Text).
+// ================================================================ Sprache (je Marke: OFFICE de/en, FALLBROOK en/es)
+// Die Inhalte sind deutsch hinterlegt; T() liefert die Übersetzung aus en.js / es.js (Schlüssel = deutscher Text).
+// Fehlt eine spanische Übersetzung, gilt die englische.
+const I18N = {
+  en: { dict: window.I18N_EN, html: window.I18N_EN_HTML, general: window.I18N_EN_GENERAL },
+  es: { dict: window.I18N_ES, html: window.I18N_ES_HTML, general: window.I18N_ES_GENERAL }
+};
 let LANG = null;
 try { LANG = localStorage.getItem(BR.storageKey); } catch (e) { /* ohne Speicher */ }
-if (LANG !== 'de' && LANG !== 'en') LANG = BR.defaultLang || (/^de/i.test(navigator.language || 'de') ? 'de' : 'en');
+if (!BR.langs.includes(LANG)) {
+  const nav = (navigator.language || '').slice(0, 2).toLowerCase();
+  LANG = BR.langs.includes(nav) ? nav : BR.langs[0];
+}
 // BR.text: markenspezifische Anpassung (FALLBROOK: CRL-Artikelnummern, Zoll, Produktname)
 const RT = BR.product.toLowerCase();   // Adresse: #/office/… bzw. #/fallbrook/…
-const T = s => BR.text((LANG === 'en' && s != null && window.I18N_EN && window.I18N_EN[s] != null) ? window.I18N_EN[s] : s);
-const THtml = h => {
-  if (LANG !== 'en' || !h) return BR.text(h);
-  let o = h; (window.I18N_EN_HTML || []).forEach(([a, b]) => { o = o.split(a).join(b); }); return BR.text(o);
+const lookup = (l, s) => I18N[l] && I18N[l].dict && I18N[l].dict[s] != null ? I18N[l].dict[s] : null;
+const T = s => {
+  if (s == null || LANG === 'de') return BR.text(s);
+  const v = lookup(LANG, s) ?? lookup('en', s);
+  return BR.text(v ?? s);
 };
+const THtml = h => {
+  if (LANG === 'de' || !h) return BR.text(h);
+  let o = h; ((I18N[LANG] && I18N[LANG].html) || []).forEach(([a, b]) => { o = o.split(a).join(b); }); return BR.text(o);
+};
+// Sprachumschalter mit den Sprachen der Marke
+const LANG_NAMES = { de: 'Deutsch', en: 'English', es: 'Español' };
+document.querySelector('.lang-switch').innerHTML = BR.langs.map(l => `<button data-lang="${l}" title="${LANG_NAMES[l]}">${l.toUpperCase()}</button>`).join('');
 function setLang(l) {
   LANG = l;
   try { localStorage.setItem(BR.storageKey, l); } catch (e) { /* ohne Speicher */ }
@@ -28,6 +44,7 @@ function setLang(l) {
   document.querySelectorAll('.lang-switch button').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
 }
 // Marke: Titel und Logo bzw. Schriftzug
+document.documentElement.dataset.brand = BR.id;
 document.title = BR.title;
 if (!BR.logo) { const lg = document.querySelector('.logo'); if (lg) lg.outerHTML = `<span class="wordmark">${BR.product}</span>`; }
 // statische Texte merken, bevor sie übersetzt werden
@@ -215,10 +232,10 @@ function rerender() {
       edge: new THREE.LineBasicMaterial({ color: 0x33363b }),
       edgeGlass: new THREE.LineBasicMaterial({ color: 0x6f9aa3, transparent: true, opacity: 0.7 }),
       edgeWall: new THREE.LineBasicMaterial({ color: 0xc9c6bf }),
-      edgeHl: new THREE.LineBasicMaterial({ color: 0x000000 }),
-      hl: new THREE.MeshStandardMaterial({ color: 0x1a1a1a, metalness: 0.1, roughness: 0.5 }),
-      hlGlass: new THREE.MeshPhysicalMaterial({ color: 0x555555, transparent: true, opacity: 0.3, depthWrite: false, side: THREE.DoubleSide }),
-      marker: new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.15, depthWrite: false })
+      edgeHl: new THREE.LineBasicMaterial({ color: BR.hl3d ? BR.hl3d.edge : 0x000000 }),
+      hl: new THREE.MeshStandardMaterial({ color: BR.hl3d ? BR.hl3d.mesh : 0x1a1a1a, metalness: 0.1, roughness: 0.5 }),
+      hlGlass: new THREE.MeshPhysicalMaterial({ color: BR.hl3d ? BR.hl3d.mesh : 0x555555, transparent: true, opacity: 0.3, depthWrite: false, side: THREE.DoubleSide }),
+      marker: new THREE.MeshBasicMaterial({ color: BR.hl3d ? BR.hl3d.mesh : 0x000000, transparent: true, opacity: 0.15, depthWrite: false })
     });
 
     // Klick auf ein Bauteil → passender Montageschritt
@@ -580,7 +597,7 @@ function rerender() {
     const lines = F.labels.flatMap(l => l.to.map(t => `<line x1="${X(l.at[0])}" y1="${l.at[1]}" x2="${X(t[0])}" y2="${t[1]}"/>`)).join('');
     const dots = F.labels.flatMap(l => l.to.map(t => `<i class="f-dot" style="${at(t)}"></i>`)).join('');
     const labels = F.labels.map(l => `<span class="f-lbl${/^\d/.test(l.n) ? '' : ' word'}" style="${at(l.at)}" title="${esc(posTitle(l.n))}">${esc(l.n)}</span>`).join('');
-    const notes = F.notes.filter(n => !n.long).map(n => `<span class="f-note" style="${at(n.at)};transform:rotate(${-(n.rot || 0)}deg) translateY(-50%)">${esc(T(n.t))}</span>`).join('');
+    const notes = F.notes.filter(n => !n.long).map(n => `<span class="f-note${n.head ? ' head' : ''}" style="${at(n.at)};transform:${n.head ? "translate(-50%,-50%)" : `rotate(${-(n.rot || 0)}deg) translateY(-50%)`}">${esc(T(n.t))}</span>`).join('');
     // Richtig/Falsch: Kreuz-Skizzen bekommen ✕, die übrigen Felder ✓; Teilabbildungen tragen ihre Markierung selbst
     const big = b => (b[2] - b[0]) * (b[3] - b[1]) > F.w * F.h * 0.8;
     const hit = (a, b) => a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1];
@@ -620,10 +637,18 @@ function rerender() {
   function workStep(item, cfg) {
     const it = typeof item === 'string' ? { t: item } : item;
     const figs = (val(it.fig, cfg) || []).map(f => val(f, cfg)).filter(Boolean);
-    return `<li><div class="ws-text">${T(it.t)}</div>${figs.length ? `
+    return `<li><div class="ws-text">${T(val(it.t, cfg))}</div>${figs.length ? `
       <div class="ws-figs${it.row ? ' row' : ''}"${it.row ? ` style="grid-template-columns:repeat(${figs.length},1fr)"` : ''}>
         ${figs.map(figItem).join('')}
-      </div>${it.cap ? `<div class="ws-cap">${esc(T(it.cap))}</div>` : ''}` : ''}</li>`;
+      </div>${it.cap ? `<div class="ws-cap">${esc(T(val(it.cap, cfg)))}</div>` : ''}` : ''}</li>`;
+  }
+
+  // Hinweis: Text oder { t, tools: [{ img, name, nr, crl }] } – Hilfsmittel klein mit Name und Artikelnummer
+  function noteHTML(n) {
+    if (typeof n === 'string') return `<div class="note">${T(n)}</div>`;
+    const tools = (n.tools || []).map(x => `<button class="note-tool"${x.img ? ` data-img="${x.img}"` : ''} aria-label="${T('Zeichnung vergrößern')}">
+      ${x.img ? `<img src="${x.img}" alt="" loading="lazy">` : ''}<span><b>${esc(T(x.name))}</b><small>${esc(BR.nr(x))}</small></span></button>`).join('');
+    return `<div class="note">${T(n.t)}${tools ? `<div class="note-tools">${tools}</div>` : ''}</div>`;
   }
 
   function cfgLabel(cfg) {
@@ -702,11 +727,12 @@ function rerender() {
   const panel = $('#panel');
   const body = $('#panelBody');
 
+  const partsOf = (s, cfg) => (val(s.parts, cfg) || []).filter(k => PARTS[k] && (!PARTS[k].brand || PARTS[k].brand === BR.id));
   const partRow = k => {
     const p = PARTS[k];
-    return `<button class="part-row" data-img="${p.img}" title="${T('Antippen zum Vergrößern')}">
-      <img src="${p.img}" alt="" loading="lazy">
-      <span class="txt">${esc(T(p.name))}<small>${esc(BR.nr(p))}</small></span>
+    return `<button class="part-row"${p.img ? ` data-img="${BR.img(p.img)}" title="${T('Antippen zum Vergrößern')}"` : ''}>
+      ${p.img ? `<img src="${BR.img(p.img)}" alt="" loading="lazy">` : '<span class="no-img"></span>'}
+      <span class="txt">${esc(T(p.name))}${p.optional ? ` <em class="opt-tag">${T('Option')}</em>` : ''}<small>${esc(BR.nr(p))}</small></span>
       ${p.pos || /^\d+$/.test(String(k)) ? `<span class="n">${p.pos || k}</span>` : ''}
     </button>`;
   };
@@ -735,12 +761,13 @@ function rerender() {
         ${html}</ul></div>`;
     } else if (state.tab === 'parts') {
       const used = [];
-      list.forEach(s => (s.parts || []).forEach(p => { if (!used.includes(p)) used.push(p); }));
-      used.sort((a, b) => (isNaN(a) ? 100 : a) - (isNaN(b) ? 100 : b));
+      list.forEach(s => partsOf(s, cfg).forEach(p => { if (!used.includes(p)) used.push(p); }));
+      const ord = k => PART_ORDER.indexOf(isNaN(k) ? k : +k);
+      used.sort((a, b) => ord(a) - ord(b));
       content = `<div class="pad"><p class="intro">${T('Bauteile für')} ${esc(cfgLabel(cfg))}. ${T('Antippen zum Vergrößern.')}</p>
         <div class="parts">${used.map(partRow).join('')}</div></div>`;
     } else {
-      content = `<div class="pad general">${BR.text(LANG === 'en' && window.I18N_EN_GENERAL ? window.I18N_EN_GENERAL : GENERAL)}</div>`;
+      content = `<div class="pad general">${BR.text(LANG !== 'de' && I18N[LANG] && I18N[LANG].general ? I18N[LANG].general : GENERAL)}</div>`;
     }
     body.innerHTML = tabs + content;
   }
@@ -764,17 +791,17 @@ function rerender() {
         <div class="small" style="margin-top:6px">${T('Schritt')} ${idx + 1} ${T('von')} ${list.length}</div>
       </div>
 
-      ${step.parts && step.parts.length ? `<div class="section"><h3>${T('Benötigte Teile')}</h3>
-        <div class="parts">${step.parts.map(partRow).join('')}</div></div>` : ''}
+      ${partsOf(step, cfg).length ? `<div class="section"><h3>${T('Benötigte Teile')}</h3>
+        <div class="parts">${partsOf(step, cfg).map(partRow).join('')}</div></div>` : ''}
 
       <div class="section">
         <h3>${T('Montage')}</h3>
         <ol class="steps">${text.map(s => workStep(s, cfg)).join('')}</ol>
       </div>
 
-      ${step.extraHtml ? `<div class="section"><h3>${esc(T(step.extraTitle || ''))}</h3>${THtml(step.extraHtml)}</div>` : ''}
+      ${step.extraHtml ? `<div class="section"><h3>${esc(T(step.extraTitle || ''))}</h3>${THtml(val(step.extraHtml, cfg))}</div>` : ''}
 
-      ${notes.length ? `<div class="section">${notes.map(n => `<div class="note">${T(n)}</div>`).join('')}</div>` : ''}
+      ${notes.length ? `<div class="section">${notes.map(noteHTML).join('')}</div>` : ''}
 
       <div class="guide-nav">
         <button class="btn" data-act="prev" ${idx <= 0 ? 'disabled' : ''}>${T('← Zurück')}</button>

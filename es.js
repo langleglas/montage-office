@@ -1,0 +1,300 @@
+// Spanische Übersetzung der Montageanleitung (nur FALLBROOK / CRL).
+// Schlüssel = deutscher Originaltext wie in en.js, Wert = spanischer Text. Fachbegriffe nach den CRL-Anleitungen (EN/ES).
+// Maße bleiben hier in mm/cm – die Marke CRL rechnet sie automatisch in Zoll um. Fehlt ein Eintrag, zeigt die App den englischen Text.
+window.I18N_ES = {
+  // ---------------------------------------------------------------- Oberfläche
+  'Montageanleitungen': 'Instrucciones de montaje',
+  'Interaktive Montageanleitung': 'Instrucciones de montaje interactivas',
+  'Wählen Sie das Produkt, das Sie montieren.': 'Seleccione el producto que va a instalar.',
+  'Glastrennwand-System · 6 Varianten': 'Sistema de divisiones de vidrio · 6 variantes',
+  '← Produkte': '← Productos',
+  'OFFICE – Variante wählen': 'OFFICE – seleccionar variante',
+  'Welche Variante bauen Sie ein? Optionen wie Glasstoß, Top Light und Swing Door wählen Sie danach direkt in der Anleitung.': '¿Qué variante va a instalar? Las opciones como unión de vidrio, Top Light y Swing Door se seleccionan después directamente en las instrucciones.',
+  'Einbausituation': 'Instalación',
+  'Gerade (Wand zu Wand)': 'Recta (de pared a pared)',
+  'Ecklösung': 'Solución de esquina',
+  'gerade': 'recta',
+  'Glasstoß': 'Unión de vidrio',
+  'Variante wechseln': 'Cambiar variante',
+  '▶ Schritt für Schritt': '▶ Paso a paso',
+  'Ansicht zurücksetzen': 'Restablecer vista',
+  'Ziehen = drehen · Scrollen / 2 Finger = zoomen · Rechtsklick / 2 Finger ziehen = verschieben · <b>Punkte anklicken</b>': 'Arrastrar = girar · Rueda / 2 dedos = zoom · Clic derecho / arrastrar con 2 dedos = desplazar · <b>Haga clic en los puntos</b>',
+  'Montageablauf': 'Secuencia de montaje',
+  'Bauteile': 'Componentes',
+  'Hinweise': 'Indicaciones',
+  '← Montageablauf': '← Secuencia de montaje',
+  'Benötigte Teile': 'Componentes necesarios',
+  'Montage': 'Montaje',
+  '← Zurück': '← Atrás',
+  'Weiter →': 'Siguiente →',
+  'Fertig ✓': 'Listo ✓',
+  'Option': 'Opción',
+  'Schritt': 'Paso',
+  'von': 'de',
+  'Schritte. Klicken Sie auf einen Punkt im Modell oder einen Schritt – oder starten Sie mit <b>„Schritt für Schritt“</b>.': 'pasos. Haga clic en un punto del modelo o en un paso, o comience con <b>«Paso a paso»</b>.',
+  'Bauteile für': 'Componentes para',
+  'Antippen zum Vergrößern.': 'Toque para ampliar.',
+  'Antippen zum Vergrößern': 'Toque para ampliar',
+  'Zeichnung vergrößern': 'Ampliar dibujo',
+  'Top Light ist nur bei C2–C4 möglich': 'Top Light solo es posible en C2–C4',
+  'Nicht mit Swing Door kombinierbar': 'No combinable con Swing Door',
+  'Oberlicht im Türrahmen': 'Montante en el marco de la puerta',
+  'Nicht mit Top Light kombinierbar': 'No combinable con Top Light',
+  'Pendeltür': 'Puerta de vaivén',
+  'Anleitung öffnen': 'Abrir instrucciones',
+  'Ziehen: Anleitung ↕ 3D-Ansicht': 'Arrastrar: instrucciones ↕ vista 3D',
+  '3D-Ansicht vergrößern': 'Ampliar vista 3D',
+  'Anleitung vergrößern': 'Ampliar instrucciones',
+  'Ziehen oder antippen, um Anleitung und 3D-Ansicht zu vergrößern': 'Arrastre o toque para ampliar las instrucciones o la vista 3D',
+  'richtig': 'correcto',
+  'falsch': 'incorrecto',
+  'Sprache wählen': 'Elegir idioma',
+  'Bitte wählen Sie Ihre Sprache.': 'Elija su idioma.',
+
+  // ---------------------------------------------------------------- Varianten und Abschnitte
+  'Tür links mit Oberlicht': 'Puerta a la izquierda con montante',
+  'Tür mittig mit Oberlicht': 'Puerta central con montante',
+  'Tür rechts mit Oberlicht': 'Puerta a la derecha con montante',
+  'Tür links bis zur Decke': 'Puerta a la izquierda hasta el techo',
+  'Tür mittig bis zur Decke': 'Puerta central hasta el techo',
+  'Tür rechts bis zur Decke': 'Puerta a la derecha hasta el techo',
+  'Vorbereitung': 'Preparación',
+  'Rahmen liegend vormontieren': 'Premontar el marco en el suelo',
+  'Rahmen aufstellen und befestigen': 'Levantar y fijar el marco',
+  'Verglasen': 'Acristalar',
+  'Tür montieren': 'Montar la puerta',
+  'Abschluss': 'Finalización',
+
+  // ---------------------------------------------------------------- Bauteile
+  'Türzargenprofil': 'Perfil del marco de la puerta',
+  'Basisrahmenprofil': 'Perfil base',
+  'Clipprofil': 'Perfil clip',
+  'Deckenbasisrahmenprofil': 'Perfil base de techo',
+  'Glasstoßprofil': 'Perfil de unión de vidrio',
+  'Fixierdichtung': 'Junta de fijación',
+  'Anschlagdichtung 16 mm': 'Junta de acristalamiento 16 mm',
+  'Zargendichtung': 'Junta del marco de la puerta',
+  'Anschlagdichtung 8/10/12 mm': 'Junta de acristalamiento 8/10/12 mm',
+  'T-Verbinder (Basis und Top Frame oder Frame Verbinder)': 'Conector en T (conector de marco base y superior o de marco)',
+  'CL-Verbinder (Top Frame und Frame Verbinder)': 'Conector CL (conector de marco superior y de marco)',
+  '90°-Eckverbinder (Boden- und Deckenprofilverbinder)': 'Conector de esquina de 90° (conector de perfil de suelo y de techo)',
+  'C-Verbinder (Boden- und Eckverbinder)': 'Conector en C (conector de suelo y de esquina)',
+  'Hammerkopfmutter 8–10 mm Glas': 'Tuerca de cabeza de martillo, vidrio de 8–10 mm',
+  'Hammerkopfmutter 12 mm Glas': 'Tuerca de cabeza de martillo, vidrio de 12 mm',
+  'Schließblech 8–12 mm Glas': 'Cerradero, vidrio de 8–12 mm',
+  '180°-Verbinder': 'Conector de 180°',
+  'Glas-Auflage-Winkel links & rechts (Oberlicht)': 'Ángulos de apoyo del vidrio, izquierdo y derecho (montante)',
+  'Clipprofil Oberlicht 10 mm Glas': 'Perfil clip de montante, vidrio de 10 mm',
+  'Clipprofil Oberlicht 8 mm Glas': 'Perfil clip de montante, vidrio de 8 mm',
+  'Block für Pendeltür': 'Bloque para puerta de vaivén',
+  'Clipprofil Pendeltür': 'Perfil clip para puerta de vaivén',
+
+  // ---------------------------------------------------------------- Montageschritte
+  'Profile vorbereiten und Bohrungen setzen': 'Preparar los perfiles y perforar',
+  'Profile auf einer weichen Unterlage am Boden auslegen, damit nichts verkratzt. Der Rahmen wird <b>liegend vormontiert</b>.': 'Coloque los perfiles en el suelo sobre una base protectora para evitar rayaduras. El marco se <b>premonta en posición horizontal</b>.',
+  'In Basisrahmenprofil <b>(2)</b> und Deckenprofil <b>(4)</b> Befestigungslöcher bohren: an beiden Profilenden und entlang des Profils alle <b>30–60 cm</b>.': 'Perfore agujeros de fijación en el perfil base <b>(2)</b> y en el perfil de techo <b>(4)</b>: en ambos extremos del perfil y a lo largo del perfil cada <b>30–60 cm</b>.',
+  'Ebenso im Türzargenprofil <b>(1)</b> an der Wandseite.': 'Haga lo mismo en el perfil del marco de la puerta <b>(1)</b> del lado de la pared.',
+  'Lochgröße und Abstand richten sich nach Untergrund und Schrauben.': 'El tamaño del agujero y la distancia de fijación dependen del sustrato y de los tornillos utilizados.',
+  'Profile (2) oder (4) länger als 6 m werden mit dem 180°-Verbinder 41AL-OFFICE-CS verbunden.': 'Los perfiles (2) o (4) de más de 6 m se unen con el conector de 180° 41AL-OFFICE-CS.',
+  'Zargendichtung aus dem Türrahmen entfernen': 'Retirar la junta del marco de la puerta',
+  'Zargendichtung <b>(8)</b> links und rechts aus den senkrechten Türzargenprofilen <b>(1)</b> herausziehen.': 'Extraiga la junta del marco de la puerta <b>(8)</b> de los perfiles verticales del marco de la puerta <b>(1)</b>, a la izquierda y a la derecha.',
+  'Dichtung aufbewahren – sie wird am Ende ausgeklinkt und wieder eingedrückt.': 'Guarde la junta: al final se ranura y se vuelve a presionar en su sitio.',
+  'Türrahmen-Ecken auf Gehrung verbinden': 'Unir las esquinas del marco de la puerta a inglete',
+  'Waagrechtes und senkrechtes Türzargenprofil <b>(1)</b> auf Gehrung (45°) zusammenstecken. Je Ecke <b>zwei</b> C-Verbinder <b>(13)</b> in beide Profile einschieben – einer davon wird <b>ohne Madenschrauben</b> eingesetzt und dient zur Stabilisierung der Ecke.': 'Encaje a inglete (45°) el perfil horizontal y el vertical del marco de la puerta <b>(1)</b>. En cada esquina, introduzca <b>dos</b> conectores en C <b>(13)</b> en ambos perfiles; uno de ellos se coloca <b>sin tornillos prisioneros</b> y sirve para estabilizar la esquina.',
+  'Gehrung dicht zusammenschieben und die Madenschrauben festziehen – kein Versatz.': 'Cierre bien el inglete y apriete los tornillos prisioneros, sin desalineación.',
+  'Türrahmen-Ecke mit Wandprofil darüber verbinden': 'Unir la esquina del marco de la puerta con el perfil de pared superior',
+  'An der wandseitigen Türrahmen-Ecke einen C-Verbinder <b>(13)</b> und einen T-Verbinder <b>(10)</b> in die Gehrung der Türzargenprofile <b>(1)</b> einschieben.': 'En la esquina del marco de la puerta del lado de la pared, introduzca un conector en C <b>(13)</b> y un conector en T <b>(10)</b> en el inglete de los perfiles del marco de la puerta <b>(1)</b>.',
+  'Senkrechtes Basisrahmenprofil <b>(2)</b> von oben auf den T-Verbinder schieben – dieser läuft dann an der Wand bis zur Decke.': 'Deslice el perfil base vertical <b>(2)</b> desde arriba sobre el conector en T; este perfil sube luego por la pared hasta el techo.',
+  'Alles ausrichten und die Madenschrauben festziehen.': 'Alinee todo y apriete los tornillos prisioneros.',
+  'Türrahmen mit Deckenprofil verbinden': 'Unir el marco de la puerta con el perfil de techo',
+  'An der Türrahmen-Ecke zum Seitenteil je <b>einen</b> C-Verbinder <b>(13)</b> und T-Verbinder <b>(10)</b> in die Gehrung der Türzargenprofile <b>(1)</b> einschieben.': 'En la esquina del marco de la puerta hacia el panel lateral, introduzca <b>un</b> conector en C <b>(13)</b> y <b>un</b> conector en T <b>(10)</b> en el inglete de los perfiles del marco de la puerta <b>(1)</b>.',
+  'Deckenprofil <b>(4)</b> des Seitenteils seitlich auf den T-Verbinder schieben.': 'Deslice lateralmente el perfil de techo <b>(4)</b> del panel lateral sobre el conector en T.',
+  'Alles bündig ausrichten und die Madenschrauben festziehen.': 'Alinee todo al ras y apriete los tornillos prisioneros.',
+  'Deckenprofil mit Wandprofil verbinden': 'Unir el perfil de techo con el perfil de pared',
+  'CL-Verbinder <b>(11)</b> mit dem kurzen Schenkel in das Deckenprofil <b>(4)</b> schieben, das senkrechte Basisrahmenprofil <b>(2)</b> von unten aufschieben.': 'Introduzca el lado corto del conector CL <b>(11)</b> en el perfil de techo <b>(4)</b> y deslice el perfil base vertical <b>(2)</b> desde abajo.',
+  'Profile <b>stumpf</b> stoßen (nicht auf Gehrung), ausrichten und die Madenschrauben festziehen.': 'Una los perfiles <b>a tope</b> (no a inglete), alinéelos y apriete los tornillos prisioneros.',
+  'Basisrahmenprofil mit Türrahmen verbinden': 'Unir el perfil base con el marco de la puerta',
+  'C-Verbinder <b>(13)</b> in das Ende des Basisrahmenprofils <b>(2)</b> schieben und das Türzargenprofil <b>(1)</b> von oben aufstecken.': 'Introduzca el conector en C <b>(13)</b> en el extremo del perfil base <b>(2)</b> y encaje desde arriba el perfil del marco de la puerta <b>(1)</b>.',
+  'Basisrahmenprofil stumpf an den Türrahmen schieben, ausrichten und die Madenschrauben festziehen.': 'Junte el perfil base a tope con el marco de la puerta, alinéelo y apriete los tornillos prisioneros.',
+  'Basisrahmenprofil mit Wandprofil verbinden': 'Unir el perfil base con el perfil de pared',
+  'C-Verbinder <b>(13)</b> in das waagrechte Basisrahmenprofil <b>(2)</b> schieben und das senkrechte Basisrahmenprofil <b>(2)</b> von oben aufstecken – Ecke auf <b>Gehrung</b>.': 'Introduzca el conector en C <b>(13)</b> en el perfil base horizontal <b>(2)</b> y encaje desde arriba el perfil base vertical <b>(2)</b>; esquina a <b>inglete</b>.',
+  'Ecke schließen und die Madenschrauben festziehen.': 'Cierre la esquina y apriete los tornillos prisioneros.',
+  'Rahmen aufstellen': 'Levantar el marco',
+  'Den vormontierten Rahmen zu zweit (bei Bedarf mit mehreren Personen) gleichmäßig vom Boden aufheben.': 'Levante el marco premontado del suelo de forma uniforme entre dos personas (o más si es necesario).',
+  'An der vorgesehenen Position aufstellen.': 'Colóquelo en la posición prevista.',
+  'Ecke 90° verbinden (Ecklösung)': 'Unir la esquina de 90° (solución de esquina)',
+  'Rahmen der Rückwand an den Hauptrahmen stellen.': 'Coloque el marco del tramo en ángulo junto al marco principal.',
+  'Oben die Deckenprofile <b>(4)</b> und unten die Basisrahmenprofile <b>(2)</b> jeweils mit einem 90°-Eckverbinder <b>(12)</b> auf Gehrung verbinden.': 'Una a inglete los perfiles de techo <b>(4)</b> arriba y los perfiles base <b>(2)</b> abajo, cada uno con un conector de esquina de 90° <b>(12)</b>.',
+  'Je Verbinder die vier Madenschrauben festziehen.': 'Apriete los cuatro tornillos prisioneros de cada conector.',
+  'Rahmen ausrichten': 'Alinear el marco',
+  'Rahmen mit Wasserwaage oder Linienlaser ausrichten: Er muss <b>lotrecht, waagrecht und rechtwinklig</b> stehen und darf nicht verdreht sein. Sind Boden, Wände oder Decke schief oder uneben, den Rahmen an den Befestigungspunkten entsprechend unterlegen bzw. hinterlegen – nicht dem Bauwerk folgen.': 'Alinee el marco con un nivel de burbuja o un láser de líneas: debe quedar <b>a plomo, nivelado y a escuadra</b> y no debe estar torcido. Si el suelo, las paredes o el techo están inclinados o son irregulares, calce el marco en los puntos de fijación según corresponda; no siga la forma de la obra.',
+  '<b>Ausnahme:</b> Manche Anlagen sind bewusst so geplant, dass sie dem Wand- bzw. Deckenverlauf folgen. In diesen Fällen den Rahmen <b>nicht</b> automatisch lotrecht, waagrecht und rechtwinklig ausrichten. Die Ausrichtung ist je nach Anlage immer mit den Planvorgaben abzugleichen.': '<b>Excepción:</b> algunas instalaciones se planifican a propósito para seguir la forma de la pared o del techo. En estos casos, <b>no</b> alinee el marco automáticamente a plomo, nivelado y a escuadra. Compruebe siempre la alineación con las especificaciones del plano de cada instalación.',
+  'Standardkonfiguration: Verglasungsblöcke <b>5 mm</b>. Ist es erforderlich, die Gläser ins Lot zu bringen, kann bzw. muss die Klotzung entsprechend angepasst werden.': 'Configuración estándar: bloques de apoyo de <b>5 mm</b>. Si es necesario poner los vidrios a plomo, los calzos pueden o deben ajustarse en consecuencia.',
+  'Rahmen befestigen': 'Fijar el marco',
+  'Deckenprofil <b>(4)</b> an der Decke verschrauben.': 'Atornille el perfil de techo <b>(4)</b> al techo.',
+  'Basisrahmenprofile <b>(2)</b> an Wand und Boden verschrauben.': 'Atornille los perfiles base <b>(2)</b> a la pared y al suelo.',
+  'Türzargenprofil <b>(1)</b> an der Wand verschrauben – die Zargendichtung deckt die Schrauben später ab.': 'Atornille el perfil del marco de la puerta <b>(1)</b> a la pared; la junta del marco de la puerta cubre después los tornillos.',
+  'Nur zur Info: Die Zargendichtung (8) wird erst später ausgeklinkt und danach wieder eingedrückt.': 'Solo a título informativo: la junta del marco de la puerta (8) se ranura más adelante y luego se vuelve a presionar en su sitio.',
+  'Befestigungspunkte alle <b>30–60 cm</b>; Schrauben und Dübel passend zum Untergrund wählen.': 'Puntos de fijación cada <b>30–60 cm</b>; elija tornillos y anclajes adecuados al sustrato.',
+  'Schraubenköpfe müssen bündig sitzen. Spalt zwischen Profil und Mauerwerk gegebenenfalls hinterfüllen. Im Bereich der Befestigungspunkte unterlegen.': 'Las cabezas de los tornillos deben quedar al ras. Si es necesario, rellene el espacio entre el perfil y la mampostería. Calce en la zona de los puntos de fijación.',
+  'Anschlagdichtung einsetzen': 'Colocar la junta de acristalamiento',
+  'Anschlagdichtung in Deckenprofil <b>(4)</b> und Basisrahmenprofile <b>(2)</b> einziehen. Beim Türzargenprofil <b>(1)</b> die Anschlagdichtung in das Clipprofil <b>(3)</b> einziehen.': 'Introduzca la junta de acristalamiento en el perfil de techo <b>(4)</b> y en los perfiles base <b>(2)</b>. En el perfil del marco de la puerta <b>(1)</b>, introdúzcala en el perfil clip <b>(3)</b>.',
+  'Anschlagdichtung nach Glasdicke': 'Junta de acristalamiento según el grosor del vidrio',
+  'Verglasungsblöcke setzen': 'Colocar los bloques de apoyo',
+  'Verglasungsblöcke ca. <b>10 cm</b> von der linken und rechten Glaskante entfernt in das Basisrahmenprofil <b>(2)</b> legen.': 'Coloque los bloques de apoyo en el perfil base <b>(2)</b> a unos <b>10 cm</b> del borde izquierdo y derecho del vidrio.',
+  'Für das Oberlicht ebenso Blöcke auf das waagrechte Türzargenprofil <b>(1)</b> legen.': 'Para el montante, coloque también bloques sobre el perfil horizontal del marco de la puerta <b>(1)</b>.',
+  'Verglasungsblöcke: 80 × 20 mm, Höhe 1,5–5 mm je nach benötigtem Abstand.': 'Bloques de apoyo: 80 × 20 mm, altura 1,5–5 mm según la separación necesaria.',
+  'Seitenteil verglasen': 'Acristalar el panel lateral',
+  'Seitenteile verglasen': 'Acristalar los paneles laterales',
+  'Glas zuerst <b>oben</b> in das Deckenprofil <b>(4)</b> einführen und bis an die Anschlagdichtung schieben.': 'Introduzca primero el vidrio por <b>arriba</b> en el perfil de techo <b>(4)</b> y empújelo hasta la junta de acristalamiento.',
+  'Dann <b>unten</b> in das Basisrahmenprofil <b>(2)</b> einschwenken und auf die Verglasungsblöcke absetzen.': 'Después introdúzcalo girándolo por <b>abajo</b> en el perfil base <b>(2)</b> y apóyelo sobre los bloques de apoyo.',
+  'Glas gerade einsetzen – nicht verkanten.': 'Coloque el vidrio recto, sin ladearlo.',
+  'Nur ESG oder VSG aus ESG verwenden.': 'Utilice solo vidrio templado o vidrio laminado de vidrio templado.',
+  'Oberlicht verglasen': 'Acristalar el montante',
+  'Oberlichtglas oben in das Deckenprofil <b>(4)</b> einführen.': 'Introduzca el vidrio del montante por arriba en el perfil de techo <b>(4)</b>.',
+  'Unten in das waagrechte Türzargenprofil <b>(1)</b> einschwenken und auf die Verglasungsblöcke absetzen.': 'Introdúzcalo girándolo por abajo en el perfil horizontal del marco de la puerta <b>(1)</b> y apóyelo sobre los bloques de apoyo.',
+  'Glasstoß zum Seitenteil: Abstand der Glaskanten <b>21 mm</b> für das Glasstoßprofil <b>(5)</b> – Einbau im nächsten Schritt. Glas lotrecht ausrichten.': 'Unión de vidrio con el panel lateral: <b>21 mm</b> entre los bordes del vidrio para el perfil de unión de vidrio <b>(5)</b>, que se instala en el paso siguiente. Alinee el vidrio a plomo.',
+  'Glasstoßprofil einsetzen (Option)': 'Colocar el perfil de unión de vidrio (opción)',
+  'Glasstoßprofile <b>(5)</b> an allen Glasstößen setzen: im Seitenteil sowie zwischen Oberlicht und Seitenteil.': 'Coloque perfiles de unión de vidrio <b>(5)</b> en todas las uniones de vidrio: en el panel lateral y entre el montante y el panel lateral.',
+  'Glasstoßprofile <b>(5)</b> an allen Glasstößen setzen: im Seitenteil sowie zwischen Oberlicht und Seitenteil (links und rechts der Tür).': 'Coloque perfiles de unión de vidrio <b>(5)</b> en todas las uniones de vidrio: en el panel lateral y entre el montante y el panel lateral (a la izquierda y a la derecha de la puerta).',
+  'Anschlagdichtungen <b>(9)</b> beidseitig in das Glasstoßprofil <b>(5)</b> einziehen.': 'Introduzca juntas de acristalamiento <b>(9)</b> a ambos lados del perfil de unión de vidrio <b>(5)</b>.',
+  'Glasstoßprofil zwischen die beiden Glasscheiben setzen (Abstand der Glaskanten <b>21 mm</b>), Clipprofile <b>(3)</b> von der Gegenseite einclipsen und Fixierdichtungen <b>(6)</b> eindrücken.': 'Coloque el perfil de unión de vidrio entre los dos vidrios (<b>21 mm</b> entre los bordes del vidrio), encaje los perfiles clip <b>(3)</b> desde el lado opuesto y presione las juntas de fijación <b>(6)</b>.',
+  'Fertig montierter Glasstoß. An den Enden des Glasstoßprofils (markiert) ist kein Verbinder notwendig.': 'Unión de vidrio terminada. En los extremos del perfil de unión de vidrio (marcados) no se necesita conector.',
+  'Fixierdichtung und Clipprofil einsetzen': 'Colocar la junta de fijación y el perfil clip',
+  '<b>Deckenprofil (4):</b> Fixierdichtung <b>(6)</b> von unten zwischen Glas und Profil eindrücken.': '<b>Perfil de techo (4):</b> presione la junta de fijación <b>(6)</b> desde abajo entre el vidrio y el perfil.',
+  '<b>Basisrahmenprofil (2):</b> zuerst Clipprofil <b>(3)</b> einclipsen, dann Fixierdichtung <b>(6)</b> zwischen Glas und Clipprofil eindrücken.': '<b>Perfil base (2):</b> encaje primero el perfil clip <b>(3)</b> y después presione la junta de fijación <b>(6)</b> entre el vidrio y el perfil clip.',
+  '<b>Türzargenprofil (1):</b> ebenso Clipprofil <b>(3)</b> und Fixierdichtung <b>(6)</b>.': '<b>Perfil del marco de la puerta (1):</b> igualmente perfil clip <b>(3)</b> y junta de fijación <b>(6)</b>.',
+  'Tipp: Glasreiniger und Vinylroller erleichtern das Einsetzen der Dichtung.': 'Consejo: el limpiavidrios y un rodillo de vinilo facilitan la colocación de la junta.',
+  'Top Light: Glas-Auflage-Winkel einsetzen und positionieren': 'Top Light: colocar y posicionar los ángulos de apoyo del vidrio',
+  'Glas-Auflage-Winkel links und rechts in die Nut der senkrechten Türzargenprofile <b>(1)</b> einsetzen, eindrehen und mit der Madenschraube (im Lieferumfang) fixieren.': 'Coloque los ángulos de apoyo del vidrio a la izquierda y a la derecha en la ranura de los perfiles verticales del marco de la puerta <b>(1)</b>, colóquelos girándolos y fíjelos con el tornillo prisionero (incluido).',
+  '<b>Option 1:</b> Glas-Auflage-Winkel nach Maß laut Planung positionieren.': '<b>Opción 1:</b> posicione los ángulos de apoyo del vidrio según la medida del plano.',
+  '<b>Option 2:</b> Glas-Auflage-Winkel mit Hilfe der Oberlicht-Clipprofile positionieren. Die Clipprofile vor dem nächsten Schritt wieder entfernen.': '<b>Opción 2:</b> posicione los ángulos de apoyo del vidrio con ayuda de los perfiles clip del montante. Retire de nuevo los perfiles clip antes del paso siguiente.',
+  'Top Light: Dichtung im Oberlicht einsetzen': 'Top Light: colocar la junta en el montante',
+  'Dichtung vorbereiten.': 'Prepare la junta.',
+  'Beide Dichtungslippen abreißen – unabhängig von der Glasdicke.': 'Quite ambos labios de la junta, independientemente del grosor del vidrio.',
+  'Dichtung im Bereich des Oberlichts oben und seitlich in den Türrahmen einsetzen.': 'Coloque la junta en el marco de la puerta, arriba y en los laterales, en la zona del montante.',
+  'Top Light: Oberlicht verglasen': 'Top Light: acristalar el montante',
+  'Einsteckdichtung je nach Oberlicht-Glasdicke wählen.': 'Elija la junta de inserción según el grosor del vidrio del montante.',
+  'Das Glas wird auf die Flügel der Glas-Auflage-Winkel gesetzt.': 'El vidrio se apoya sobre las alas de los ángulos de apoyo del vidrio.',
+  'Clipprofil in der gezeigten Reihenfolge (oben, dann seitlich) einsetzen und das Glas mit passender Fixierdichtung sichern – vor Ort zuschneiden.': 'Coloque el perfil clip en el orden indicado (arriba y después en los laterales) y asegure el vidrio con la junta de fijación adecuada; córtela a medida en obra.',
+  'Schraubenköpfe der Türrahmenbefestigung dürfen nicht überstehen – sonst das Clipprofil im Bereich der Befestigungspunkte einkerben.': 'Las cabezas de los tornillos de fijación del marco de la puerta no deben sobresalir; de lo contrario, entalle el perfil clip en la zona de los puntos de fijación.',
+  'Türbänder montieren': 'Montar las bisagras',
+  'Die Türbänder werden mit Hammerkopfmuttern am Türzargenprofil <b>(1)</b> befestigt: Pro Band zwei Hammerkopfmuttern an der Bandseite in die Nut einsetzen und eindrehen. Einbauposition laut Tabelle (ganz unten).': 'Las bisagras se fijan al perfil del marco de la puerta <b>(1)</b> con tuercas de cabeza de martillo: por cada bisagra, coloque dos tuercas en la ranura del lado de las bisagras y gírelas para fijarlas. Posición de instalación según la tabla (al final).',
+  'Türband mit zwei Senkkopfschrauben befestigen – <b>max. 6 Nm</b>.': 'Fije la bisagra con dos tornillos de cabeza avellanada, <b>máx. 6 Nm</b>.',
+  'Einbauposition Hammerkopfmutter': 'Posición de instalación de la tuerca de cabeza de martillo',
+  'Schließblech montieren': 'Montar el cerradero',
+  'Das Schließblech <b>(16)</b> wird ebenfalls mit Hammerkopfmuttern am Türzargenprofil <b>(1)</b> befestigt: Zwei Hammerkopfmuttern an der Schlossseite in die Nut einsetzen und eindrehen – Einbauposition laut Tabelle (ganz unten). Schließblech mit zwei Senkkopfschrauben befestigen – <b>max. 6 Nm</b>.': 'El cerradero <b>(16)</b> también se fija al perfil del marco de la puerta <b>(1)</b> con tuercas de cabeza de martillo: coloque dos tuercas en la ranura del lado de la cerradura y gírelas para fijarlas; posición de instalación según la tabla (al final). Fije el cerradero con dos tornillos de cabeza avellanada, <b>máx. 6 Nm</b>.',
+  'Swing Door: Block für Pendeltür befestigen': 'Swing Door: fijar el bloque para puerta de vaivén',
+  'Block für Pendeltür im oberen Türzargenprofil <b>(1)</b> links- oder rechtsbündig mit Hammerkopfmuttern befestigen.': 'Fije el bloque para puerta de vaivén en el perfil superior del marco de la puerta <b>(1)</b>, alineado a la izquierda o a la derecha, con tuercas de cabeza de martillo.',
+  'Der Steg der Hammerkopfmuttern zeigt beim Einsetzen immer nach rechts.': 'Al colocar las tuercas de cabeza de martillo, el puente siempre apunta hacia la derecha.',
+  'Swing Door: oberen Drehzapfen montieren': 'Swing Door: montar el pivote superior',
+  'Oberen, mittig gehängten, frei schwingenden Drehzapfen am Block befestigen.': 'Fije en el bloque el pivote superior de suspensión central y giro libre.',
+  'Systemkompatible Beschläge: 1NT401, PH21, CRL380 – Montageanleitung des Beschlagherstellers beachten.': 'Herrajes compatibles con el sistema: 1NT401, PH21, CRL380. Siga las instrucciones de montaje del fabricante de los herrajes.',
+  'Swing Door: Clipprofil einsetzen': 'Swing Door: colocar el perfil clip',
+  'Clipprofil Pendeltür bauseits auf Maß zuschneiden und seitlich und oben in die Türzargenprofile <b>(1)</b> einclipsen – es ersetzt bei der Pendeltür die Zargendichtung.': 'Corte a medida en obra el perfil clip para puerta de vaivén y encájelo en los laterales y arriba en los perfiles del marco de la puerta <b>(1)</b>; en la puerta de vaivén sustituye a la junta del marco de la puerta.',
+  'Bei Nachrüstung einer bestehenden OFFICE-Tür: vorher die Zargendichtung entfernen.': 'Al adaptar una puerta OFFICE existente: retire antes la junta del marco de la puerta.',
+  'Türblatt einsetzen': 'Colocar la hoja de la puerta',
+  'Montierte Bänder öffnen.': 'Abra las bisagras instaladas.',
+  'Türglas in die vorgesehene Position stellen. Abstand Boden–Glas laut Plan mit passenden Verglasungsklötzen unterlegen.': 'Coloque el vidrio de la puerta en la posición prevista. Ajuste la distancia suelo–vidrio según el plano con bloques de apoyo adecuados.',
+  'Spalt zwischen Glas und Profil laut Plan mit Verglasungsklötzen vorübergehend fixieren.': 'Fije temporalmente el espacio entre el vidrio y el perfil según el plano con bloques de apoyo.',
+  'Mit Top Light: Abstand Türblatt–Oberlichtglas <b>5 mm</b>; Zargendichtung einlegen.': 'Con Top Light: distancia entre la hoja de la puerta y el vidrio del montante <b>5 mm</b>; coloque la junta del marco de la puerta.',
+  'Bänder schließen und Schloss montieren': 'Cerrar las bisagras y montar la cerradura',
+  'Türgriff montieren': 'Montar la manija',
+  'Bänder auf das Türglas schließen; Gegenplatten auf der Gegenseite nach Herstellerangabe montieren.': 'Cierre las bisagras sobre el vidrio de la puerta; monte las placas de montaje en el lado opuesto según las instrucciones del fabricante.',
+  'Die zur Positionierung verwendeten Verglasungsklötze entfernen, sobald die Bänder am Türglas montiert sind.': 'Retire los bloques de apoyo utilizados para el posicionamiento en cuanto las bisagras estén montadas en el vidrio de la puerta.',
+  'Schloss nach Herstellerangabe montieren.': 'Monte la cerradura según las instrucciones del fabricante.',
+  'Türgriff nach Herstellerangabe montieren.': 'Monte la manija según las instrucciones del fabricante.',
+  'Tür auf leichten Lauf und gleichmäßige Fugen prüfen.': 'Compruebe que la puerta se mueve con suavidad y que las holguras son uniformes.',
+  'Zargendichtung ausklinken und eindrücken': 'Ranurar y volver a presionar la junta del marco de la puerta',
+  'Dichtung an jedem Band und am Schließblech bis zur gedachten Linie (strichliert) einschneiden – <b>2 Schnitte</b> je Band bzw. Schließblech.': 'Corte la junta hasta la línea discontinua en cada bisagra y en el cerradero: <b>2 cortes</b> por bisagra o cerradero.',
+  'Dichtung umdrehen und den eingeschnittenen Teil entlang der Linie wegschneiden.': 'Gire la junta y corte la parte marcada a lo largo de la línea.',
+  'Hohlkammer aufklappen, den inneren Lappen an den Enden einschneiden und wegschneiden.': 'Abra la cámara hueca, corte la pestaña interior en los extremos y retírela.',
+  'Zargendichtung wieder in das Türzargenprofil <b>(1)</b> eindrücken.': 'Vuelva a presionar la junta del marco de la puerta en el perfil del marco de la puerta <b>(1)</b>.',
+  'Anlage reinigen': 'Limpiar la instalación',
+  'Gesamte Anlage und Glas reinigen.': 'Limpie toda la instalación y el vidrio.',
+  'Zement, Gips oder Mörtelreste auf dem Aluminium sofort mit Wasser und milder Seife entfernen – keine scharfen oder alkalischen Reiniger.': 'Elimine de inmediato los restos de cemento, yeso o mortero del aluminio con agua y jabón suave; no use limpiadores agresivos ni alcalinos.',
+
+  'Glasreiniger': 'Limpiavidrios',
+  'Vinylroller': 'Rodillo de vinilo',
+
+  'Türblatt mit den vormontierten Beschlägen (laut Herstellerangabe) in den Rahmen einsetzen und gegebenenfalls ausrichten – dazu die Einstellmöglichkeiten des Hydraulikbandes nutzen (laut Herstellerangabe bzw. Montageanleitung des Hydraulikbandes).': 'Coloque la hoja de la puerta con los herrajes premontados (según las indicaciones del fabricante) en el marco y, si es necesario, ajústela aprovechando las posibilidades de ajuste de la bisagra hidráulica (según las indicaciones del fabricante o las instrucciones de montaje de la bisagra hidráulica).',
+  'Zargendichtung provisorisch in das Türzargenprofil <b>(1)</b> einsetzen und die Position der Bänder und des Schließblechs auf der Dichtung markieren. Dichtung danach wieder herausnehmen.': 'Coloque provisionalmente la junta del marco de la puerta en el perfil del marco de la puerta <b>(1)</b> y marque en la junta la posición de las bisagras y del cerradero. Después vuelva a retirar la junta.',
+
+  'Glas-Auflage-Winkel links (Oberlicht)': 'Ángulo de apoyo del vidrio izquierdo (montante)',
+  'Glas-Auflage-Winkel rechts (Oberlicht)': 'Ángulo de apoyo del vidrio derecho (montante)',
+  'Schließblech CP DORMA (für hohe Schlösser)': 'Cerradero CP DORMA (para cerraduras altas)',
+  '<b>Option:</b> Bei hohen Schlössern wird das Schließblech CP DORMA <b>(17)</b> verwendet – Befestigung ebenfalls mit zwei Hammerkopfmuttern und Senkkopfschrauben.': '<b>Opción:</b> para cerraduras altas se utiliza el cerradero CP DORMA <b>(17)</b>; también se fija con dos tuercas de cabeza de martillo y tornillos de cabeza avellanada.',
+
+  'Lippen der Anschlagdichtung <b>(9)</b> je nach Glasdicke der Fixverglasung entfernen: <b>8 mm</b> komplett verwenden · <b>10 mm</b> eine Lippe abziehen · <b>12 mm</b> beide Lippen abziehen.': 'Retire los labios de la junta de acristalamiento <b>(9)</b> según el grosor del acristalamiento fijo: <b>8 mm</b> junta completa · <b>10 mm</b> quite un labio · <b>12 mm</b> quite ambos labios.',
+  'Türglas 8 mm oder 10 mm: Hammerkopfmutter 8–10 mm (14), Position A12/B12 · Türglas 12 mm: Hammerkopfmutter 12 mm (15), Position C13/D13': 'Vidrio de puerta de 8 mm o 10 mm: tuerca de cabeza de martillo 8–10 mm (14), posición A12/B12 · vidrio de puerta de 12 mm: tuerca de cabeza de martillo 12 mm (15), posición C13/D13',
+  'Mit Top Light ist das Türglas 8 mm oder 10 mm: Hammerkopfmutter 8–10 mm (14), Position A12/B12': 'Con Top Light, el vidrio de la puerta es de 8 mm o 10 mm: tuerca de cabeza de martillo 8–10 mm (14), posición A12/B12',
+  'Glas einsetzen und auf die Glas-Auflage-Winkel setzen. Clipprofil passend zur Glasdicke wählen – das Oberlicht hat immer dieselbe Glasstärke wie die Tür: <b>8 mm → 41AL-CLIP-TL-8</b>, <b>10 mm → 41AL-CLIP-TL-10</b>.': 'Coloque el vidrio y apóyelo sobre los ángulos de apoyo del vidrio. Elija el perfil clip según el grosor del vidrio; el montante siempre tiene el mismo grosor de vidrio que la puerta: <b>8 mm → 41AL-CLIP-TL-8</b>, <b>10 mm → 41AL-CLIP-TL-10</b>.',
+
+  'Glasstoß zum Seitenteil: <b>3 mm</b> Fuge – mit Silikon oder dem CRL-Verbindungsstreifen <b>EZCC</b> (180°) schließen. Glas lotrecht ausrichten.': 'Unión de vidrio con el panel lateral: junta de <b>3 mm</b>; ciérrela con silicona o con la tira de unión de vidrio CRL <b>EZCC</b> (180°). Alinee el vidrio a plomo.',
+  'Glasfuge 3 mm: Silikonfuge oder CRL-Verbindungsstreifen (180°).': 'Junta de vidrio de 3 mm: junta de silicona o tira de unión de vidrio CRL (180°).',
+  'Ecklösung: Glasfuge an der 90°-Ecke mit Silikon oder dem CRL-Verbindungsstreifen <b>EZCL</b> (90° Ecke) schließen.': 'Solución de esquina: cierre la junta de vidrio en la esquina de 90° con silicona o con la tira de unión de vidrio CRL <b>EZCL</b> (esquina de 90°).',
+  'Glasfuge an der Ecke: Silikonfuge oder CRL-Verbindungsstreifen (90° Ecke).': 'Junta de vidrio en la esquina: junta de silicona o tira de unión de vidrio CRL (esquina de 90°).',
+  'CRL-Verbindungsstreifen 180°': 'Tira de unión de vidrio CRL 180°',
+  'CRL-Verbindungsstreifen 90° Ecke': 'Tira de unión de vidrio CRL, esquina de 90°',
+
+  // ---------------------------------------------------------------- Beschriftungen in Zeichnungen
+  'Verglasungsblock': 'Bloque de apoyo',
+  'Glas': 'Vidrio',
+  'Markierte Stellen: kein Verbinder notwendig': 'Puntos marcados: no se necesita conector',
+  'Steg': 'Puente',
+  'links': 'izquierda',
+  'rechts': 'derecha',
+  'wie geliefert': 'como se suministra',
+  'wie montiert': 'como se instala',
+  'linksbündig': 'alineado a la izquierda',
+  'rechtsbündig': 'alineado a la derecha'
+};
+
+// Tabellen (extraHtml): Wortersetzungen
+window.I18N_ES_HTML = [
+  ['Glasdicke', 'Grosor del vidrio'], ['Schließblech', 'Cerradero'], ['Türband', 'Bisagra'],
+  ['DIN links', 'DIN izquierda'], ['DIN rechts', 'DIN derecha'],
+  ['Gewicht Türblatt', 'Peso de la hoja de la puerta'], ['Anzahl Türbänder', 'Número de bisagras'],
+  ['Richtwerte nach Höhe: über 2.400 mm = 3 Bänder, über 2.800 mm = 4 Bänder.', 'Valores orientativos según la altura: más de 2.400 mm = 3 bisagras, más de 2.800 mm = 4 bisagras.'],
+  ['Anschlagdichtung (9)', 'Junta de acristalamiento (9)'], ['beide Lippen abziehen', 'quitar ambos labios'], ['1 Lippe abziehen', 'quitar un labio'], ['komplett', 'junta completa']
+];
+
+window.I18N_ES_GENERAL = `
+<h4>Indicaciones generales de montaje</h4>
+<ul>
+  <li>Realice el montaje solo con los componentes planificados y aprobados por Längle para la situación de instalación. La planificación aprobada o el dibujo del sistema tienen prioridad.</li>
+  <li>Montaje solo por personal calificado; utilice únicamente productos sin daños.</li>
+  <li>Instale los componentes a plomo, nivelados y a escuadra; utilice únicamente los elementos de fijación previstos.</li>
+  <li>Utilice solo vidrio templado o vidrio laminado de vidrio templado.</li>
+  <li>Solo para uso en interiores: no apto para duchas, saunas, piscinas o baños de salmuera, ni para locales donde se utilicen productos químicos (p. ej., cloro).</li>
+  <li>Los selladores deben ser compatibles con todos los materiales adyacentes.</li>
+</ul>
+<h4>Manipulación del aluminio</h4>
+<ul>
+  <li>Almacene los perfiles protegidos y en lugar seco; manténgalos alejados del agua, el barro y las salpicaduras.</li>
+  <li>Compruebe que la mercancía esté completa en el momento de la entrega; comunique los defectos en un plazo de 8 días hábiles.</li>
+  <li>Proteja la instalación después del montaje: elimine de inmediato el cemento, el yeso o los productos de limpieza con agua y jabón suave.</li>
+</ul>
+<h4>Dimensiones máximas (valores orientativos)</h4>
+<ul>
+  <li>Puertas: ancho 1.000 mm, alto 3.000 mm</li>
+  <li>Paneles fijos: ancho ilimitado, alto 3.400 mm</li>
+</ul>
+<h4>Número de bisagras</h4>
+<table class="tbl">
+  <thead><tr><th>Peso de la hoja de la puerta</th><th>Número de bisagras</th></tr></thead>
+  <tbody>
+    <tr><td>&lt; 57,5 kg</td><td>2</td></tr>
+    <tr><td>57,5 – 78,5 kg</td><td>3</td></tr>
+    <tr><td>&gt; 78,5 kg</td><td>4</td></tr>
+  </tbody>
+</table>
+<p class="small">Valores orientativos según la altura: más de 2.400 mm = 3 bisagras, más de 2.800 mm = 4 bisagras.</p>
+<h4>Toma de medidas en obra</h4>
+<ol>
+  <li>Instale un láser de líneas autonivelante.</li>
+  <li>Mida las alturas a la izquierda, en el centro y a la derecha: la menor altura y anchura libres son las determinantes.</li>
+  <li>Instale el sistema y, si es necesario, rellene el espacio hasta la mampostería.</li>
+</ol>
+<p class="small">Garantía: 5 años desde la entrega.</p>
+`;

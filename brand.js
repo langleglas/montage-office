@@ -6,8 +6,10 @@
   // ---------------------------------------------------------------- Zoll-Umrechnung (FALLBROOK)
   // Übliche Maße in den Werten, wie CRL sie angibt; alles andere wird auf 1/16" gerundet.
   const INCH = {
-    1.5: '1/16"', 2: '1/16"', 3: '1/8"', 5: '3/16"', 8: '5/16"', 10: '3/8"', 12: '1/2"', 16: '5/8"',
-    20: '13/16"', 21: '13/16"', 80: '3 1/8"', 100: '4"', 300: '12"', 600: '24"',
+    1.5: '1/16"', 2: '1/16"', 3: '1/8"', 5: '3/16"',
+    // Vorgabe CRL/Längle (Lena, 15.10.2026)
+    8: '5/16"', 10: '3/8"', 12: '1/2"', 14: '9/16"', 16: '5/8"', 20: '3/4"', 22: '7/8"', 24: '15/16"', 26: '1"', 28: '1 1/8"',
+    21: '13/16"', 80: '3 1/8"', 100: '4"', 300: '12"', 600: '24"',
     1000: '39 3/8"', 2400: '94 1/2"', 2800: '110"', 3000: '118"', 3400: '133 7/8"', 6000: '236"'
   };
   function gcd(a, b) { return b ? gcd(b, a % b) : a; }
@@ -45,24 +47,34 @@
   const NR_MAP = P ? Object.keys(P).map(k => P[k]).filter(p => p.crl && /^[\w-]+$/.test(p.nr)).map(p => [p.nr, p.crl])
                          .sort((a, b) => b[0].length - a[0].length) : [];
 
+  // Amerikanisches Englisch und US-Glasbezeichnungen (FALLBROOK)
+  const US_EN = [
+    [/toughened safety glass \(ESG\) or laminated safety glass made of ESG \(VSG\)/g, 'tempered glass or laminated tempered glass'],
+    [/aluminium/g, 'aluminum'], [/stabilis/g, 'stabiliz'], [/([Cc])entre/g, '$1enter'], [/([Mm])itred/g, '$1itered'], [/([Mm])itre/g, '$1iter']
+  ];
+
   const BRANDS = {
     laengle: {
       id: 'laengle', product: 'OFFICE', company: 'Längle',
       logo: 'img/brand/laengle-logo-schwarz.webp', title: 'OFFICE Montage',
-      defaultLang: null, storageKey: 'office-lang',
+      langs: ['de', 'en'], storageKey: 'office-lang',
       nr: p => p.nr,
+      img: src => src,
       text: s => s
     },
     crl: {
       id: 'crl', product: 'FALLBROOK', company: 'CRL',
-      logo: null, title: 'FALLBROOK Assembly',
-      defaultLang: 'en', storageKey: 'fallbrook-lang',
+      logo: 'img/brand-crl/crl-logo.png', title: 'FALLBROOK Assembly',
+      hl3d: { mesh: 0x00b1eb, edge: 0x007fab },   // Hervorhebung im 3D-Modell in CRL-Blau
+      langs: ['en', 'es'], storageKey: 'fallbrook-lang',
       nr: p => p.crl || p.nr,
+      img: src => src.replace('img/profiles/', 'img/profiles-in/'),   // Profilzeichnungen mit Zoll-Maßen (aus der CRL-Anleitung)
       text: s => {
         if (typeof s !== 'string' || !s) return s;
         let o = s;
         NR_MAP.forEach(([a, b]) => { o = o.split(a).join(b); });
         o = o.replace(/(^|[^\w-])OFFICE(?![\w-])/g, '$1FALLBROOK').replace(/Längle/g, 'CRL');
+        US_EN.forEach(([a, b]) => { o = o.replace(a, b); });
         return toInches(o);
       }
     }
