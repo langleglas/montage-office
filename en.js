@@ -237,6 +237,20 @@ window.I18N_EN = {
   'CRL-Verbindungsstreifen 180°': 'CRL glass-to-glass joint strip 180°',
   'CRL-Verbindungsstreifen 90° Ecke': 'CRL glass-to-glass joint strip 90° corner',
 
+  'Kabelkanal': 'Cable channel',
+  'Kabelkanal Unterteil 80 × 48 mm': 'Cable channel base 80 × 48 mm',
+  'Kabelkanal Deckel 80 mm': 'Cable channel cover 80 mm',
+  'Kabelkanal einsetzen (Option)': 'Insert the cable channel (option)',
+  'Kabelkanal <b>(23)</b> links neben dem Türzargenprofil <b>(1)</b> einsetzen – vom Boden bis zur Decke.': 'Insert the cable channel <b>(23)</b> to the left of the door frame profile <b>(1)</b> – from floor to ceiling.',
+  'Kabelkanal <b>(23)</b> rechts neben dem Türzargenprofil <b>(1)</b> einsetzen – vom Boden bis zur Decke.': 'Insert the cable channel <b>(23)</b> to the right of the door frame profile <b>(1)</b> – from floor to ceiling.',
+  'Kabelkanäle <b>(23)</b> links und rechts neben dem Türzargenprofil <b>(1)</b> einsetzen – jeweils vom Boden bis zur Decke.': 'Insert the cable channels <b>(23)</b> to the left and right of the door frame profile <b>(1)</b> – each from floor to ceiling.',
+  'Der Kabelkanal sitzt zwischen Türzargenprofil <b>(1)</b> und Basisrahmenprofil <b>(2)</b> bzw. Wand. Die Anlage wird dadurch um die Kanalbreite breiter.': 'The cable channel sits between the door frame profile <b>(1)</b> and the base frame profile <b>(2)</b> or wall. The installation becomes wider by the width of the channel.',
+  'Deckel <b>(24)</b> nach der Elektroinstallation aufsetzen.': 'Fit the cover <b>(24)</b> after the electrical installation.',
+  'Die genauen Montageschritte für den Kabelkanal werden noch ergänzt.': 'The detailed installation steps for the cable channel will be added.',
+  'Tippen Sie im 3D-Modell auf ＋ neben der Tür, um einen Kabelkanal zu setzen.': 'Tap ＋ next to the door in the 3D model to place a cable channel.',
+  'Kabelkanal hier setzen': 'Place cable channel here',
+  'Kabelkanal entfernen': 'Remove cable channel',
+
   // ---------------------------------------------------------------- Beschriftungen in Zeichnungen
   'Verglasungsblock': 'Setting block',
   'Glas': 'Glass',

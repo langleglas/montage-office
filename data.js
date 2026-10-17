@@ -26,6 +26,9 @@
     16: { name: 'Schließblech 8–12 mm Glas',       nr: '41AL-OFFICE-CP',            crl: 'FSP' },
     // Schließblech für hohe Schlösser (Name „DORMA“ bleibt, kein Dorma-Produkt) – nur Längle, in Amerika nicht verwendet
     CP:     { pos: 17, name: 'Schließblech CP DORMA (für hohe Schlösser)', nr: '41AL-OFFICE-CP DORMA', img: 'CP', optional: true, brand: 'laengle' },
+    // Kabelkanal CC 80 (Option) – CRL-Nummer noch offen
+    CCB:    { pos: 23, name: 'Kabelkanal Unterteil 80 × 48 mm', nr: '41AL-CABLE CHANNEL BASE', crl: '–', img: 'CCB' },
+    CCC:    { pos: 24, name: 'Kabelkanal Deckel 80 mm', nr: '41AL-CABLE CHANNEL COVER', crl: '–', img: 'CCC' },
     CS:     { name: '180°-Verbinder',              nr: '41AL-OFFICE-CS',            crl: 'FCS', img: 'CS', optional: true },
     // Glas-Auflage-Winkel: bei Längle links und rechts getrennt, bei CRL als Set (brand = nur für diese Marke)
     TL3L:   { pos: 18, name: 'Glas-Auflage-Winkel links (Oberlicht)', nr: '41AL-OFFICE-H-TL-L', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3L', brand: 'laengle' },
@@ -38,7 +41,7 @@
   };
   Object.keys(PARTS).forEach(k => { if (PARTS[k].img !== false) PARTS[k].img = 'img/profiles/' + (PARTS[k].img || 'p' + k) + '.jpg'; });
   // Reihenfolge in der Teileliste: Profile, Dichtungen, Verbinder, Kleinteile
-  const PART_ORDER = [1, 2, 3, 4, 5, 'CLIPSD', 'TL4', 'TL5', 6, 7, 8, 9, 10, 11, 12, 13, 'CS', 14, 15, 16, 'CP', 'TL3L', 'TL3R', 'TL3', 'SDBL'];
+  const PART_ORDER = [1, 2, 3, 4, 5, 'CLIPSD', 'TL4', 'TL5', 'CCB', 'CCC', 6, 7, 8, 9, 10, 11, 12, 13, 'CS', 14, 15, 16, 'CP', 'TL3L', 'TL3R', 'TL3', 'SDBL'];
 
   // ---------------------------------------------------------------- Varianten
   // B = Tür mit Oberlicht (Festteil über der Tür), C = Tür bis zur Decke
@@ -111,6 +114,7 @@
     c180: { img: 'img/tools/ezcc.jpg', name: 'CRL-Verbindungsstreifen 180°', nr: 'EZCC', crl: 'EZCC' },
     c90: { img: 'img/tools/ezcl.jpg', name: 'CRL-Verbindungsstreifen 90° Ecke', nr: 'EZCL', crl: 'EZCL' }
   };
+  const CC_TEXT = { L: 'Kabelkanal <b>(23)</b> links neben dem Türzargenprofil <b>(1)</b> einsetzen – vom Boden bis zur Decke.', R: 'Kabelkanal <b>(23)</b> rechts neben dem Türzargenprofil <b>(1)</b> einsetzen – vom Boden bis zur Decke.', LR: 'Kabelkanäle <b>(23)</b> links und rechts neben dem Türzargenprofil <b>(1)</b> einsetzen – jeweils vom Boden bis zur Decke.' };
   const pdfKey = c => c.type.toLowerCase() + (c.door === 'M' ? '3' : '24');
 
   // ---------------------------------------------------------------- Montageschritte
@@ -245,6 +249,21 @@
       ],
       notes: ['Schraubenköpfe müssen bündig sitzen. Spalt zwischen Profil und Mauerwerk gegebenenfalls hinterfüllen. Im Bereich der Befestigungspunkte unterlegen.'],
       hl: ['p1', 'p2floor', 'p2wall', 'p4']
+    },
+    {
+      // Option Kabelkanal: Position wird im 3D-Modell gewählt (links/rechts der Tür); Montage folgt noch
+      id: 'kabelkanal', phase: 'set', view: 'area', option: true,
+      // vorerst ausgeblendet (Lena, 17.10.2026): nur Option + 3D-Darstellung; Schritt und Teile erst, wenn die Montage geklärt ist
+      cond: () => false,   // später: c => c.cable && c.cc.length > 0
+      title: 'Kabelkanal einsetzen (Option)',
+      parts: ['CCB', 'CCC'],
+      text: [
+        c => ({ t: CC_TEXT[c.cc.length > 1 ? 'LR' : c.cc[0]], fig: () => window.BR && window.BR.id === 'crl' ? [f('cc80_3d')] : [f('cc80_schnitt'), f('cc80_3d')] }),
+        'Der Kabelkanal sitzt zwischen Türzargenprofil <b>(1)</b> und Basisrahmenprofil <b>(2)</b> bzw. Wand. Die Anlage wird dadurch um die Kanalbreite breiter.',
+        'Deckel <b>(24)</b> nach der Elektroinstallation aufsetzen.'
+      ],
+      notes: ['Die genauen Montageschritte für den Kabelkanal werden noch ergänzt.'],
+      spots: ['cc'], hl: ['cc']
     },
     {
       id: 'anschlag', phase: 'glass', view: 'overview',

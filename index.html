@@ -20,6 +20,7 @@
         <label class="toggle"><input type="checkbox" data-opt="frameT"> <span class="i18n">Glasstoß</span></label>
         <label class="toggle" id="optTopLight"><input type="checkbox" data-opt="topLight"> <span>Top Light</span></label>
         <label class="toggle" id="optSwing"><input type="checkbox" data-opt="swing"> <span>Swing Door</span></label>
+        <label class="toggle" id="optCable"><input type="checkbox" data-opt="cable"> <span class="i18n">Kabelkanal</span></label>
       </div>
       <button id="guideBtn" class="btn primary i18n">▶ Schritt für Schritt</button>
       <button id="resetBtn" class="btn icon" data-i18n-title="Ansicht zurücksetzen" title="Ansicht zurücksetzen" aria-label="Ansicht zurücksetzen">⟲</button>
@@ -77,6 +78,7 @@
     <button class="btn icon close" aria-label="Schließen">✕</button>
   </div>
 
+  <script>window.FEATURES = { cable: false };</script>
   <script src="vendor/three.min.js"></script>
   <script src="vendor/OrbitControls.js"></script>
   <script src="data.js"></script>

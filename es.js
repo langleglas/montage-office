@@ -237,6 +237,20 @@ window.I18N_ES = {
   'CRL-Verbindungsstreifen 180°': 'Tira de unión de vidrio CRL 180°',
   'CRL-Verbindungsstreifen 90° Ecke': 'Tira de unión de vidrio CRL, esquina de 90°',
 
+  'Kabelkanal': 'Canal para cables',
+  'Kabelkanal Unterteil 80 × 48 mm': 'Canal para cables, base 80 × 48 mm',
+  'Kabelkanal Deckel 80 mm': 'Canal para cables, tapa 80 mm',
+  'Kabelkanal einsetzen (Option)': 'Colocar el canal para cables (opción)',
+  'Kabelkanal <b>(23)</b> links neben dem Türzargenprofil <b>(1)</b> einsetzen – vom Boden bis zur Decke.': 'Coloque el canal para cables <b>(23)</b> a la izquierda del perfil del marco de la puerta <b>(1)</b>, desde el suelo hasta el techo.',
+  'Kabelkanal <b>(23)</b> rechts neben dem Türzargenprofil <b>(1)</b> einsetzen – vom Boden bis zur Decke.': 'Coloque el canal para cables <b>(23)</b> a la derecha del perfil del marco de la puerta <b>(1)</b>, desde el suelo hasta el techo.',
+  'Kabelkanäle <b>(23)</b> links und rechts neben dem Türzargenprofil <b>(1)</b> einsetzen – jeweils vom Boden bis zur Decke.': 'Coloque los canales para cables <b>(23)</b> a la izquierda y a la derecha del perfil del marco de la puerta <b>(1)</b>, cada uno desde el suelo hasta el techo.',
+  'Der Kabelkanal sitzt zwischen Türzargenprofil <b>(1)</b> und Basisrahmenprofil <b>(2)</b> bzw. Wand. Die Anlage wird dadurch um die Kanalbreite breiter.': 'El canal para cables se sitúa entre el perfil del marco de la puerta <b>(1)</b> y el perfil base <b>(2)</b> o la pared. La instalación es más ancha en el ancho del canal.',
+  'Deckel <b>(24)</b> nach der Elektroinstallation aufsetzen.': 'Coloque la tapa <b>(24)</b> después de la instalación eléctrica.',
+  'Die genauen Montageschritte für den Kabelkanal werden noch ergänzt.': 'Los pasos de montaje detallados del canal para cables se añadirán más adelante.',
+  'Tippen Sie im 3D-Modell auf ＋ neben der Tür, um einen Kabelkanal zu setzen.': 'Toque ＋ junto a la puerta en el modelo 3D para colocar un canal para cables.',
+  'Kabelkanal hier setzen': 'Colocar el canal aquí',
+  'Kabelkanal entfernen': 'Quitar el canal',
+
   // ---------------------------------------------------------------- Beschriftungen in Zeichnungen
   'Verglasungsblock': 'Bloque de apoyo',
   'Glas': 'Vidrio',

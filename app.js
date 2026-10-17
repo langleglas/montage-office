@@ -20,6 +20,9 @@ if (!BR.langs.includes(LANG)) {
   LANG = BR.langs.includes(nav) ? nav : BR.langs[0];
 }
 // BR.text: markenspezifische Anpassung (FALLBROOK: CRL-Artikelnummern, Zoll, Produktname)
+// Funktionen, die auf einer Seite ausgeblendet werden können (z. B. Kunden-Version: window.FEATURES = { cable: false })
+const FEAT = Object.assign({ cable: true }, window.FEATURES || {});
+if (!FEAT.cable) { const o = document.querySelector('#optCable'); if (o) o.remove(); }
 const RT = BR.product.toLowerCase();   // Adresse: #/office/… bzw. #/fallbrook/…
 const lookup = (l, s) => I18N[l] && I18N[l].dict && I18N[l].dict[s] != null ? I18N[l].dict[s] : null;
 const T = s => {
@@ -57,7 +60,8 @@ document.querySelectorAll('.i18n').forEach(el => { if (!el.dataset.i18n) el.data
   // #/                       Startseite
   // #/office?ecke=1          Variantenwahl
   // #/office/B4?ecke=1&glasstoss=1&toplight=1&swing=1&schritt=j   Anleitung
-  const state = { cfg: null, sel: null, tab: 'steps', cornerPick: false };
+  // ccEdit: ＋/− zum Setzen der Kabelkanäle sichtbar – direkt nach dem Anwählen der Option oder nach Klick auf einen Kabelkanal
+  const state = { cfg: null, sel: null, tab: 'steps', cornerPick: false, ccEdit: false };
 
   function route() {
     const h = location.hash.replace(/^#\/?/, '');
@@ -74,7 +78,10 @@ document.querySelectorAll('.i18n').forEach(el => { if (!el.dataset.i18n) el.data
       frameT: q.get('glasstoss') === '1',
       topLight: v.type === 'C' && q.get('toplight') === '1',
       // Top Light und Swing Door sind nicht kombinierbar – Top Light hat Vorrang
-      swing: q.get('swing') === '1' && !(v.type === 'C' && q.get('toplight') === '1')
+      swing: q.get('swing') === '1' && !(v.type === 'C' && q.get('toplight') === '1'),
+      // Kabelkanal: Option + gewählte Positionen (L/R = links/rechts neben der Tür)
+      cable: FEAT.cable && q.get('kabel') === '1',
+      cc: (q.get('kk') || '').split(',').filter((p, i, a) => ['L', 'R'].includes(p) && a.indexOf(p) === i).sort()
     }, q.get('schritt'));
   }
 
@@ -84,6 +91,8 @@ document.querySelectorAll('.i18n').forEach(el => { if (!el.dataset.i18n) el.data
     if (cfg.frameT) q.push('glasstoss=1');
     if (cfg.topLight) q.push('toplight=1');
     if (cfg.swing) q.push('swing=1');
+    if (cfg.cable) q.push('kabel=1');
+    if (cfg.cc && cfg.cc.length) q.push('kk=' + cfg.cc.join(','));
     if (step) q.push('schritt=' + step);
     return '#/' + RT + '/' + cfg.code + (q.length ? '?' + q.join('&') : '');
   }
@@ -249,7 +258,9 @@ function rerender() {
       const hits = ray.intersectObjects(pickables, false);
       const hit = hits.find(h => h.object.userData.base !== M.glass) || hits[0];
       if (!hit) return;
+      if (hit.object.userData.tags.includes('cc')) { setCcEdit(true); return; }
       const cand = activeSteps().filter(s => (s.hl || []).some(t => hit.object.userData.tags.includes(t)) && s.spots);
+      setCcEdit(false);
       if (!cand.length) return;
       const i = cand.findIndex(s => s.id === state.sel);
       select(cand[(i + 1) % cand.length].id);
@@ -263,6 +274,7 @@ function rerender() {
   // Profilmaße (vereinfacht, für die Sichtbarkeit leicht verbreitert)
   const F = 0.032, FD = 0.034, DF = 0.048, DD = 0.05, GT = 0.01;
   const H = 2.70, PW = 0.95, DW = 0.90, HD = 2.15, R = 0.8, TL_BOTTOM = 2.17;
+  const CCW = 0.08, CCD = DD;      // Kabelkanal CC 80: 80 mm breit, Tiefe bündig mit dem Türzargenprofil (48 mm)
 
   function box(group, x0, y0, z0, x1, y1, z1, mat, tags = []) {
     const g = new THREE.BoxGeometry(Math.abs(x1 - x0), Math.abs(y1 - y0), Math.abs(z1 - z0));
@@ -286,12 +298,15 @@ function rerender() {
     }
     pickables = [];
     const g = new THREE.Group();
-    const A = { H: [], I: [], J: [], K: [], L: [], M: [], N: [], glass: [], over: [], blocks: [], frameT: [], hinge: [], strike: [], handle: [], notch: [], door: [], transom: [], tlCarrier: [], sd: [], frameMid: [] };
+    const A = { H: [], I: [], J: [], K: [], L: [], M: [], N: [], glass: [], over: [], blocks: [], frameT: [], hinge: [], strike: [], handle: [], notch: [], door: [], transom: [], tlCarrier: [], sd: [], frameMid: [], cc: [], ccSlots: [] };
     const zf = 0.03; // Anker leicht vor der Wandebene
 
-    const segs = cfg.door === 'L' ? ['door', 'panel'] : cfg.door === 'R' ? ['panel', 'door'] : ['panel', 'door', 'panel'];
+    const ccL = cfg.cable && cfg.cc.includes('L'), ccR = cfg.cable && cfg.cc.includes('R');
+    const segs = [];
+    (cfg.door === 'L' ? ['door', 'panel'] : cfg.door === 'R' ? ['panel', 'door'] : ['panel', 'door', 'panel'])
+      .forEach(t => { if (t === 'door' && ccL) segs.push('cc'); segs.push(t); if (t === 'door' && ccR) segs.push('cc'); });
     let x = 0;
-    const S = segs.map(t => { const w = t === 'door' ? DW + 2 * DF : PW; const s = { t, x0: x, x1: x + w }; x += w; return s; });
+    const S = segs.map(t => { const w = t === 'door' ? DW + 2 * DF : t === 'cc' ? CCW : PW; const s = { t, x0: x, x1: x + w }; x += w; return s; });
     const W = x;
     const cornerSide = cfg.corner ? (cfg.door === 'L' ? 'R' : 'L') : null;
     const wallL = cornerSide !== 'L', wallR = cornerSide !== 'R';
@@ -337,9 +352,10 @@ function rerender() {
     box(g, d.x0, 0, -DD / 2, d.x0 + DF, fTop, DD / 2, M.alu, ['p1']);
     box(g, d.x1 - DF, 0, -DD / 2, d.x1, fTop, DD / 2, M.alu, ['p1']);
     box(g, d.x0, innerTop, -DD / 2, d.x1, fTop, DD / 2, M.alu, ['p1']);
+    const di = S.indexOf(d), panelL = S[di - 1] && S[di - 1].t === 'panel', panelR = S[di + 1] && S[di + 1].t === 'panel';
     const panelSides = [];                                // Türrahmenseiten, an die ein Seitenteil grenzt
-    if (d.x0 > 0) panelSides.push(d.x0 + DF / 2);
-    if (d.x1 < W) panelSides.push(d.x1 - DF / 2);
+    if (panelL) panelSides.push(d.x0 + DF / 2);
+    if (panelR) panelSides.push(d.x1 - DF / 2);
     const wallSideX = cfg.door === 'M' ? null : (hingeRight ? d.x1 - DF / 2 : d.x0 + DF / 2);
     panelSides.forEach(px => A.I.push([px, 0.02, zf]));
 
@@ -354,12 +370,12 @@ function rerender() {
         if (hingeRight) ox1 = d.x1 - F * 0.5; else ox0 = d.x0 + F * 0.5;
       }
       // Mit Glasstoß: Oberlichtglas endet am Glasstoßprofil zum Seitenteil
-      if (cfg.frameT) { if (d.x0 > 0) ox0 = d.x0 + DF / 2 + 0.0105; if (d.x1 < W) ox1 = d.x1 - DF / 2 - 0.0105; }
+      if (cfg.frameT) { if (panelL) ox0 = d.x0 + DF / 2 + 0.0105; if (panelR) ox1 = d.x1 - DF / 2 - 0.0105; }
       box(g, ox0, fTop, -GT / 2, ox1, H - F, GT / 2, M.glass, ['over']);
       A.over.push([(d.x0 + d.x1) / 2, (fTop + H) / 2, zf]);
       // Option Glasstoß: auch dort, wo Oberlichtglas und Seitenteilglas wirklich aneinanderstoßen
       if (cfg.frameT) {
-        [d.x0 > 0 ? d.x0 + DF / 2 : null, d.x1 < W ? d.x1 - DF / 2 : null].filter(x => x !== null).forEach(jx => {
+        [panelL ? d.x0 + DF / 2 : null, panelR ? d.x1 - DF / 2 : null].filter(x => x !== null).forEach(jx => {
           box(g, jx - DF / 2, fTop, -FD / 2, jx + DF / 2, H - F, FD / 2, M.alu, ['frameT']);
           A.frameT.push([jx, (fTop + H - F) / 2, zf]);
         });
@@ -438,6 +454,20 @@ function rerender() {
       const sx = hingeRight ? d.x0 + DF : d.x1 - DF - 0.008;
       box(g, sx, 1.0, -0.02, sx + 0.008, 1.1, 0.02, M.steel, ['strike']);
       A.strike.push([lockFrameX, 1.05, zf]);
+    }
+
+    // Kabelkanal: senkrecht neben der Türzarge vom Boden bis zur Decke (Unterteil + Deckel)
+    S.filter(sg => sg.t === 'cc').forEach(sg => {
+      const top = isB ? H - F : H;
+      box(g, sg.x0, 0, -CCD / 2, sg.x1, top, CCD / 2, M.alu, ['cc']);
+      box(g, sg.x0 + 0.012, 0.003, CCD / 2 - 0.002, sg.x1 - 0.012, top - 0.003, CCD / 2 + 0.0004, M.steel, ['cc']);   // Deckel bündig eingelegt
+      A.cc.push([(sg.x0 + sg.x1) / 2, 1.2, zf]);
+    });
+    // mögliche Positionen zum Setzen/Entfernen im 3D-Modell
+    if (cfg.cable) {
+      const sL = S[di - 1], sR = S[di + 1];
+      A.ccSlots.push({ side: 'L', on: ccL, pos: [ccL ? (sL.x0 + sL.x1) / 2 : d.x0 - 0.03, 1.55, zf + 0.03] });
+      A.ccSlots.push({ side: 'R', on: ccR, pos: [ccR ? (sR.x0 + sR.x1) / 2 : d.x1 + 0.03, 1.55, zf + 0.03] });
     }
 
     // Ecklösung: Rückwand entlang -z am Ende ohne Tür
@@ -525,15 +555,32 @@ function rerender() {
         el.innerHTML = `<span class="lbl">${i + 1}</span>`;
         el.title = `${i + 1}. ${T(val(step.title, state.cfg))}`;
         el.setAttribute('aria-label', el.title);
-        el.addEventListener('click', e => { e.stopPropagation(); select(step.id); });
+        el.addEventListener('click', e => { e.stopPropagation(); setCcEdit(false); select(step.id); });
         hsLayer.appendChild(el);
         hsEls.push({ el, id: step.id, pos: new THREE.Vector3(...p) });
       });
     });
+    const ccShow = state.ccEdit || !(state.cfg && state.cfg.cc.length);
+    (ccShow && anchors && anchors.ccSlots || []).forEach(sl => {
+      const el = document.createElement('button');
+      el.className = 'cc-slot' + (sl.on ? ' on' : '');
+      el.textContent = sl.on ? '−' : '＋';
+      el.title = T(sl.on ? 'Kabelkanal entfernen' : 'Kabelkanal hier setzen');
+      el.setAttribute('aria-label', el.title);
+      el.addEventListener('click', e => {
+        e.stopPropagation();
+        const cc = sl.on ? state.cfg.cc.filter(p => p !== sl.side) : state.cfg.cc.concat(sl.side);
+        location.hash = guideHash(Object.assign({}, state.cfg, { cc }), state.sel);
+      });
+      hsLayer.appendChild(el);
+      hsEls.push({ el, id: 'cc-slot', pos: new THREE.Vector3(...sl.pos) });
+    });
     updateHotspotClasses();
   }
+  function setCcEdit(on) { if (state.ccEdit !== on) { state.ccEdit = on; buildHotspots(); } }
   function updateHotspotClasses() {
     hsEls.forEach(h => {
+      if (h.id === 'cc-slot') return;
       h.el.classList.toggle('active', h.id === state.sel);
       h.el.classList.toggle('dim', !!state.sel && h.id !== state.sel);
     });
@@ -545,7 +592,7 @@ function rerender() {
       pv.copy(hs.pos).project(camera);
       // Bei sehr kleiner 3D-Ansicht (Anleitung groß aufgezogen) nur die Punkte des aktuellen Schritts zeigen
       const compact = h < 300;
-      const vis = pv.z < 1 && Math.abs(pv.x) < 1.2 && Math.abs(pv.y) < 1.2 && (!compact || hs.id === state.sel);
+      const vis = pv.z < 1 && Math.abs(pv.x) < 1.2 && Math.abs(pv.y) < 1.2 && (!compact || hs.id === state.sel || hs.id === 'cc-slot');
       hs.el.style.display = vis ? '' : 'none';
       if (vis) hs.el.style.transform = `translate(${(pv.x + 1) / 2 * w}px, ${(1 - pv.y) / 2 * h}px)`;
     });
@@ -652,7 +699,7 @@ function rerender() {
   }
 
   function cfgLabel(cfg) {
-    const o = [cfg.corner ? T('Ecklösung') : T('gerade'), cfg.frameT && T('Glasstoß'), cfg.topLight && 'Top Light', cfg.swing && 'Swing Door'].filter(Boolean);
+    const o = [cfg.corner ? T('Ecklösung') : T('gerade'), cfg.frameT && T('Glasstoß'), cfg.topLight && 'Top Light', cfg.swing && 'Swing Door', cfg.cable && T('Kabelkanal')].filter(Boolean);
     return `${cfg.code} · ${o.join(' · ')}`;
   }
 
@@ -757,6 +804,7 @@ function rerender() {
       });
       content = `<div class="pad">
         <p class="config-line">${esc(cfgLabel(cfg))}</p>
+        ${cfg.cable && !cfg.cc.length ? `<p class="cc-hint">${T('Tippen Sie im 3D-Modell auf ＋ neben der Tür, um einen Kabelkanal zu setzen.')}</p>` : ''}
         <p class="intro">${list.length} ${T('Schritte. Klicken Sie auf einen Punkt im Modell oder einen Schritt – oder starten Sie mit <b>„Schritt für Schritt“</b>.')}</p>
         ${html}</ul></div>`;
     } else if (state.tab === 'parts') {
@@ -812,6 +860,7 @@ function rerender() {
   body.addEventListener('click', e => {
     const t = e.target.closest('[data-sel],[data-tab],[data-act],[data-img]');
     if (!t) return;
+    setCcEdit(false);
     if (t.dataset.sel) select(t.dataset.sel);
     else if (t.dataset.tab) { state.tab = t.dataset.tab; renderPanel(); }
     else if (t.dataset.act === 'back') deselect();
@@ -822,11 +871,13 @@ function rerender() {
 
   // ---------------------------------------------------------------- Bedienelemente
   document.querySelectorAll('[data-opt]').forEach(inp => inp.addEventListener('change', () => {
+    state.ccEdit = inp.dataset.opt === 'cable' && inp.checked;
     const cfg = Object.assign({}, state.cfg, { [inp.dataset.opt]: inp.checked });
     location.hash = guideHash(cfg, state.sel);
   }));
-  $('#guideBtn').addEventListener('click', () => select(activeSteps()[0].id));
-  $('#resetBtn').addEventListener('click', () => { if (state.sel) deselect(); else flyHome(); });
+  $('#guideBtn').addEventListener('click', () => { setCcEdit(false); select(activeSteps()[0].id); });
+  $('#resetBtn').addEventListener('click', () => {
+    setCcEdit(false); if (state.sel) deselect(); else flyHome(); });
   window.addEventListener('keydown', e => {
     if ($('#view-guide').hidden) return;
     if (e.key === 'Escape') { if (!lb.hidden) lb.hidden = true; else if (state.sel) deselect(); }
