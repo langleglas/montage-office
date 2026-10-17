@@ -236,6 +236,8 @@ function rerender() {
       gasket: new THREE.MeshStandardMaterial({ color: 0x2a2b2d, roughness: 0.8 }),
       glass: new THREE.MeshPhysicalMaterial({ color: 0xc5dfe4, transparent: true, opacity: 0.22, roughness: 0.05, depthWrite: false, side: THREE.DoubleSide }),
       steel: new THREE.MeshStandardMaterial({ color: 0xd0d3d6, metalness: 0.2, roughness: 0.35 }),
+      hw: new THREE.MeshStandardMaterial({ color: 0xc8ccd1, metalness: 0.55, roughness: 0.32 }),
+      hwDark: new THREE.MeshStandardMaterial({ color: 0x2a2b2d, roughness: 0.6 }),
       wood: new THREE.MeshStandardMaterial({ color: 0x8a6a4a, roughness: 0.9 }),
       wall: new THREE.MeshStandardMaterial({ color: 0xebe9e4, transparent: true, opacity: 0.35, roughness: 1, depthWrite: false }),
       edge: new THREE.LineBasicMaterial({ color: 0x33363b }),
@@ -290,6 +292,38 @@ function rerender() {
     if (tags.length) pickables.push(m);
     return m;
   }
+
+function addMesh(group, geo, mat, tags, pos, rot) {
+  const m = new THREE.Mesh(geo, mat);
+  m.position.set(...pos);
+  if (rot) m.rotation.set(...rot);
+  m.userData = { tags, base: mat };
+  m.castShadow = true; m.receiveShadow = true;
+  const em = M.edge;
+  const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo, 35), em);
+  edges.userData.base = em;
+  m.add(edges);
+  group.add(m);
+  if (tags.length) pickables.push(m);
+  return m;
+}
+// Platte mit abgerundeten Ecken (w × h in der x/y-Ebene, Dicke d in z), Mittelpunkt bei pos
+function roundPlate(group, w, h, d, r, mat, tags, pos) {
+  const sh = new THREE.Shape(), x = -w / 2, y = -h / 2;
+  sh.moveTo(x + r, y); sh.lineTo(x + w - r, y); sh.quadraticCurveTo(x + w, y, x + w, y + r);
+  sh.lineTo(x + w, y + h - r); sh.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  sh.lineTo(x + r, y + h); sh.quadraticCurveTo(x, y + h, x, y + h - r);
+  sh.lineTo(x, y + r); sh.quadraticCurveTo(x, y, x + r, y);
+  const geo = new THREE.ExtrudeGeometry(sh, { depth: d, bevelEnabled: true, bevelThickness: d * 0.25, bevelSize: Math.min(r, d) * 0.4, bevelSegments: 2, curveSegments: 6 });
+  geo.translate(0, 0, -d / 2);
+  return addMesh(group, geo, mat, tags, pos);
+}
+// Zylinder entlang x, y oder z
+function cyl(group, r, len, axis, mat, tags, pos) {
+  const geo = new THREE.CylinderGeometry(r, r, len, 24);
+  const rot = axis === 'x' ? [0, 0, Math.PI / 2] : axis === 'z' ? [Math.PI / 2, 0, 0] : null;
+  return addMesh(group, geo, mat, tags, pos, rot);
+}
 
   function buildModel(cfg) {
     if (model) {
@@ -417,23 +451,27 @@ function rerender() {
     const off = cfg.swing ? -0.05 : 0;
     const lx0 = dir < 0 ? -leafW - off : off, lx1 = dir < 0 ? -off : leafW + off;
     box(pivot, Math.min(lx0, lx1), 0.012, -GT / 2, Math.max(lx0, lx1), leafTop, GT / 2, M.glass, ['door']);
-    const lockLocal = dir * (leafW - 0.07);
+    const lockLocal = cfg.swing ? dir * (leafW - 0.07) : dir * (leafW - 0.122);
     if (cfg.swing) {
       box(pivot, lockLocal - 0.008, 0.75, 0.02, lockLocal + 0.008, 1.55, 0.035, M.steel, ['handle']);
       box(pivot, lockLocal - 0.008, 0.75, -0.035, lockLocal + 0.008, 1.55, -0.02, M.steel, ['handle']);
     } else {
-      box(pivot, lockLocal - 0.04, 1.0, -0.02, lockLocal + 0.04, 1.1, 0.02, M.steel, ['handle']);
+      // WSS Studio Alea: Schlosskasten auf beiden Glasseiten (150 × 55 mm), Drückerrosette + Schlüsselloch, L-Drücker
+      const LY = 1.02, lockC = dir * (leafW - 0.075), roseX = dir * (leafW - 0.122), keyX = dir * (leafW - 0.06);
       [-1, 1].forEach(sd => {
-        const h = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.13, 16), M.steel);
-        h.rotation.z = Math.PI / 2;
-        h.position.set(lockLocal - dir * 0.065, 1.05, sd * 0.055);
-        h.userData = { tags: ['handle'], base: M.steel };
-        pivot.add(h);
+        roundPlate(pivot, 0.15, 0.055, 0.009, 0.006, M.hw, ['handle'], [lockC, LY, sd * (GT / 2 + 0.0045)]);
+        const zf0 = sd * (GT / 2 + 0.0115);   // Außenfläche des Schlosskastens
+        // Schlüsselloch (Profilzylinder angedeutet)
+        box(pivot, keyX - 0.007, LY - 0.011, zf0 - sd * 0.001, keyX + 0.007, LY + 0.011, zf0 + sd * 0.0012, M.hwDark, ['handle']);
+        // Rosette und Drücker: Hals senkrecht zum Glas, Griff parallel zum Glas Richtung Band
+        cyl(pivot, 0.012, 0.012, 'z', M.hw, ['handle'], [roseX, LY, zf0 + sd * 0.006]);
+        cyl(pivot, 0.0095, 0.05, 'z', M.hw, ['handle'], [roseX, LY, zf0 + sd * 0.025]);
+        cyl(pivot, 0.0095, 0.135, 'x', M.hw, ['handle'], [roseX - dir * 0.0675, LY, zf0 + sd * 0.045]);
       });
     }
     pivot.updateMatrixWorld(true);
     const wp = (lx, y) => new THREE.Vector3(lx, y, 0).applyMatrix4(pivot.matrixWorld).toArray();
-    A.handle.push(wp(lockLocal, 1.05));
+    A.handle.push(wp(lockLocal, cfg.swing ? 1.05 : 1.02));
     A.door.push(wp(dir * leafW / 2, 1.2));
 
     if (cfg.swing) {
@@ -446,8 +484,12 @@ function rerender() {
       const n = leafTop > 2.4 ? 3 : 2;
       const ys = n === 3 ? [0.28, leafTop / 2, leafTop - 0.28] : [0.28, leafTop - 0.28];
       ys.forEach(y => {
-        box(g, hingeRight ? d.x1 - DF - 0.012 : d.x0 + DF, y - 0.055, -0.026, hingeRight ? d.x1 - DF : d.x0 + DF + 0.012, y + 0.055, 0.03, M.steel, ['hinge']);
-        box(pivot, dir < 0 ? -0.07 : 0, y - 0.05, -0.022, dir < 0 ? 0 : 0.07, y + 0.05, 0.022, M.steel, ['hinge']);
+        // Rahmenwinkel auf der Innenseite der Türzarge
+        const fx = hingeRight ? d.x1 - DF : d.x0 + DF;
+        box(g, hingeRight ? fx - 0.004 : fx, y - 0.045, -0.018, hingeRight ? fx : fx + 0.004, y + 0.045, 0.022, M.hw, ['hinge']);
+        // Bandrolle an der Drehachse und Glasklemmplatten (60 × 90 mm) auf beiden Glasseiten
+        cyl(pivot, 0.0135, 0.09, 'y', M.hw, ['hinge'], [-dir * 0.002, y, GT / 2 + 0.009]);
+        [-1, 1].forEach(sd => roundPlate(pivot, 0.06, 0.09, 0.008, 0.006, M.hw, ['hinge'], [dir * 0.042, y, sd * (GT / 2 + 0.004)]));
         A.hinge.push([hingeFrameX, y, zf]);
       });
       A.notch.push([hingeFrameX, (ys[0] + ys[1]) / 2, zf]);
