@@ -339,8 +339,10 @@ function cyl(group, r, len, axis, mat, tags, pos) {
     const segs = [];
     (cfg.door === 'L' ? ['door', 'panel'] : cfg.door === 'R' ? ['panel', 'door'] : ['panel', 'door', 'panel'])
       .forEach(t => { if (t === 'door' && ccL) segs.push('cc'); segs.push(t); if (t === 'door' && ccR) segs.push('cc'); });
-    let x = 0;
-    const S = segs.map(t => { const w = t === 'door' ? DW + 2 * DF : t === 'cc' ? CCW : PW; const s = { t, x0: x, x1: x + w }; x += w; return s; });
+    let x = 0, firstPanel = true;
+    // Option Glasstoß: im ersten Seitenteil zwei gleich große Gläser mit Glasstoßprofil dazwischen
+    const panelW = () => { const w = cfg.frameT && firstPanel ? 2 * PW + 0.048 : PW; firstPanel = false; return w; };
+    const S = segs.map(t => { const w = t === 'door' ? DW + 2 * DF : t === 'cc' ? CCW : panelW(); const s = { t, x0: x, x1: x + w }; x += w; return s; });
     const W = x;
     const cornerSide = cfg.corner ? (cfg.door === 'L' ? 'R' : 'L') : null;
     const wallL = cornerSide !== 'L', wallR = cornerSide !== 'R';
@@ -361,7 +363,10 @@ function cyl(group, r, len, axis, mat, tags, pos) {
       if (!isB) box(g, p.x0, H - F, -FD / 2, p.x1, H, FD / 2, M.alu, ['p4']);
       if (atWallL) { box(g, 0, F, -FD / 2, F, H - F, FD / 2, M.alu, ['p2wall']); A.H.push([F / 2, 0.02, zf]); A.J.push([F / 2, H - 0.02, zf]); }
       if (atWallR) { box(g, W - F, F, -FD / 2, W, H - F, FD / 2, M.alu, ['p2wall']); A.H.push([W - F / 2, 0.02, zf]); A.J.push([W - F / 2, H - 0.02, zf]); }
-      const gx0 = p.x0 + (p.x0 === 0 ? F * 0.5 : 0.015), gx1 = p.x1 - (p.x1 === W ? F * 0.5 : 0.015);
+      const si = S.indexOf(p), doorL = S[si - 1] && S[si - 1].t === 'door', doorR = S[si + 1] && S[si + 1].t === 'door';
+      const jg = isB && cfg.frameT ? 0.0105 : 0.0015;   // halbe Fuge zum Oberlichtglas (mit Glasstoßprofil 21 mm, sonst 3 mm)
+      const gx0 = doorL ? p.x0 - DF / 2 + jg : p.x0 + (p.x0 === 0 ? F * 0.5 : 0.015);
+      const gx1 = doorR ? p.x1 + DF / 2 - jg : p.x1 - (p.x1 === W ? F * 0.5 : 0.015);
       // Mit Glasstoß wird das Seitenteilglas geteilt: links und rechts vom Glasstoßprofil je eine Scheibe
       if (cfg.frameT && pi === 0) {
         const mx = (p.x0 + p.x1) / 2, gap = 0.0105;
@@ -371,7 +376,8 @@ function cyl(group, r, len, axis, mat, tags, pos) {
         box(g, gx0, F, -GT / 2, gx1, H - F, GT / 2, M.glass, ['glass']);
       }
       A.glass.push([(p.x0 + p.x1) / 2, 1.35, zf]);
-      [p.x0 + 0.12, p.x1 - 0.12].forEach(bx => { box(g, bx - 0.04, F - 0.006, -0.01, bx + 0.04, F - 0.001, 0.01, M.wood, ['blocks']); A.blocks.push([bx, F, zf]); });
+      const pm = (p.x0 + p.x1) / 2;
+      (cfg.frameT && pi === 0 ? [p.x0 + 0.12, pm - 0.12, pm + 0.12, p.x1 - 0.12] : [p.x0 + 0.12, p.x1 - 0.12]).forEach(bx => { box(g, bx - 0.04, F - 0.006, -0.01, bx + 0.04, F - 0.001, 0.01, M.wood, ['blocks']); A.blocks.push([bx, F, zf]); });
       if (cfg.frameT && pi === 0) {
         const mx = (p.x0 + p.x1) / 2;
         box(g, mx - 0.024, F, -FD / 2, mx + 0.024, H - F, FD / 2, M.alu, ['frameT']);
@@ -404,7 +410,9 @@ function cyl(group, r, len, axis, mat, tags, pos) {
         if (hingeRight) ox1 = d.x1 - F * 0.5; else ox0 = d.x0 + F * 0.5;
       }
       // Mit Glasstoß: Oberlichtglas endet am Glasstoßprofil zum Seitenteil
-      if (cfg.frameT) { if (panelL) ox0 = d.x0 + DF / 2 + 0.0105; if (panelR) ox1 = d.x1 - DF / 2 - 0.0105; }
+      const og = cfg.frameT ? 0.0105 : 0.0015;
+      if (panelL) ox0 = d.x0 + DF / 2 + og;
+      if (panelR) ox1 = d.x1 - DF / 2 - og;
       box(g, ox0, fTop, -GT / 2, ox1, H - F, GT / 2, M.glass, ['over']);
       A.over.push([(d.x0 + d.x1) / 2, (fTop + H) / 2, zf]);
       // Option Glasstoß: auch dort, wo Oberlichtglas und Seitenteilglas wirklich aneinanderstoßen
