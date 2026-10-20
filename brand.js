@@ -29,6 +29,8 @@
     return s
       // Bereiche: 30–60 cm, 1,5–5 mm, 8–10 mm
       .replace(new RegExp(N + '\\s?[–-]\\s?' + N + '\\s?(mm|cm|m)\\b', 'g'), (m, a, b, u) => `${inch(toMm(num(a), u))}–${inch(toMm(num(b), u))}`)
+      // Maße: 60 × 30 × 3 mm
+      .replace(new RegExp(N + '\\s?×\\s?' + N + '\\s?×\\s?' + N + '\\s?(mm|cm|m)\\b', 'g'), (m, a, b, c, u) => `${inch(toMm(num(a), u))} × ${inch(toMm(num(b), u))} × ${inch(toMm(num(c), u))}`)
       // Maße: 80 × 20 mm
       .replace(new RegExp(N + '\\s?×\\s?' + N + '\\s?(mm|cm|m)\\b', 'g'), (m, a, b, u) => `${inch(toMm(num(a), u))} × ${inch(toMm(num(b), u))}`)
       // Glasdicken: 8/10/12 mm

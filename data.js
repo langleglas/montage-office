@@ -1,43 +1,45 @@
 // Inhalte der interaktiven Montageanleitung OFFICE
 // Quellen: Montageanleitung OFFICE (Längle, Nov. 2024), FALLBROOK Assembly Instructions B2/B4, B3, C2/C4, C3 (CRL, Juni 2025),
-// Artikelzuordnung Längle ↔ CRL (OFFICE_Artikelzuornung_Laengle_CRL.xlsx).
+// Artikelzuordnung Längle ↔ CRL (OFFICE_Artikelzuordnung_Laengle_CRL.xlsx, korrigierte Fassung vom 20.10.2026).
 // Ablauf nach FALLBROOK, Bezeichnungen und Artikelnummern nach Längle.
 (function () {
   'use strict';
 
   // ---------------------------------------------------------------- Bauteile
   // key = Positionsnummer in den Zeichnungen (1–16) bzw. Kurzname für Zusatzteile; crl = Artikelnummer CRL (für FALLBROOK/CRL-Varianten)
+  // Artikelnummern und Bezeichnungen nach „OFFICE_Artikelzuordnung_Laengle_CRL.xlsx“ (Lena, 20.10.2026):
+  // nr = Längle (Reiter „Artikelzuordnung Längle“), crl = CRL (Reiter „Artikelzuordnung CRL USA“)
   const PARTS = {
-    1:  { name: 'Türzargenprofil',                 nr: '41AL-BASIS STOCK',          crl: 'FBD6MBL / FBD6SA' },
-    2:  { name: 'Basisrahmenprofil',               nr: '41AL-FRAME STOCK',          crl: 'FRMD6MBL / FRMD6SA' },
-    3:  { name: 'Clipprofil',                      nr: '41AL-CLIP STOCK',           crl: 'FCLPD6MBL / FCLPD6SA' },
-    4:  { name: 'Deckenbasisrahmenprofil',         nr: '41AL-TOP FRAME STOCK',      crl: 'FTPD6MBL / FTPD6SA' },
-    5:  { name: 'Glasstoßprofil',                  nr: '41AL-FRAME T STOCK',        crl: '41AL-FRAME T-D' },
-    6:  { name: 'Fixierdichtung',                  nr: '41AL-EPDM-F (25 m / 50 m)', crl: 'FRGBL / FRGBL25 / FRGGR / FRGGR25' },
-    7:  { name: 'Anschlagdichtung 16 mm',          nr: '41AL-EPDM-16 (50 m)',       crl: 'FFP16BL / FFP16GR' },
-    8:  { name: 'Zargendichtung',                  nr: '41AL-EPDM-B (25 m / 50 m)', crl: 'FDJBL / FDJBL25 / FDJGR / FDJGR25' },
-    9:  { name: 'Anschlagdichtung 8/10/12 mm',     nr: '41AL-EPDM-8/10/12 (25 m / 50 m)', crl: 'FFPBL / FFPBL25 / FFGR / FFGR25' },
-    10: { name: 'T-Verbinder (Basis und Top Frame oder Frame Verbinder)',          nr: '41AL-OFFICE-CT',            crl: 'FTC' },
-    11: { name: 'CL-Verbinder (Top Frame und Frame Verbinder)',          nr: '41AL-OFFICE-CL',            crl: 'FFCCL' },
-    12: { name: '90°-Eckverbinder (Boden- und Deckenprofilverbinder)',   nr: '41AL-OFFICE-CH',            crl: 'FXCH' },
-    13: { name: 'C-Verbinder (Boden- und Eckverbinder)', nr: '41AL-OFFICE-C',          crl: 'FFCC' },
-    14: { name: 'Hammerkopfmutter 8–10 mm Glas',   nr: '41AL-OFFICE-H 8/10',        crl: 'FHHN' },
-    15: { name: 'Hammerkopfmutter 12 mm Glas',     nr: '41AL-OFFICE-H 12',          crl: 'FHHN12' },
-    16: { name: 'Schließblech 8–12 mm Glas',       nr: '41AL-OFFICE-CP',            crl: 'FSP' },
-    // Schließblech für hohe Schlösser (Name „DORMA“ bleibt, kein Dorma-Produkt) – nur Längle, in Amerika nicht verwendet
-    CP:     { pos: 17, name: 'Schließblech CP DORMA (für hohe Schlösser)', nr: '41AL-OFFICE-CP DORMA', img: 'CP', optional: true, brand: 'laengle' },
-    // Kabelkanal CC 80 (Option) – CRL-Nummer noch offen
-    CCB:    { pos: 23, name: 'Kabelkanal Unterteil 80 × 48 mm', nr: '41AL-CABLE CHANNEL BASE', crl: '–', img: 'CCB' },
-    CCC:    { pos: 24, name: 'Kabelkanal Deckel 80 mm', nr: '41AL-CABLE CHANNEL COVER', crl: '–', img: 'CCC' },
+    1:  { name: 'Türzargenprofil',                 nr: '41AL-BASIS-D',              crl: 'FBD6MBL / FBD6SA' },
+    2:  { name: 'Basisrahmenprofil',               nr: '41AL-FRAME-D',              crl: 'FRMD6MBL / FRMD6SA' },
+    3:  { name: 'Clipprofil',                      nr: '41AL-CLIP-D',               crl: 'FCLPD6MBL / FCLPD6SA' },
+    4:  { name: 'Deckenbasisrahmenprofil',         nr: '41AL-TOP-D',                crl: 'FTPD6MBL / FTPD6SA' },
+    5:  { name: 'Glasstoßprofil',                  nr: '41AL-FRAME T-D',            crl: '41AL-FRAME T-D' },
+    6:  { name: 'Fixierdichtung',                  nr: '41AL-EPDM F',               crl: 'FRGBL / FRGBL25 / FRGGR / FRGGR25' },
+    7:  { name: 'Anschlagdichtung 16 mm & 28 mm',  nr: '41AL-EPDM 16',              crl: 'FFP16BL / FFP16GR' },
+    8:  { name: 'Zargendichtung',                  nr: '41AL-EPDM B',               crl: 'FDJBL / FDJBL25 / FDJGR / FDJGR25' },
+    9:  { name: 'Anschlagdichtung 8/10/12 mm & 20/22/24 mm', nr: '41AL-EPDM 8/10/12', crl: 'FFPBL / FFPBL25 / FFGR / FFGR25' },
+    10: { name: 'T-Verbinder (Basis und Top Frame oder Frame Verbinder)', nr: '41AL-OFFICE-CT',            crl: 'FTC' },
+    11: { name: 'CL-Verbinder (L-Verbinder, Top Frame und Frame Verbinder)', nr: '41AL-OFFICE-CL',            crl: 'FFCCL' },
+    12: { name: '90°-Eckverbinder (horizontal, für Boden- und Deckenprofil)', nr: '41AL-OFFICE-CH', crl: 'FXCH' },
+    13: { name: 'C-Verbinder (Boden- und Eckverbinder, vertikal)', nr: '41AL-OFFICE-C', crl: 'FFCC' },
+    14: { name: 'Hammerkopfmutter für 8–10 mm Glas', nr: '41AL-OFFICE-H',           crl: 'FHHN' },
+    15: { name: 'Hammerkopfmutter für 12 mm Glas', nr: '41AL-OFFICE-H-L-12',        crl: 'FHHN12' },
+    16: { name: 'Schließblech für 8–12 mm Glas',   nr: '41AL-OFFICE-CP',            crl: 'FSP' },
+    // Schließblech für hohe Schlösser – nur Längle, in Amerika nicht verwendet (CRL-Nr. laut Liste: FDSP)
+    CP:     { pos: 17, name: 'Schließblech Dorma/WSS für 8–12 mm Glas', nr: '41AL-OFFICE-CP DORMA', crl: 'FDSP', img: 'CP', optional: true, brand: 'laengle' },
+    // Kabelkanal CC 80 (Option) – bei CRL keine eigene Nummer
+    CCB:    { pos: 23, name: 'Kabelkanal Basisprofil (80 × 48 mm)', nr: '41AL-CABLE CHANNEL BASE', crl: '41AL-CABLE CHANNEL BASE', img: 'CCB' },
+    CCC:    { pos: 24, name: 'Abdeckprofil für Kabelkanal 80 mm', nr: '41AL-CABLE CHANNEL COVER', crl: '41AL-CABLE CHANNEL COVER', img: 'CCC' },
     CS:     { name: '180°-Verbinder',              nr: '41AL-OFFICE-CS',            crl: 'FCS', img: 'CS', optional: true },
     // Glas-Auflage-Winkel: bei Längle links und rechts getrennt, bei CRL als Set (brand = nur für diese Marke)
-    TL3L:   { pos: 18, name: 'Glas-Auflage-Winkel links (Oberlicht)', nr: '41AL-OFFICE-H-TL-L', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3L', brand: 'laengle' },
-    TL3R:   { pos: 18, name: 'Glas-Auflage-Winkel rechts (Oberlicht)', nr: '41AL-OFFICE-H-TL-R', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3R', brand: 'laengle' },
-    TL3:    { pos: 18, name: 'Glas-Auflage-Winkel links & rechts (Oberlicht)', nr: '41AL-OFFICE-H-TL-L+R', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3', brand: 'crl' },
-    TL4:    { pos: 19, name: 'Clipprofil Oberlicht 10 mm Glas', nr: '41AL-CLIP-TL-10',       crl: 'FCLPT3SA / FCLPT3MBL', img: 'TL4' },
-    TL5:    { pos: 20, name: 'Clipprofil Oberlicht 8 mm Glas',  nr: '41AL-CLIP-TL-8',        crl: 'FCLPT3SA / FCLPT3MBL', img: 'TL5' },
-    SDBL:   { pos: 21, name: 'Block für Pendeltür',         nr: '41AL-OFFICE-SD-BL',         crl: 'FCPDB1SA / FCPDB1MBL', img: 'SDBL' },
-    CLIPSD: { pos: 22, name: 'Clipprofil Pendeltür',        nr: '41AL-CLIP-SD STOCK',        crl: 'FCLPCP6SA / FCLPCP6MBL', img: 'CLIPSD' }
+    TL3L:   { pos: 18, name: 'Glas-Auflage-Winkel links, Oberlicht', nr: '41AL-OFFICE-H-TL-L', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3L', brand: 'laengle' },
+    TL3R:   { pos: 18, name: 'Glas-Auflage-Winkel rechts, Oberlicht', nr: '41AL-OFFICE-H-TL-R', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3R', brand: 'laengle' },
+    TL3:    { pos: 18, name: 'Glas-Auflage-Winkel links & rechts, Oberlicht', nr: '41AL-OFFICE-H-TL-L+R', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3', brand: 'crl' },
+    TL4:    { pos: 19, name: 'Clipprofil Oberlicht für 10 mm Glas', nr: '41AL-CLIP-TL-10',  crl: 'FCLPT3SA / FCLPT3MBL', img: 'TL4' },
+    TL5:    { pos: 20, name: 'Clipprofil Oberlicht für 8 mm Glas',  nr: '41AL-CLIP-TL-8',   crl: 'FCLPT3SA / FCLPT3MBL', img: 'TL5' },
+    SDBL:   { pos: 21, name: 'Block für Pendeltüre',        nr: '41AL-OFFICE-SD-BL',         crl: 'FCPDB1SA / FCPDB1MBL', img: 'SDBL' },
+    CLIPSD: { pos: 22, name: 'Clipprofil Pendeltür',        nr: '41AL-CLIP-SD',              crl: 'FCLPCP6SA / FCLPCP6MBL', img: 'CLIPSD' }
   };
   Object.keys(PARTS).forEach(k => { if (PARTS[k].img !== false) PARTS[k].img = 'img/profiles/' + (PARTS[k].img || 'p' + k) + '.jpg'; });
   // Reihenfolge in der Teileliste: Profile, Dichtungen, Verbinder, Kleinteile
