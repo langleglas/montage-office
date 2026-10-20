@@ -115,6 +115,7 @@
     c90: { img: 'img/tools/ezcl.jpg', name: 'CRL-Verbindungsstreifen 90° Ecke', nr: 'EZCL', crl: 'EZCL' }
   };
   const CC_TEXT = { L: 'Kabelkanal <b>(23)</b> links neben dem Türzargenprofil <b>(1)</b> einsetzen – vom Boden bis zur Decke.', R: 'Kabelkanal <b>(23)</b> rechts neben dem Türzargenprofil <b>(1)</b> einsetzen – vom Boden bis zur Decke.', LR: 'Kabelkanäle <b>(23)</b> links und rechts neben dem Türzargenprofil <b>(1)</b> einsetzen – jeweils vom Boden bis zur Decke.' };
+  // Zuschnitt (aus den FALLBROOK-Anleitungen): Ecken je Variante, die einem Verbindungsschritt zugeordnet sind; Ecklösung = eigenes Bild
   const pdfKey = c => c.type.toLowerCase() + (c.door === 'M' ? '3' : '24');
 
   // ---------------------------------------------------------------- Montageschritte
@@ -131,7 +132,7 @@
         { t: 'Ebenso im Türzargenprofil <b>(1)</b> an der Wandseite.', fig: [f('E_drill')] },
         'Lochgröße und Abstand richten sich nach Untergrund und Schrauben.'
       ],
-      notes: ['Profile (2) oder (4) länger als 6 m werden mit dem 180°-Verbinder 41AL-OFFICE-CS verbunden.'],
+      notes: ['Die Profile werden in der Regel fertig zugeschnitten geliefert. Bei eigenem Zuschnitt: siehe Reiter <a href="#" data-act="cut-tab">Zuschnitt</a>.', 'Profile (2) oder (4) länger als 6 m werden mit dem 180°-Verbinder 41AL-OFFICE-CS verbunden.'],
       hl: ['p1', 'p2floor', 'p2wall', 'p4']
     },
     {

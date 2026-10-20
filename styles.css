@@ -390,3 +390,44 @@ html[data-brand="crl"] .f-box line { stroke: var(--accent-text); }
 .cc-slot.on { background: var(--accent); color: #fff; }
 .cc-slot:hover { transform-origin: center; filter: brightness(1.05); }
 .cc-hint { font-size: 13px; background: var(--chip); border-radius: 8px; padding: 8px 10px; margin: 0 0 10px; }
+/* Zuschnitt */
+.cut-tab .ws-fig { display: block; width: 100%; margin: 6px 0 14px; }
+.cut-tab .ws-fig img, .cut-detail .ws-fig img { width: 100%; height: auto; display: block; }
+.cut-legend { font-size: 12.5px; color: var(--ink-2); margin: 4px 0 8px; }
+.cut-detail { margin: 2px 0 6px 38px; border: 1px solid var(--line); border-radius: 8px; padding: 0 10px; background: #fff; }
+.cut-detail summary { cursor: pointer; padding: 8px 0; font-size: 13.5px; color: var(--ink-2); list-style: none; }
+.cut-detail summary::-webkit-details-marker { display: none; }
+.cut-detail summary::before { content: "▸"; display: inline-block; width: 16px; transition: transform .15s; }
+.cut-detail[open] summary::before { transform: rotate(90deg); }
+.cut-detail .ws-fig { display: block; width: 100%; margin-bottom: 4px; }
+.note a { color: inherit; font-weight: 600; }
+/* Zuschnitt im 3D-Modell: Ecken als Rauten, Schnittfarben orange (45°) und blau (gerade) */
+:root { --cut-mc: #e8822a; --cut-sc: #2f74c0; }
+.hs.cut::before { width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius: 2px; transform: rotate(45deg); background: linear-gradient(135deg, var(--cut-mc) 50%, var(--cut-sc) 50%); }
+.hs.cut:hover::before, .hs.cut.active::before { transform: rotate(45deg) scale(1.4); }
+.hs.cut .lbl { color: var(--ink); opacity: 0; transition: opacity .15s; }
+.hs.cut:hover .lbl, .hs.cut.active .lbl { opacity: 1; }
+.cut-dim { position: absolute; left: 0; top: 0; width: 0; height: 0; pointer-events: none; }
+.cut-dim span { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); font-size: 12px; font-weight: 700; color: var(--ink); background: rgba(255,255,255,.92); border-radius: 3px; padding: 0 4px; white-space: nowrap; }
+.cut-key { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; margin: 0 0 12px; }
+.cut-key span, .cut-pieces li { display: flex; align-items: center; gap: 7px; }
+.cut-key i, .cut-pieces i { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+i.mc { background: var(--cut-mc); }
+i.sc { background: var(--cut-sc); }
+.cut-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.cut-list > li { border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.cut-list > li.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.cut-item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: none; border: 0; padding: 10px 12px; font: inherit; color: inherit; cursor: pointer; }
+.cut-item b { display: block; font-size: 14px; }
+.cut-item small { display: block; font-size: 12.5px; color: var(--ink-2); }
+.cut-ic { width: 12px; height: 12px; margin: 0 3px; flex-shrink: 0; border-radius: 2px; transform: rotate(45deg); background: linear-gradient(135deg, var(--cut-mc) 50%, var(--cut-sc) 50%); }
+.cut-pieces { list-style: none; margin: 0; padding: 2px 12px 8px 12px; display: grid; gap: 7px; font-size: 13.5px; }
+.cut-pieces li { align-items: flex-start; }
+.cut-pieces i { margin-top: 3px; }
+.cut-pieces small { display: block; font-size: 12.5px; color: var(--ink-2); }
+.cut-list .link { background: none; border: 0; padding: 0 12px 12px 33px; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--accent-text, var(--accent)); cursor: pointer; }
+.btn.cut-3d { display: block; margin: 4px 0 6px 38px; font-size: 13.5px; color: var(--ink-2); text-align: left; }
+.btn.cut-3d:hover { border-color: var(--accent); color: var(--ink); }
+.hs.cut.open { display: none !important; }
+i.none { background: #c9ccd0; }
+.cut-dim.deg span { color: #b85a0c; font-size: 11.5px; }

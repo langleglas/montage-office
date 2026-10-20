@@ -61,7 +61,7 @@ document.querySelectorAll('.i18n').forEach(el => { if (!el.dataset.i18n) el.data
   // #/office?ecke=1          Variantenwahl
   // #/office/B4?ecke=1&glasstoss=1&toplight=1&swing=1&schritt=j   Anleitung
   // ccEdit: ＋/− zum Setzen der Kabelkanäle sichtbar – direkt nach dem Anwählen der Option oder nach Klick auf einen Kabelkanal
-  const state = { cfg: null, sel: null, tab: 'steps', cornerPick: false, ccEdit: false };
+  const state = { cfg: null, sel: null, tab: 'steps', cornerPick: false, ccEdit: false, cutSel: null };
 
   function route() {
     const h = location.hash.replace(/^#\/?/, '');
@@ -246,6 +246,12 @@ function rerender() {
       edgeHl: new THREE.LineBasicMaterial({ color: BR.hl3d ? BR.hl3d.edge : 0x000000 }),
       hl: new THREE.MeshStandardMaterial({ color: BR.hl3d ? BR.hl3d.mesh : 0x1a1a1a, metalness: 0.1, roughness: 0.5 }),
       hlGlass: new THREE.MeshPhysicalMaterial({ color: BR.hl3d ? BR.hl3d.mesh : 0x555555, transparent: true, opacity: 0.3, depthWrite: false, side: THREE.DoubleSide }),
+      cutMC: new THREE.MeshBasicMaterial({ color: 0xc8600a, side: THREE.DoubleSide }),
+      dimLine: new THREE.MeshBasicMaterial({ color: 0x111111, depthTest: false, transparent: true, side: THREE.DoubleSide }),
+      cutSC: new THREE.MeshBasicMaterial({ color: 0x1d4f94, side: THREE.DoubleSide }),
+      ghostWall: new THREE.MeshBasicMaterial({ color: 0xebe9e4, transparent: true, opacity: 0.08, depthWrite: false }),
+      ghost: new THREE.MeshStandardMaterial({ color: 0xc9ccd0, transparent: true, opacity: 0.16, depthWrite: false }),
+      edgeGhost: new THREE.LineBasicMaterial({ color: 0x9aa0a6, transparent: true, opacity: 0.25 }),
       marker: new THREE.MeshBasicMaterial({ color: BR.hl3d ? BR.hl3d.mesh : 0x000000, transparent: true, opacity: 0.15, depthWrite: false })
     });
 
@@ -259,7 +265,7 @@ function rerender() {
       ray.setFromCamera({ x: ((e.clientX - r.left) / r.width) * 2 - 1, y: -((e.clientY - r.top) / r.height) * 2 + 1 }, camera);
       const hits = ray.intersectObjects(pickables, false);
       const hit = hits.find(h => h.object.userData.base !== M.glass) || hits[0];
-      if (!hit) return;
+      if (!hit || cutMode()) return;
       if (hit.object.userData.tags.includes('cc')) { setCcEdit(true); return; }
       const cand = activeSteps().filter(s => (s.hl || []).some(t => hit.object.userData.tags.includes(t)) && s.spots);
       setCcEdit(false);
@@ -334,6 +340,7 @@ function cyl(group, r, len, axis, mat, tags, pos) {
     const g = new THREE.Group();
     const A = { H: [], I: [], J: [], K: [], L: [], M: [], N: [], glass: [], over: [], blocks: [], frameT: [], hinge: [], strike: [], handle: [], notch: [], door: [], transom: [], tlCarrier: [], sd: [], frameMid: [], cc: [], ccSlots: [] };
     const zf = 0.03; // Anker leicht vor der Wandebene
+    const tJ = [];   // Glasstoßprofile (für den Zuschnitt)
 
     const ccL = cfg.cable && cfg.cc.includes('L'), ccR = cfg.cable && cfg.cc.includes('R');
     const segs = [];
@@ -381,6 +388,7 @@ function cyl(group, r, len, axis, mat, tags, pos) {
       if (cfg.frameT && pi === 0) {
         const mx = (p.x0 + p.x1) / 2;
         box(g, mx - 0.024, F, -FD / 2, mx + 0.024, H - F, FD / 2, M.alu, ['frameT']);
+        tJ.push({ x: mx, y0: F, y1: H - F, door: false });
         A.frameT.push([mx, 1.35, zf]);
       }
     });
@@ -419,6 +427,7 @@ function cyl(group, r, len, axis, mat, tags, pos) {
       if (cfg.frameT) {
         [panelL ? d.x0 + DF / 2 : null, panelR ? d.x1 - DF / 2 : null].filter(x => x !== null).forEach(jx => {
           box(g, jx - DF / 2, fTop, -FD / 2, jx + DF / 2, H - F, FD / 2, M.alu, ['frameT']);
+          tJ.push({ x: jx, y0: fTop, y1: H - F, door: true, side: jx < (d.x0 + d.x1) / 2 ? 1 : -1 });
           A.frameT.push([jx, (fTop + H - F) / 2, zf]);
         });
       }
@@ -536,6 +545,8 @@ function cyl(group, r, len, axis, mat, tags, pos) {
       [-0.12, -R + 0.12].forEach(bz => { box(g, xe + s * FD / 2 - 0.01, F - 0.006, bz - 0.04, xe + s * FD / 2 + 0.01, F - 0.001, bz + 0.04, M.wood, ['blocks']); A.blocks.push([xe - s * 0.03, F, bz]); });
     }
 
+    G = { W, d, fTop, wallL, wallR, S, cornerSide, tJ };
+    cutShown = null;
     scene.add(g);
     model = g;
     // Schattenlicht über der Mitte des Modells ausrichten
@@ -596,8 +607,28 @@ function cyl(group, r, len, axis, mat, tags, pos) {
   let hsEls = [];
   function buildHotspots() {
     hsLayer.innerHTML = '';
-    hsEls = [];
-    activeSteps().forEach((step, i) => {
+hsEls = [];
+if (cutMode()) {
+  cutCorners(state.cfg).forEach((c, i) => {
+    const el = document.createElement('button');
+    el.className = 'hs cut';
+    el.innerHTML = `<span class="lbl">${T(c.title)}</span>`;
+    el.title = T(c.title);
+    el.setAttribute('aria-label', el.title);
+    el.addEventListener('click', e => { e.stopPropagation(); selectCut(c.key); });
+    hsLayer.appendChild(el);
+    hsEls.push({ el, id: 'cut:' + c.key, pos: cutWorld(c, c.s[0] * 0.02, c.s[1] * 0.02, 0.03) });
+  });
+  (cutGroup ? cutGroup.userData.lbls : []).forEach(l => {
+    const el = document.createElement('span');
+    el.className = 'cut-dim' + (l.deg ? ' deg' : '');
+    el.innerHTML = `<span>${esc(l.t)}</span>`;
+    hsLayer.appendChild(el);
+    hsEls.push({ el, id: 'cut-lbl', pos: new THREE.Vector3(...l.pos) });
+  });
+  return updateHotspotClasses();
+}
+activeSteps().forEach((step, i) => {
       if (step.view === 'overview') return;
       spotsOf(step).slice(0, step.spotLimit || undefined).forEach(p => {
         const el = document.createElement('button');
@@ -630,7 +661,8 @@ function cyl(group, r, len, axis, mat, tags, pos) {
   function setCcEdit(on) { if (state.ccEdit !== on) { state.ccEdit = on; buildHotspots(); } }
   function updateHotspotClasses() {
     hsEls.forEach(h => {
-      if (h.id === 'cc-slot') return;
+      if (h.id === 'cc-slot' || h.id === 'cut-lbl') return;
+      if (h.id.startsWith('cut:')) { const on = h.id === 'cut:' + state.cutSel; h.el.classList.toggle('active', on); h.el.classList.toggle('open', on && !!cutGroup); h.el.classList.toggle('dim', !!state.cutSel && !on); return; }
       h.el.classList.toggle('active', h.id === state.sel);
       h.el.classList.toggle('dim', !!state.sel && h.id !== state.sel);
     });
@@ -642,7 +674,7 @@ function cyl(group, r, len, axis, mat, tags, pos) {
       pv.copy(hs.pos).project(camera);
       // Bei sehr kleiner 3D-Ansicht (Anleitung groß aufgezogen) nur die Punkte des aktuellen Schritts zeigen
       const compact = h < 300;
-      const vis = pv.z < 1 && Math.abs(pv.x) < 1.2 && Math.abs(pv.y) < 1.2 && (!compact || hs.id === state.sel || hs.id === 'cc-slot');
+      const vis = pv.z < 1 && Math.abs(pv.x) < 1.2 && Math.abs(pv.y) < 1.2 && (!compact || hs.id === state.sel || hs.id === 'cc-slot' || hs.id.startsWith('cut'));
       hs.el.style.display = vis ? '' : 'none';
       if (vis) hs.el.style.transform = `translate(${(pv.x + 1) / 2 * w}px, ${(1 - pv.y) / 2 * h}px)`;
     });
@@ -653,9 +685,16 @@ function cyl(group, r, len, axis, mat, tags, pos) {
     if (!model) return;
     const step = state.sel && STEPS.find(s => s.id === state.sel);
     const hl = step ? (step.hl || []) : [];
+    const ghost = cutMode() && !!cutGroup;
     model.traverse(o => {
       if (!o.isMesh || !o.userData.base) return;
       const base = o.userData.base;
+      if (ghost) {
+        o.material = base === M.wall ? M.ghostWall : M.ghost;
+        const ed = o.children.find(c => c.isLineSegments);
+        if (ed) ed.material = M.edgeGhost;
+        return;
+      }
       const on = hl.length && (o.userData.tags || []).some(t => hl.includes(t));
       o.material = on ? (base === M.glass ? M.hlGlass : M.hl) : base;
       const edge = o.children.find(c => c.isLineSegments);
@@ -746,6 +785,271 @@ function cyl(group, r, len, axis, mat, tags, pos) {
     const tools = (n.tools || []).map(x => `<button class="note-tool"${x.img ? ` data-img="${x.img}"` : ''} aria-label="${T('Zeichnung vergrößern')}">
       ${x.img ? `<img src="${x.img}" alt="" loading="lazy">` : ''}<span><b>${esc(T(x.name))}</b><small>${esc(BR.nr(x))}</small></span></button>`).join('');
     return `<div class="note">${T(n.t)}${tools ? `<div class="note-tools">${tools}</div>` : ''}</div>`;
+  }
+
+// ---------------------------------------------------------------- Zuschnitt im 3D-Modell
+// Jede Ecke: Profilstücke als Ansicht (u = entlang des waagrechten Profils von der Ecke weg, v = entlang des senkrechten,
+// in mm), Tiefe z in mm (+ = Vorderseite). cut: 'MC' = Gehrung 45°, 'SC' = gerader Schnitt; e = Kante des Schnitts im Polygon.
+// dir = Richtung, in die das Stück in der Explosionsansicht wegrückt. Maße nach den CRL-Zuschnittzeichnungen.
+// Ecken mit plan: true (Ecklösung) liegen im Grundriss: u entlang der Front, w entlang der Rückseite, h = Höhe ab der Ecke.
+  const CUT3D = cfg => !!cfg;
+  const PB = 26, PC = 17, PT = 35, L = 190;              // Ansichtsbreite Basis-/Clipprofil, Clip an der Türzarge, Deckenprofil, Stücklänge
+  const Z = { base: [-17, 8], clip: [8, 17], top: [-17, 17], door: [-25, 25], gasket: [-12, 12], dclip: [-13, 13] };
+  const DOOR_L = (clips) => [   // Türzarge oben: Kopfstück + Zargenstück auf Gehrung, Dichtung ebenso
+    { part: 1, poly: [[0, 0], [L, 0], [L, 48], [48, 48]], z: Z.door, cut: 'MC', e: [3, 0], dir: [1, 0] },
+    { part: 1, poly: [[0, 0], [48, 48], [48, L], [0, L]], z: Z.door, cut: 'MC', e: [0, 1], dir: [0, 1] },
+    { part: 8, poly: [[48, 48], [L, 48], [L, 54], [54, 54]], z: Z.gasket, cut: 'MC', e: [3, 0], dir: [1, 0] },
+    { part: 8, poly: [[48, 48], [54, 54], [54, L], [48, L]], z: Z.gasket, cut: 'MC', e: [0, 1], dir: [0, 1] }
+  ].concat(clips);
+  const CORNERS = {
+    h: { title: 'Boden / Wand', pieces: [
+      { part: 2, poly: [[0, 0], [L, 0], [L, PB], [PB, PB]], z: Z.base, cut: 'MC', e: [3, 0], dir: [1, 0] },
+      { part: 2, poly: [[0, 0], [PB, PB], [PB, L], [0, L]], z: Z.base, cut: 'MC', e: [0, 1], dir: [0, 1] },
+      { part: 3, poly: [[9, 0], [L, 0], [L, PB], [9, PB]], z: Z.clip, cut: 'SC', e: [3, 0], dir: [1, 0], note: 'beginnt 9 mm neben der Ecke', dim: { t: '9 mm', ax: 'u', a: [0, -45], b: [9, 0], at: -59 } },
+      { part: 3, poly: [[0, PB], [PB, PB], [PB, L], [0, L]], z: Z.clip, cut: 'SC', e: [0, 1], dir: [0, 1], note: 'steht auf dem waagrechten Clipprofil (26 mm)', dim: { t: '26 mm', ax: 'v', a: [-45, 0], b: [0, PB], at: -59 } }
+    ] },
+    j: { title: 'Decke / Wand', pieces: [
+      { part: 4, poly: [[0, 0], [L, 0], [L, PT], [0, PT]], z: Z.top, cut: 'SC', e: [3, 0], dir: [1, 0], note: 'läuft bis zur Wand durch' },
+      { part: 2, poly: [[0, PT], [PB, PT], [PB, L], [0, L]], z: Z.base, cut: 'SC', e: [0, 1], dir: [0, 1] },
+      { part: 3, poly: [[0, PT], [PB, PT], [PB, L], [0, L]], z: Z.clip, cut: 'SC', e: [0, 1], dir: [0, 1] }
+    ] },
+    i: { title: 'Türzarge unten', pieces: [
+      { part: 1, poly: [[-48, 0], [0, 0], [0, L], [-48, L]], z: Z.door, cut: 'SC', e: [0, 1], dir: [0, 1], note: 'läuft bis zum Boden durch' },
+      { part: 8, poly: [[-54, 0], [-48, 0], [-48, L], [-54, L]], z: Z.gasket, cut: 'SC', e: [0, 1], dir: [0, 1] },
+      { part: 2, poly: [[0, 0], [L, 0], [L, PB], [0, PB]], z: Z.base, cut: 'SC', e: [3, 0], dir: [1, 0] },
+      { part: 3, poly: [[0, 0], [L, 0], [L, PB], [0, PB]], z: Z.clip, cut: 'SC', e: [3, 0], dir: [1, 0] },
+      { part: 3, poly: [[0, PB], [PC, PB], [PC, L], [0, L]], z: Z.clip, cut: 'SC', e: [0, 1], dir: [0, 1], note: 'endet 26 mm über dem Boden', dim: { t: '26 mm', ax: 'v', a: [-45, 0], b: [0, PB], at: PC + 14 } }
+    ] },
+    // B: Türzarge oben zum Seitenteil (Oberlicht darüber)
+    k: { title: 'Türzarge oben – Seite Seitenteil', pieces: DOOR_L([
+      { part: 3, poly: [[-PC, -PC], [L, -PC], [L, 0], [0, 0]], z: Z.dclip, cut: 'MC', e: [3, 0], dir: [1, 0], note: 'Gehrung 17 mm außerhalb der Türzarge', dim: { t: '17 mm', ax: 'u', a: [-PC, -PC], b: [0, 30], at: -PC - 14 } },
+      { part: 3, poly: [[-PC, -PC], [0, 0], [0, L], [-PC, L]], z: Z.dclip, cut: 'MC', e: [0, 1], dir: [0, 1], note: 'Gehrung 17 mm außerhalb der Türzarge', dim: { t: '17 mm', ax: 'v', a: [-PC, -PC], b: [30, 0], at: -PC - 14 } }
+    ]) },
+    // B: Türzarge oben an der Wand, Fixrahmen darüber
+    n: { title: 'Türzarge oben – Seite Wand', pieces: DOOR_L([
+      { part: 2, poly: [[0, 0], [PB, 0], [PB, -L], [0, -L]], z: Z.base, cut: 'SC', e: [0, 1], dir: [0, -1] },
+      { part: 3, poly: [[0, 0], [PB, 0], [PB, -L], [0, -L]], z: Z.clip, cut: 'SC', e: [0, 1], dir: [0, -1] },
+      { part: 3, poly: [[PB, -PC], [L, -PC], [L, 0], [PB, 0]], z: Z.dclip, cut: 'SC', e: [3, 0], dir: [1, 0], note: 'endet 26 mm vor der Ecke', dim: { t: '26 mm', ax: 'u', a: [0, 30], b: [PB, -PC], at: -PC - 14 } }
+    ]) },
+    // C: Türzarge bis zur Decke, an der Wand
+    kc: { title: 'Türzarge oben – Seite Wand', pieces: DOOR_L([]) },
+    // C: Türzarge oben zum Seitenteil – Deckenprofil des Seitenteils stößt gerade an die Türzarge
+    l: { title: 'Türzarge oben / Decke – Seite Seitenteil', pieces: DOOR_L([
+      { part: 4, poly: [[-L, 0], [0, 0], [0, PT], [-L, PT]], z: Z.top, cut: 'SC', e: [1, 2], dir: [-1, 0], note: 'stößt gerade an die Türzarge' },
+      { part: 3, poly: [[-PC, PT], [0, PT], [0, L], [-PC, L]], z: Z.dclip, cut: 'SC', e: [0, 1], dir: [0, 1], note: 'endet 35 mm unter der Decke', dim: { t: '35 mm', ax: 'v', a: [30, 0], b: [0, PT], at: -PC - 14 } }
+    ]) },
+    // Ecklösung (Grundriss): Deckenprofil oben, Basisrahmen- und Clipprofil unten auf Gehrung
+    mT: { title: 'Ecke oben (Decke)', plan: true, pieces: [
+      { part: 4, poly: [[0, 0], [L, 0], [L, 34], [34, 34]], h: [0, PT], cut: 'MC', e: [3, 0], dir: [1, 0] },
+      { part: 4, poly: [[0, 0], [34, 34], [34, L], [0, L]], h: [0, PT], cut: 'MC', e: [0, 1], dir: [0, 1] }
+    ] },
+    mB: { title: 'Ecke unten (Boden)', plan: true, pieces: [
+      { part: 2, poly: [[0, 0], [L, 0], [L, 34], [34, 34]], h: [0, PB], cut: 'MC', e: [3, 0], dir: [1, 0] },
+      { part: 2, poly: [[0, 0], [34, 34], [34, L], [0, L]], h: [0, PB], cut: 'MC', e: [0, 1], dir: [0, 1] },
+      { part: 3, poly: [[8, 8], [L, 8], [L, 26], [26, 26]], h: [PB, PB + 8], lift: 0.04, cut: 'MC', e: [3, 0], dir: [1, 0] },
+      { part: 3, poly: [[8, 8], [26, 26], [26, L], [8, L]], h: [PB, PB + 8], lift: 0.04, cut: 'MC', e: [0, 1], dir: [0, 1] }
+    ] }
+  };
+  // Glasstoßprofil (5): stößt gerade (90°) auf das durchlaufende Profil (Basisrahmen-, Decken- oder Türzargenprofil)
+  const TJ = (title, part, thk) => ({ title, focus: [0, 0.07], pieces: [
+    { part, poly: [[-95, 0], [95, 0], [95, -thk], [-95, -thk]], z: part === 1 ? Z.door : Z.top, cut: null, dir: [0, 0] },
+    { part: 5, poly: [[-24, 0], [24, 0], [24, L], [-24, L]], z: Z.top, cut: 'SC', e: [0, 1], dir: [0, 1], note: 'stößt gerade (90°) auf das durchlaufende Profil' }
+  ] });
+  Object.assign(CORNERS, {
+    tB: TJ('Glasstoßprofil unten', 2, PB), tT: TJ('Glasstoßprofil oben', 4, PT),
+    // über der Tür: das Glasstoßprofil steht auf der Gehrungsecke der Türzarge (u = 0 Mitte Glasstoßprofil, Tür auf +u)
+    tDB: { title: 'Glasstoßprofil über der Tür unten', focus: [0.03, -0.02], pieces: [
+      { part: 1, poly: [[-24, 0], [L, 0], [L, -48], [24, -48]], z: Z.door, cut: 'MC', e: [3, 0], dir: [1, 0] },
+      { part: 1, poly: [[-24, 0], [24, -48], [24, -L], [-24, -L]], z: Z.door, cut: 'MC', e: [0, 1], dir: [0, -1] },
+      { part: 8, poly: [[24, -48], [L, -48], [L, -54], [30, -54]], z: Z.gasket, cut: 'MC', e: [3, 0], dir: [1, 0] },
+      { part: 8, poly: [[24, -48], [30, -54], [30, -L], [24, -L]], z: Z.gasket, cut: 'MC', e: [0, 1], dir: [0, -1] },
+      { part: 5, poly: [[-24, 0], [24, 0], [24, L], [-24, L]], z: Z.top, cut: 'SC', e: [0, 1], dir: [0, 1], note: 'stößt gerade (90°) auf die Gehrungsecke der Türzarge' }
+    ] }, tDT: TJ('Glasstoßprofil über der Tür oben', 4, PT)
+  });
+  let G = null;                                          // Eckpunkte des aktuellen Modells (aus buildModel)
+  // Ecke c: o = Ursprung [x, y, z], s = [Richtung u, Richtung v], rot = Drehung um die Hochachse (Rückseite der Ecklösung)
+  function cutCorners(cfg) {
+    if (!G) return [];
+    const { W, d, fTop, wallL, wallR, S, cornerSide } = G;
+    const isB = cfg.type === 'B';
+    const out = [], add = (key, id, o, s, def, rot) => out.push(Object.assign({ key, step: id, o, s, rot: rot || 0 }, CORNERS[def || id]));
+    const endL = S[0].t === 'panel', endR = S[S.length - 1].t === 'panel';
+    const leftOfDoor = d.x0 > 0, rightOfDoor = d.x1 < W - 1e-6;
+    // Decke / Wand: an jeder Wand (bei C nur über einem Seitenteil, dort reicht die Türzarge bis zur Decke)
+    if (wallL && (endL || isB)) add('jL', 'j', [0, H, 0], [1, -1]);
+    if (wallR && (endR || isB)) add('jR', 'j', [W, H, 0], [-1, -1]);
+    if (endL && wallL) add('hL', 'h', [0, 0, 0], [1, 1]);
+    if (endR && wallR) add('hR', 'h', [W, 0, 0], [-1, 1]);
+    // Türzarge zum Seitenteil
+    const top = isB ? 'k' : 'l';
+    if (leftOfDoor) { add('iL', 'i', [d.x0, 0, 0], [-1, 1]); add(top + 'L', top, [d.x0, fTop, 0], [1, -1]); }
+    if (rightOfDoor) { add('iR', 'i', [d.x1, 0, 0], [1, 1]); add(top + 'R', top, [d.x1, fTop, 0], [-1, -1]); }
+    // Türzarge an der Wand
+    const wid = isB ? 'n' : 'k', wdef = isB ? 'n' : 'kc';
+    if (!leftOfDoor) add('wL', wid, [d.x0, fTop, 0], [1, -1], wdef);
+    if (!rightOfDoor) add('wR', wid, [d.x1, fTop, 0], [-1, -1], wdef);
+    // Ecklösung: Gehrung im Grundriss + Wandanschluss am Ende der Rückseite
+    if (cornerSide) {
+      const sL = cornerSide === 'L', xe = sL ? 0 : W, sx = sL ? 1 : -1;
+      add('mT', 'm', [xe, H, FD / 2], [sx, -1], 'mT');
+      add('mB', 'm', [xe, 0, FD / 2], [sx, 1], 'mB');
+      const bx = xe + sx * FD / 2, rot = sL ? Math.PI / 2 : -Math.PI / 2, su = sL ? -1 : 1;
+      add('jB', 'j', [bx, H, -R], [su, -1], 'j', rot);
+      add('hB', 'h', [bx, 0, -R], [su, 1], 'h', rot);
+    }
+    // Glasstoßprofile: unten und oben je ein gerader Stoß
+    (G.tJ || []).forEach((t, i) => {
+      add('tB' + i, 'glasstoss', [t.x, t.y0, 0], [t.side || 1, 1], t.door ? 'tDB' : 'tB');
+      add('tT' + i, 'glasstoss', [t.x, t.y1, 0], [1, -1], t.door ? 'tDT' : 'tT');
+    });
+    // Reihenfolge wie die Montageschritte
+    const ids = activeSteps().map(s => s.id);
+    return out.sort((a, b) => ids.indexOf(a.step) - ids.indexOf(b.step) || (a.key < b.key ? -1 : 1));
+  }
+  // Punkt im Eckkoordinatensystem (Meter) → Welt
+  function cutWorld(c, lx, ly, lz) {
+    const cs = Math.cos(c.rot), sn = Math.sin(c.rot);
+    return new THREE.Vector3(c.o[0] + cs * lx + sn * lz, c.o[1] + ly, c.o[2] - sn * lx + cs * lz);
+  }
+  const cutSummary = c => {
+    const t = new Set(c.pieces.map(p => p.cut).filter(Boolean));
+    return T(t.size > 1 ? 'Gehrung 45° und gerade Schnitte' : t.has('MC') ? 'alle Profile auf Gehrung 45°' : 'alle Profile gerade geschnitten');
+  };
+
+  let cutGroup = null, cutShown = null;
+  const cutMode = () => state.tab === 'cut' && !state.sel && CUT3D(state.cfg);
+  // Stückfarbe nach Schnittart, je Profil leicht abgestuft (Türzarge dunkler, Clipprofil heller)
+  const CUT_COL = { MC: { 1: 0xd06614, 2: 0xe8822a, 3: 0xf4b072, 4: 0xe8822a, 5: 0xe8822a }, SC: { 1: 0x2a64b4, 2: 0x4a86d6, 3: 0x8bb4e8, 4: 0x3a78cc, 5: 0x3a78cc } }, cutMats = {};
+  const cutMat = p => !p.cut ? M.alu : cutMats[p.cut + p.part] || (cutMats[p.cut + p.part] = new THREE.MeshStandardMaterial({ color: CUT_COL[p.cut][p.part], roughness: 0.6 }));
+  // Linie als schmaler Streifen (1,2 mm) in der Ebene z = const – gut sichtbar, immer vorne
+  function stripTo(parent, p0, p1) {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(p0.distanceTo(p1), 0.0012), M.dimLine);
+    m.position.copy(p0).add(p1).multiplyScalar(0.5);
+    m.rotation.z = Math.atan2(p1.y - p0.y, p1.x - p0.x);
+    m.renderOrder = 10;
+    parent.add(m);
+  }
+  function buildCutDetail(c) {
+    const grp = new THREE.Group();
+    grp.position.set(...c.o);
+    grp.rotation.y = c.rot;
+    const [sx, sy] = c.s, E = 0.04, lbls = [];
+    c.pieces.forEach(p => {
+      // Form in der Ebene des Querschnitts, Extrusion entlang z; Grundriss-Stücke danach aufgerichtet (Form-y → Welt-z, Extrusion → Höhe)
+      let pts, zA, zB, off;
+      if (c.plan) {
+        pts = p.poly.map(([u, w]) => new THREE.Vector2(sx * u / 1000, -w / 1000));
+        const ya = sy > 0 ? p.h[0] : -p.h[1], yb = sy > 0 ? p.h[1] : -p.h[0];
+        zA = -yb / 1000; zB = -ya / 1000;
+        off = [sx * p.dir[0] * E, sy * (p.lift || 0), -p.dir[1] * E];
+      } else {
+        pts = p.poly.map(([u, v]) => new THREE.Vector2(sx * u / 1000, sy * v / 1000));
+        zA = p.z[0] / 1000; zB = p.z[1] / 1000;
+        // Clipprofil liegt vor dem Basisprofil: in der Explosionsansicht daneben gezeichnet (wie in der Zuschnittzeichnung),
+        // Clipprofil an der Türzarge (außen) entsprechend nach außen
+        const cl = p.z === Z.clip, dc = p.z === Z.dclip, side = cl ? 0.045 : dc ? -0.03 : 0;
+        const pu = p.dir[0] === 0 ? side : 0, pv = p.dir[1] === 0 ? side : 0;
+        off = [sx * (p.dir[0] * E + pu), sy * (p.dir[1] * E + pv), cl ? 0.02 : 0];
+      }
+      const geo = new THREE.ExtrudeGeometry(new THREE.Shape(pts), { depth: zB - zA, bevelEnabled: false });
+      geo.translate(0, 0, zA);
+      if (!p.cut) { addMesh(grp, geo, cutMat(p), [], off); return; }
+      // Schnittfläche farbig
+      const [a, b] = p.e.map(i => pts[i]);
+      const cx = pts.reduce((s, q) => s + q.x, 0) / pts.length, cy = pts.reduce((s, q) => s + q.y, 0) / pts.length;
+      let nx = -(b.y - a.y), ny = b.x - a.x; const nl = Math.hypot(nx, ny); nx /= nl; ny /= nl;
+      if (nx * (a.x - cx) + ny * (a.y - cy) < 0) { nx = -nx; ny = -ny; }
+      const k = 0.0004, fz0 = zA - 0.0002, fz1 = zB + 0.0002;
+      const A = (q, z) => new THREE.Vector3(q.x + nx * k, q.y + ny * k, z);
+      const qg = new THREE.BufferGeometry().setFromPoints([A(a, fz0), A(b, fz0), A(b, fz1), A(a, fz0), A(b, fz1), A(a, fz1)]);
+      if (c.plan) { geo.rotateX(Math.PI / 2); qg.rotateX(Math.PI / 2); }
+      addMesh(grp, geo, p.part === 8 ? M.gasket : cutMat(p), [], off);
+      const face = new THREE.Mesh(qg, p.cut === 'MC' ? M.cutMC : M.cutSC);
+      face.position.set(...off);
+      grp.add(face);
+      // Gradzahl am Gehrungsschnitt (wie in der Zeichnung): Bogen an der spitzen Ecke + „45°“
+      if (p.cut === 'MC' && p.part !== 8) {
+        const n = pts.length, [ia, ib] = p.e;
+        const inner = i => { const q = pts[i], a1 = pts[(i + n - 1) % n].clone().sub(q), a2 = pts[(i + 1) % n].clone().sub(q);
+          return Math.abs(Math.atan2(a1.x * a2.y - a1.y * a2.x, a1.dot(a2))); };
+        const tip = inner(ia) < inner(ib) ? ia : ib, q = pts[tip];
+        const d1 = pts[(tip + n - 1) % n].clone().sub(q).normalize(), d2 = pts[(tip + 1) % n].clone().sub(q).normalize();
+        const sgr = new THREE.Group();
+        sgr.position.set(...off);
+        if (c.plan) sgr.rotation.x = Math.PI / 2;
+        const t1 = Math.atan2(d1.y, d1.x); let dt = Math.atan2(d2.y, d2.x) - t1;
+        if (dt > Math.PI) dt -= 2 * Math.PI; if (dt < -Math.PI) dt += 2 * Math.PI;
+        const r = 0.016, za = zB + 0.0012, arcPts = [];
+        for (let k = 0; k <= 8; k++) { const t = t1 + dt * k / 8; arcPts.push(new THREE.Vector3(q.x + r * Math.cos(t), q.y + r * Math.sin(t), za)); }
+        for (let k = 0; k < 8; k++) stripTo(sgr, arcPts[k], arcPts[k + 1]);
+        grp.add(sgr);
+        const bis = d1.clone().add(d2).normalize(), lq = [q.x + bis.x * 0.03, q.y + bis.y * 0.03, za];
+        const lw = c.plan ? [lq[0], -lq[2], lq[1]] : lq;
+        lbls.push({ t: '45°', deg: true, pos: cutWorld(c, lw[0] + off[0], lw[1] + off[1], lw[2] + off[2]).toArray() });
+      }
+      if (p.dim) {
+        // Maßlinie wie in der Zeichnung: Hilfslinien von den Messpunkten, Maßlinie mit Schrägstrichen, Wert daneben
+        const D = p.dim, zf = zB + off[2] + 0.001;
+        const P = (u, v) => new THREE.Vector3(off[0] + sx * u / 1000, off[1] + sy * v / 1000, zf);
+        const pt = (q, w) => D.ax === 'u' ? [q[0], w] : [w, q[1]];          // Punkt auf Höhe w der Maßlinie
+        const ov = 3, sg = q => Math.sign(D.at - (D.ax === 'u' ? q[1] : q[0])) || 1;
+        const segs = [];
+        [D.a, D.b].forEach(q => {
+          segs.push(P(...q), P(...pt(q, D.at + sg(q) * ov)));             // Hilfslinie bis knapp über die Maßlinie
+          const m = pt(q, D.at);
+          segs.push(P(m[0] - 3, m[1] - 3), P(m[0] + 3, m[1] + 3));         // Schrägstrich
+        });
+        segs.push(P(...pt(D.a, D.at)), P(...pt(D.b, D.at)));               // Maßlinie
+        // als schmale Streifen (1,2 mm) statt 1-px-Linien, damit sie gut sichtbar sind
+        for (let i = 0; i < segs.length; i += 2) stripTo(grp, segs[i], segs[i + 1]);
+        // Wert: mittig, außen neben der Maßlinie
+        const mid = (D.ax === 'u' ? (D.a[0] + D.b[0]) : (D.a[1] + D.b[1])) / 2, out = D.at + sg(D.a) * 9;
+        const lp = D.ax === 'u' ? [mid, out] : [out, mid];
+        lbls.push({ t: BR.text(D.t), ax: D.ax, pos: cutWorld(c, lp[0] * sx / 1000 + off[0], lp[1] * sy / 1000 + off[1], zf).toArray() });
+      }
+    });
+    grp.userData.lbls = lbls;
+    return grp;
+  }
+  // Abgleich 3D ↔ Reiter: Detail der gewählten Ecke ein-/ausblenden, Punkte umschalten
+  function syncCut(force) {
+    if (!renderer || !model) return;
+    const on = cutMode(), key = on ? 'cut:' + (state.cutSel || '') : '';
+    if (key === cutShown && !force) return;
+    cutShown = key;
+    if (cutGroup) { scene.remove(cutGroup); cutGroup.traverse(o => o.geometry && o.geometry.dispose()); cutGroup = null; }
+    const c = on && state.cutSel && cutCorners(state.cfg).find(c => c.key === state.cutSel);
+    if (c) { cutGroup = buildCutDetail(c); scene.add(cutGroup); }
+    buildHotspots();
+    applyHighlight();
+  }
+  function flyToCut(c) {
+    const [sx, sy] = c.s;
+    const t = c.plan ? cutWorld(c, sx * 0.08, sy * 0.03, -0.08) : c.focus ? cutWorld(c, sx * c.focus[0], sy * c.focus[1], 0.01) : cutWorld(c, sx * 0.09, sy * 0.09, 0.01);
+    // Abstand so, dass etwa 40 cm × 40 cm um die Ecke sichtbar sind (auch im schmalen Hochformat)
+    const vf = THREE.MathUtils.degToRad(camera.fov) / 2, hf = Math.atan(Math.tan(vf) * camera.aspect);
+    const dist = Math.max(0.2 / Math.tan(vf), 0.2 / Math.tan(hf)) * 1.1;
+    // fast von vorne, leicht von innen; Grundriss-Ecken von oben bzw. unten
+    const ld = c.plan ? [sx * 0.35, sy * 0.9, 0.7] : [sx * 0.2, sy * 0.16, 1];
+    const dir = cutWorld(c, ...ld).sub(cutWorld(c, 0, 0, 0)).normalize().multiplyScalar(dist);
+    flyTo(t.clone().add(dir), t);
+  }
+  function selectCut(key) {
+    state.cutSel = state.cutSel === key ? null : key;
+    state.tab = 'cut';
+    if (state.sel) { state.sel = null; quietHash(guideHash(state.cfg)); }
+    updateHotspotClasses();
+    renderPanel();
+    expandSheet();
+    hideHint();
+    const c = state.cutSel && cutCorners(state.cfg).find(c => c.key === state.cutSel);
+    if (c) flyToCut(c); else flyHome();
+  }
+
+  // Im Montageschritt: Knopf zur passenden Ecke im Reiter Zuschnitt
+  function cutDetail(step, cfg) {
+    const c = cutCorners(cfg).find(c => c.step === step.id);
+    return c ? `<button class="btn cut-3d" data-cut="${c.key}">✂ ${T('So ist diese Ecke geschnitten')} – ${T('im 3D-Modell zeigen')}</button>` : '';
   }
 
   function cfgLabel(cfg) {
@@ -843,6 +1147,7 @@ function cyl(group, r, len, axis, mat, tags, pos) {
       <div class="tabs">
         <button data-tab="steps" class="${state.tab === 'steps' ? 'active' : ''}">${T('Montageablauf')}</button>
         <button data-tab="parts" class="${state.tab === 'parts' ? 'active' : ''}">${T('Bauteile')}</button>
+        <button data-tab="cut" class="${state.tab === 'cut' ? 'active' : ''}">${T('Zuschnitt')}</button>
         <button data-tab="info" class="${state.tab === 'info' ? 'active' : ''}">${T('Hinweise')}</button>
       </div>`;
     let content = '';
@@ -864,14 +1169,28 @@ function cyl(group, r, len, axis, mat, tags, pos) {
       used.sort((a, b) => ord(a) - ord(b));
       content = `<div class="pad"><p class="intro">${T('Bauteile für')} ${esc(cfgLabel(cfg))}. ${T('Antippen zum Vergrößern.')}</p>
         <div class="parts">${used.map(partRow).join('')}</div></div>`;
+    } else if (state.tab === 'cut') {
+      const cs = cutCorners(cfg);
+      const piece = p => `<li><i class="${p.cut === 'MC' ? 'mc' : p.cut ? 'sc' : 'none'}"></i><span><b>${esc(T(PARTS[p.part].name))}</b> – ${T(p.cut === 'MC' ? 'Gehrung 45°' : p.cut ? 'gerade (90°)' : 'läuft durch, nicht geschnitten')}${p.note ? `<small>${esc(T(p.note))}</small>` : ''}</span></li>`;
+      const merge = ps => ps.filter((p, i) => ps.findIndex(q => q.part === p.part && q.cut === p.cut && q.note === p.note) === i);
+      content = `<div class="pad cut-tab"><p class="intro">${T('Die Profile werden in der Regel fertig zugeschnitten geliefert. Bei eigenem Zuschnitt: Ecke im Modell oder in der Liste antippen.')}</p>
+        <div class="cut-key"><span><i class="mc"></i>${T('Gehrungsschnitt 45°')}</span><span><i class="sc"></i>${T('gerader Schnitt (90°)')}</span></div>
+        <ul class="cut-list">${cs.map(c => {
+          const on = c.key === state.cutSel, st = activeSteps().findIndex(s => s.id === c.step);
+          return `<li class="${on ? 'on' : ''}"><button class="cut-item" data-cut="${c.key}"><span class="cut-ic"></span><span><b>${esc(T(c.title))}</b><small>${cutSummary(c)}</small></span></button>
+            ${on ? `<ul class="cut-pieces">${merge(c.pieces).map(piece).join('')}</ul>
+              ${st >= 0 ? `<button class="link" data-sel="${c.step}">${T('Zum Montageschritt')} ${st + 1} →</button>` : ''}` : ''}</li>`;
+        }).join('')}</ul></div>`;
     } else {
       content = `<div class="pad general">${BR.text(LANG !== 'de' && I18N[LANG] && I18N[LANG].general ? I18N[LANG].general : GENERAL)}</div>`;
     }
     body.innerHTML = tabs + content;
+    syncCut();
   }
 
   function renderDetail(step, list) {
     const cfg = state.cfg;
+    syncCut();
     const idx = list.indexOf(step);
     const text = step.text.map(t => val(t, cfg)).filter(Boolean);
     const notes = (step.notes || []).map(n => val(n, cfg)).filter(Boolean);
@@ -895,6 +1214,7 @@ function cyl(group, r, len, axis, mat, tags, pos) {
       <div class="section">
         <h3>${T('Montage')}</h3>
         <ol class="steps">${text.map(s => workStep(s, cfg)).join('')}</ol>
+        ${cutDetail(step, cfg)}
       </div>
 
       ${step.extraHtml ? `<div class="section"><h3>${esc(T(step.extraTitle || ''))}</h3>${THtml(val(step.extraHtml, cfg))}</div>` : ''}
@@ -908,14 +1228,16 @@ function cyl(group, r, len, axis, mat, tags, pos) {
   }
 
   body.addEventListener('click', e => {
-    const t = e.target.closest('[data-sel],[data-tab],[data-act],[data-img]');
+    const t = e.target.closest('[data-sel],[data-tab],[data-act],[data-img],[data-cut]');
     if (!t) return;
     setCcEdit(false);
     if (t.dataset.sel) select(t.dataset.sel);
-    else if (t.dataset.tab) { state.tab = t.dataset.tab; renderPanel(); }
+    else if (t.dataset.cut) selectCut(t.dataset.cut);
+    else if (t.dataset.tab) { const was = state.cutSel; state.tab = t.dataset.tab; state.cutSel = null; renderPanel(); if (was) flyHome(); }
     else if (t.dataset.act === 'back') deselect();
     else if (t.dataset.act === 'next') go(1);
     else if (t.dataset.act === 'prev') go(-1);
+    else if (t.dataset.act === 'cut-tab') { e.preventDefault(); state.tab = 'cut'; deselect(); renderPanel(); }
     else if (t.dataset.img) openLightbox(t.dataset.img);
   });
 
@@ -927,7 +1249,7 @@ function cyl(group, r, len, axis, mat, tags, pos) {
   }));
   $('#guideBtn').addEventListener('click', () => { setCcEdit(false); select(activeSteps()[0].id); });
   $('#resetBtn').addEventListener('click', () => {
-    setCcEdit(false); if (state.sel) deselect(); else flyHome(); });
+    setCcEdit(false); if (state.sel) deselect(); else if (state.cutSel) selectCut(state.cutSel); else flyHome(); });
   window.addEventListener('keydown', e => {
     if ($('#view-guide').hidden) return;
     if (e.key === 'Escape') { if (!lb.hidden) lb.hidden = true; else if (state.sel) deselect(); }
