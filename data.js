@@ -45,8 +45,10 @@
     CLIPSD: { pos: 23, name: 'Clipprofil Pendeltür',        nr: '41AL-CLIP-SD',              crl: 'FCLPCP6SA / FCLPCP6MBL', img: 'CLIPSD' }
   };
   Object.keys(PARTS).forEach(k => { if (PARTS[k].img !== false) PARTS[k].img = 'img/profiles/' + (PARTS[k].img || 'p' + k) + '.jpg'; });
-  // Reihenfolge in der Teileliste: aufsteigend nach Positionsnummer (180°-Verbinder ohne Nummer bei den Verbindern)
-  const PART_ORDER = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 'CS', 14, 15, 16, 'EP14', 'CP', 'TL3L', 'TL3R', 'TL3', 'TL4', 'TL5', 'SDBL', 'CLIPSD', 'CCB', 'CCC'];
+  // Reihenfolge in der Teileliste (Lena, 21.10.2026): erst alle Profile (Kabelkanal zuletzt), dann Dichtungen, dann Kleinteile – je aufsteigend
+  const PART_ORDER = [1, 2, 3, 4, 5, 'TL4', 'TL5', 'CLIPSD', 'CCB', 'CCC',
+    6, 7, 8, 9, 'EP14',
+    10, 11, 12, 13, 'CS', 14, 15, 16, 'CP', 'TL3L', 'TL3R', 'TL3', 'SDBL'];
 
   // ---------------------------------------------------------------- Varianten
   // B = Tür mit Oberlicht (Festteil über der Tür), C = Tür bis zur Decke
