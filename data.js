@@ -16,9 +16,9 @@
     4:  { name: 'Deckenbasisrahmenprofil',         nr: '41AL-TOP-D',                crl: 'FTPD6MBL / FTPD6SA' },
     5:  { name: 'Glasstoßprofil',                  nr: '41AL-FRAME T-D',            crl: '41AL-FRAME T-D' },
     6:  { name: 'Fixierdichtung',                  nr: '41AL-EPDM F',               crl: 'FRGBL / FRGBL25 / FRGGR / FRGGR25' },
-    7:  { name: 'Anschlagdichtung 16 mm & 28 mm',  nr: '41AL-EPDM 16',              crl: 'FFP16BL / FFP16GR' },
+    7:  { name: 'Anschlagdichtung 16 mm',          nr: '41AL-EPDM 16',              crl: 'FFP16BL / FFP16GR', optional: true },
     8:  { name: 'Zargendichtung',                  nr: '41AL-EPDM B',               crl: 'FDJBL / FDJBL25 / FDJGR / FDJGR25' },
-    9:  { name: 'Anschlagdichtung 8/10/12 mm & 20/22/24 mm', nr: '41AL-EPDM 8/10/12', crl: 'FFPBL / FFPBL25 / FFGR / FFGR25' },
+    9:  { name: 'Anschlagdichtung 8/10/12 mm',     nr: '41AL-EPDM 8/10/12', crl: 'FFPBL / FFPBL25 / FFGR / FFGR25' },
     10: { name: 'T-Verbinder (Basis und Top Frame oder Frame Verbinder)', nr: '41AL-OFFICE-CT',            crl: 'FTC' },
     11: { name: 'CL-Verbinder (L-Verbinder, Top Frame und Frame Verbinder)', nr: '41AL-OFFICE-CL',            crl: 'FFCCL' },
     12: { name: '90°-Eckverbinder (horizontal, für Boden- und Deckenprofil)', nr: '41AL-OFFICE-CH', crl: 'FXCH' },
@@ -27,23 +27,26 @@
     15: { name: 'Hammerkopfmutter für 12 mm Glas', nr: '41AL-OFFICE-H-L-12',        crl: 'FHHN12' },
     16: { name: 'Schließblech für 8–12 mm Glas',   nr: '41AL-OFFICE-CP',            crl: 'FSP' },
     // Schließblech für hohe Schlösser – nur Längle, in Amerika nicht verwendet (CRL-Nr. laut Liste: FDSP)
-    CP:     { pos: 17, name: 'Schließblech Dorma/WSS für 8–12 mm Glas', nr: '41AL-OFFICE-CP DORMA', crl: 'FDSP', img: 'CP', optional: true, brand: 'laengle' },
+    CP:     { pos: 18, name: 'Schließblech Dorma/WSS für 8–12 mm Glas', nr: '41AL-OFFICE-CP DORMA', crl: 'FDSP', img: 'CP', optional: true, brand: 'laengle' },
     // Kabelkanal CC 80 (Option) – bei CRL keine eigene Nummer
-    CCB:    { pos: 23, name: 'Kabelkanal Basisprofil (80 × 48 mm)', nr: '41AL-CABLE CHANNEL BASE', crl: '41AL-CABLE CHANNEL BASE', img: 'CCB' },
-    CCC:    { pos: 24, name: 'Abdeckprofil für Kabelkanal 80 mm', nr: '41AL-CABLE CHANNEL COVER', crl: '41AL-CABLE CHANNEL COVER', img: 'CCC' },
+    CCB:    { pos: 24, name: 'Kabelkanal Basisprofil (80 × 48 mm)', nr: '41AL-CABLE CHANNEL BASE', crl: '41AL-CABLE CHANNEL BASE', img: 'CCB' },
+    CCC:    { pos: 25, name: 'Abdeckprofil für Kabelkanal 80 mm', nr: '41AL-CABLE CHANNEL COVER', crl: '41AL-CABLE CHANNEL COVER', img: 'CCC' },
+    // Anschlagdichtung für 14 mm Glas (Option, Alternative zu 9); Zeichnung aus Montage_complete_OFFICE S. 7
+    // Namen nur mit den OFFICE-Glasdicken (XL: 20/22/24, 26, 28 mm – kommt mit OFFICE XL)
+    EP14:   { pos: 17, name: 'Anschlagdichtung 14 mm', nr: '41AL-EPDM 14', crl: 'FFP14BL / FFP14GR', img: 'EP14', optional: true },
     CS:     { name: '180°-Verbinder',              nr: '41AL-OFFICE-CS',            crl: 'FCS', img: 'CS', optional: true },
     // Glas-Auflage-Winkel: bei Längle links und rechts getrennt, bei CRL als Set (brand = nur für diese Marke)
-    TL3L:   { pos: 18, name: 'Glas-Auflage-Winkel links, Oberlicht', nr: '41AL-OFFICE-H-TL-L', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3L', brand: 'laengle' },
-    TL3R:   { pos: 18, name: 'Glas-Auflage-Winkel rechts, Oberlicht', nr: '41AL-OFFICE-H-TL-R', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3R', brand: 'laengle' },
-    TL3:    { pos: 18, name: 'Glas-Auflage-Winkel links & rechts, Oberlicht', nr: '41AL-OFFICE-H-TL-L+R', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3', brand: 'crl' },
-    TL4:    { pos: 19, name: 'Clipprofil Oberlicht für 10 mm Glas', nr: '41AL-CLIP-TL-10',  crl: 'FCLPT3SA / FCLPT3MBL', img: 'TL4' },
-    TL5:    { pos: 20, name: 'Clipprofil Oberlicht für 8 mm Glas',  nr: '41AL-CLIP-TL-8',   crl: 'FCLPT3SA / FCLPT3MBL', img: 'TL5' },
-    SDBL:   { pos: 21, name: 'Block für Pendeltüre',        nr: '41AL-OFFICE-SD-BL',         crl: 'FCPDB1SA / FCPDB1MBL', img: 'SDBL' },
-    CLIPSD: { pos: 22, name: 'Clipprofil Pendeltür',        nr: '41AL-CLIP-SD',              crl: 'FCLPCP6SA / FCLPCP6MBL', img: 'CLIPSD' }
+    TL3L:   { pos: 19, name: 'Glas-Auflage-Winkel links, Oberlicht', nr: '41AL-OFFICE-H-TL-L', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3L', brand: 'laengle' },
+    TL3R:   { pos: 19, name: 'Glas-Auflage-Winkel rechts, Oberlicht', nr: '41AL-OFFICE-H-TL-R', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3R', brand: 'laengle' },
+    TL3:    { pos: 19, name: 'Glas-Auflage-Winkel links & rechts, Oberlicht', nr: '41AL-OFFICE-H-TL-L+R', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3', brand: 'crl' },
+    TL4:    { pos: 20, name: 'Clipprofil Oberlicht für 10 mm Glas', nr: '41AL-CLIP-TL-10',  crl: 'FCLPT3SA / FCLPT3MBL', img: 'TL4' },
+    TL5:    { pos: 21, name: 'Clipprofil Oberlicht für 8 mm Glas',  nr: '41AL-CLIP-TL-8',   crl: 'FCLPT3SA / FCLPT3MBL', img: 'TL5' },
+    SDBL:   { pos: 22, name: 'Block für Pendeltüre',        nr: '41AL-OFFICE-SD-BL',         crl: 'FCPDB1SA / FCPDB1MBL', img: 'SDBL' },
+    CLIPSD: { pos: 23, name: 'Clipprofil Pendeltür',        nr: '41AL-CLIP-SD',              crl: 'FCLPCP6SA / FCLPCP6MBL', img: 'CLIPSD' }
   };
   Object.keys(PARTS).forEach(k => { if (PARTS[k].img !== false) PARTS[k].img = 'img/profiles/' + (PARTS[k].img || 'p' + k) + '.jpg'; });
-  // Reihenfolge in der Teileliste: Profile, Dichtungen, Verbinder, Kleinteile
-  const PART_ORDER = [1, 2, 3, 4, 5, 'CLIPSD', 'TL4', 'TL5', 'CCB', 'CCC', 6, 7, 8, 9, 10, 11, 12, 13, 'CS', 14, 15, 16, 'CP', 'TL3L', 'TL3R', 'TL3', 'SDBL'];
+  // Reihenfolge in der Teileliste: aufsteigend nach Positionsnummer (180°-Verbinder ohne Nummer bei den Verbindern)
+  const PART_ORDER = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 'CS', 14, 15, 16, 'EP14', 'CP', 'TL3L', 'TL3R', 'TL3', 'TL4', 'TL5', 'SDBL', 'CLIPSD', 'CCB', 'CCC'];
 
   // ---------------------------------------------------------------- Varianten
   // B = Tür mit Oberlicht (Festteil über der Tür), C = Tür bis zur Decke
@@ -116,7 +119,9 @@
     c180: { img: 'img/tools/ezcc.jpg', name: 'CRL-Verbindungsstreifen 180°', nr: 'EZCC', crl: 'EZCC' },
     c90: { img: 'img/tools/ezcl.jpg', name: 'CRL-Verbindungsstreifen 90° Ecke', nr: 'EZCL', crl: 'EZCL' }
   };
-  const CC_TEXT = { L: 'Kabelkanal <b>(23)</b> links neben dem Türzargenprofil <b>(1)</b> einsetzen – vom Boden bis zur Decke.', R: 'Kabelkanal <b>(23)</b> rechts neben dem Türzargenprofil <b>(1)</b> einsetzen – vom Boden bis zur Decke.', LR: 'Kabelkanäle <b>(23)</b> links und rechts neben dem Türzargenprofil <b>(1)</b> einsetzen – jeweils vom Boden bis zur Decke.' };
+  // Kabelkanal-Schnitte: FALLBROOK mit Zoll-Maßen
+  const ccFig = n => () => f(n + (window.BR && window.BR.id === 'crl' ? '_in' : ''));
+  const CC_TEXT = { L: 'Kabelkanal <b>(24)</b> links neben dem Türzargenprofil <b>(1)</b> einsetzen – vom Boden bis zur Decke.', R: 'Kabelkanal <b>(24)</b> rechts neben dem Türzargenprofil <b>(1)</b> einsetzen – vom Boden bis zur Decke.', LR: 'Kabelkanäle <b>(24)</b> links und rechts neben dem Türzargenprofil <b>(1)</b> einsetzen – jeweils vom Boden bis zur Decke.' };
   // Zuschnitt (aus den FALLBROOK-Anleitungen): Ecken je Variante, die einem Verbindungsschritt zugeordnet sind; Ecklösung = eigenes Bild
   const pdfKey = c => c.type.toLowerCase() + (c.door === 'M' ? '3' : '24');
 
@@ -210,6 +215,22 @@
       spots: ['H'], hl: ['p2floor', 'p2wall']
     },
     {
+      // Option Kabelkanal (Lena, 21.10.2026): wird beim Zusammenbau des Rahmens vor Ort mit eingebaut,
+      // Befestigung mit bauseits beigestellten selbstbohrenden Schrauben (Zeichnung 007JH026.015B)
+      id: 'kabelkanal', phase: 'frame', view: 'area', option: true,
+      cond: c => c.cable && c.cc.length > 0,
+      title: 'Kabelkanal einbauen (Option)',
+      parts: ['CCB', 'CCC'],
+      text: [
+        c => ({ t: CC_TEXT[c.cc.length > 1 ? 'LR' : c.cc[0]], fig: [ccFig('cc80_schnitt')] }),
+        'Der Kabelkanal wird beim Zusammenbau des Rahmens gleich mit eingebaut: Er sitzt zwischen Türzargenprofil <b>(1)</b> und Basisrahmenprofil <b>(2)</b>.',
+        { t: 'Kabelkanal-Basisprofil <b>(24)</b> seitlich mit dem Türzargenprofil <b>(1)</b> und dem Basisrahmenprofil <b>(2)</b> verschrauben – mit selbstbohrenden Schrauben, verteilt über die ganze Höhe.', fig: [ccFig('cc80_schrauben')] },
+        'Nach der Elektroinstallation das Abdeckprofil <b>(25)</b> an die Gegebenheiten vor Ort anpassen (z. B. Aussparungen für Schalter und Steckdosen), auf Länge zuschneiden und einsetzen.'
+      ],
+      notes: ['Selbstbohrende Schrauben (Profilverbindung inkl. Befestigungsmittel) werden bauseits beigestellt.'],
+      spots: ['cc'], hl: ['cc']
+    },
+    {
       id: 'aufstellen', phase: 'set', view: 'overview',
       title: 'Rahmen aufstellen',
       parts: [],
@@ -254,24 +275,10 @@
       hl: ['p1', 'p2floor', 'p2wall', 'p4']
     },
     {
-      // Option Kabelkanal: Position wird im 3D-Modell gewählt (links/rechts der Tür); Montage folgt noch
-      id: 'kabelkanal', phase: 'set', view: 'area', option: true,
-      // vorerst ausgeblendet (Lena, 17.10.2026): nur Option + 3D-Darstellung; Schritt und Teile erst, wenn die Montage geklärt ist
-      cond: () => false,   // später: c => c.cable && c.cc.length > 0
-      title: 'Kabelkanal einsetzen (Option)',
-      parts: ['CCB', 'CCC'],
-      text: [
-        c => ({ t: CC_TEXT[c.cc.length > 1 ? 'LR' : c.cc[0]], fig: () => window.BR && window.BR.id === 'crl' ? [f('cc80_3d')] : [f('cc80_schnitt'), f('cc80_3d')] }),
-        'Der Kabelkanal sitzt zwischen Türzargenprofil <b>(1)</b> und Basisrahmenprofil <b>(2)</b> bzw. Wand. Die Anlage wird dadurch um die Kanalbreite breiter.',
-        'Deckel <b>(24)</b> nach der Elektroinstallation aufsetzen.'
-      ],
-      notes: ['Die genauen Montageschritte für den Kabelkanal werden noch ergänzt.'],
-      spots: ['cc'], hl: ['cc']
-    },
-    {
       id: 'anschlag', phase: 'glass', view: 'overview',
       title: 'Anschlagdichtung einsetzen',
-      parts: [9],
+      parts: [9, 'EP14', 7],
+      notes: ['<b>Option dickeres Glas:</b> Bei <b>14 mm</b> Glas die Anschlagdichtung 14 mm <b>(17)</b>, bei <b>16 mm</b> Glas die Anschlagdichtung 16 mm <b>(7)</b> anstelle der Anschlagdichtung <b>(9)</b> verwenden.'],
       text: [
         { t: 'Lippen der Anschlagdichtung <b>(9)</b> je nach Glasdicke der Fixverglasung entfernen: <b>8 mm</b> komplett verwenden · <b>10 mm</b> eine Lippe abziehen · <b>12 mm</b> beide Lippen abziehen.', fig: [f('gp_a'), f('gp_b')], row: true },
         { t: 'Anschlagdichtung in Deckenprofil <b>(4)</b> und Basisrahmenprofile <b>(2)</b> einziehen. Beim Türzargenprofil <b>(1)</b> die Anschlagdichtung in das Clipprofil <b>(3)</b> einziehen.', fig: c => [{ src: f('g9_4'), size: 'md' }, { src: f('g9_2'), size: 'md' }, { src: f('g9_1'), size: 'md' }] }
@@ -320,7 +327,8 @@
     {
       id: 'glasstoss', phase: 'glass', view: 'area', cond: c => c.frameT, option: true,
       title: 'Glasstoßprofil einsetzen (Option)',
-      parts: [5, 9, 3, 6],
+      parts: [5, 9, 'EP14', 7, 3, 6],
+      notes: ['<b>Option dickeres Glas:</b> Bei <b>14 mm</b> Glas die Anschlagdichtung 14 mm <b>(17)</b>, bei <b>16 mm</b> Glas die Anschlagdichtung 16 mm <b>(7)</b> anstelle der Anschlagdichtung <b>(9)</b> verwenden.'],
       text: [
         c => c.type === 'B'
           ? `Glasstoßprofile <b>(5)</b> an allen Glasstößen setzen: im Seitenteil sowie zwischen Oberlicht und Seitenteil${c.door === 'M' ? ' (links und rechts der Tür)' : ''}.`
@@ -398,7 +406,7 @@
       text: [
         { t: 'Das Schließblech <b>(16)</b> wird ebenfalls mit Hammerkopfmuttern am Türzargenprofil <b>(1)</b> befestigt: Zwei Hammerkopfmuttern an der Schlossseite in die Nut einsetzen und eindrehen – Einbauposition laut Tabelle (ganz unten). Schließblech mit zwei Senkkopfschrauben befestigen – <b>max. 6 Nm</b>.', fig: [f('F_draw')], cap: c => c.topLight ? 'Mit Top Light ist das Türglas 8 mm oder 10 mm: Hammerkopfmutter 8–10 mm (14), Position A12/B12' : 'Türglas 8 mm oder 10 mm: Hammerkopfmutter 8–10 mm (14), Position A12/B12 · Türglas 12 mm: Hammerkopfmutter 12 mm (15), Position C13/D13' },
         // nur OFFICE: in Amerika werden keine hohen Schlösser verwendet
-        () => window.BR && window.BR.id === 'crl' ? null : '<b>Option:</b> Bei hohen Schlössern wird das Schließblech CP DORMA <b>(17)</b> verwendet – Befestigung ebenfalls mit zwei Hammerkopfmuttern und Senkkopfschrauben.'
+        () => window.BR && window.BR.id === 'crl' ? null : '<b>Option:</b> Bei hohen Schlössern wird das Schließblech CP DORMA <b>(18)</b> verwendet – Befestigung ebenfalls mit zwei Hammerkopfmuttern und Senkkopfschrauben.'
       ],
       extraTitle: 'Einbauposition Hammerkopfmutter', extraHtml: TABLE_HKM,
       spots: ['strike'], hl: ['strike']
