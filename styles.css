@@ -431,3 +431,8 @@ i.sc { background: var(--cut-sc); }
 .hs.cut.open { display: none !important; }
 i.none { background: #c9ccd0; }
 .cut-dim.deg span { color: #b85a0c; font-size: 11.5px; }
+/* Kabelkanal-Größe CC 80 / CC 130 */
+.cc-size { display: flex; align-items: center; gap: 6px; margin: 0 0 10px; font-size: 13px; }
+.cc-size span { color: var(--ink-2); margin-right: 4px; }
+.cc-size button { border: 1px solid var(--line); background: #fff; border-radius: 16px; padding: 3px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+.cc-size button.active { background: var(--accent); border-color: var(--accent); color: #fff; }

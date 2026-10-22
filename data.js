@@ -34,6 +34,9 @@
     // Anschlagdichtung für 14 mm Glas (Option, Alternative zu 9); Zeichnung aus Montage_complete_OFFICE S. 7
     // Namen nur mit den OFFICE-Glasdicken (XL: 20/22/24, 26, 28 mm – kommt mit OFFICE XL)
     EP14:   { pos: 17, name: 'Anschlagdichtung 14 mm', nr: '41AL-EPDM 14', crl: 'FFP14BL / FFP14GR', img: 'EP14', optional: true },
+    // Kabelkanal CC 130 (Option, für alle Systeme) – bei CRL keine eigene Nummer
+    CC130B: { pos: 26, name: 'Kabelkanal Basisprofil (130 × 62 mm)', nr: '41AL-CC BASE 130', crl: '41AL-CC BASE 130', img: 'CC130B' },
+    CC130C: { pos: 27, name: 'Abdeckprofil für Kabelkanal 130 mm', nr: '41AL-CC COVER 130', crl: '41AL-CC COVER 130', img: 'CC130C' },
     CS:     { name: '180°-Verbinder',              nr: '41AL-OFFICE-CS',            crl: 'FCS', img: 'CS', optional: true },
     // Glas-Auflage-Winkel: bei Längle links und rechts getrennt, bei CRL als Set (brand = nur für diese Marke)
     TL3L:   { pos: 19, name: 'Glas-Auflage-Winkel links, Oberlicht', nr: '41AL-OFFICE-H-TL-L', crl: 'FTHHN1 / FTHHN1MBL', img: 'TL3L', brand: 'laengle' },
@@ -46,7 +49,7 @@
   };
   Object.keys(PARTS).forEach(k => { if (PARTS[k].img !== false) PARTS[k].img = 'img/profiles/' + (PARTS[k].img || 'p' + k) + '.jpg'; });
   // Reihenfolge in der Teileliste (Lena, 21.10.2026): erst alle Profile (Kabelkanal zuletzt), dann Dichtungen, dann Kleinteile – je aufsteigend
-  const PART_ORDER = [1, 2, 3, 4, 5, 'TL4', 'TL5', 'CLIPSD', 'CCB', 'CCC',
+  const PART_ORDER = [1, 2, 3, 4, 5, 'TL4', 'TL5', 'CLIPSD', 'CCB', 'CCC', 'CC130B', 'CC130C',
     6, 7, 8, 9, 'EP14',
     10, 11, 12, 13, 'CS', 14, 15, 16, 'CP', 'TL3L', 'TL3R', 'TL3', 'SDBL'];
 
@@ -121,9 +124,9 @@
     c180: { img: 'img/tools/ezcc.jpg', name: 'CRL-Verbindungsstreifen 180°', nr: 'EZCC', crl: 'EZCC' },
     c90: { img: 'img/tools/ezcl.jpg', name: 'CRL-Verbindungsstreifen 90° Ecke', nr: 'EZCL', crl: 'EZCL' }
   };
-  // Kabelkanal-Schnitte: FALLBROOK mit Zoll-Maßen
-  const ccFig = n => () => f(n + (window.BR && window.BR.id === 'crl' ? '_in' : ''));
-  const CC_TEXT = { L: 'Kabelkanal <b>(24)</b> links neben dem Türzargenprofil <b>(1)</b> einsetzen – vom Boden bis zur Decke.', R: 'Kabelkanal <b>(24)</b> rechts neben dem Türzargenprofil <b>(1)</b> einsetzen – vom Boden bis zur Decke.', LR: 'Kabelkanäle <b>(24)</b> links und rechts neben dem Türzargenprofil <b>(1)</b> einsetzen – jeweils vom Boden bis zur Decke.' };
+  // Kabelkanal CC 80 (Teile 24/25) oder CC 130 (26/27); Texte mit der passenden Positionsnummer
+  const CC = c => c.ccSize === 130 ? { b: 26, c: 27, parts: ['CC130B', 'CC130C'], fig: 'cc130' } : { b: 24, c: 25, parts: ['CCB', 'CCC'], fig: 'cc80' };
+  const CC_TEXT = (c, k) => ({ L: `Kabelkanal <b>(${CC(c).b})</b> links neben dem Türzargenprofil <b>(1)</b> einsetzen – vom Boden bis zur Decke.`, R: `Kabelkanal <b>(${CC(c).b})</b> rechts neben dem Türzargenprofil <b>(1)</b> einsetzen – vom Boden bis zur Decke.`, LR: `Kabelkanäle <b>(${CC(c).b})</b> links und rechts neben dem Türzargenprofil <b>(1)</b> einsetzen – jeweils vom Boden bis zur Decke.` })[k];
   // Zuschnitt (aus den FALLBROOK-Anleitungen): Ecken je Variante, die einem Verbindungsschritt zugeordnet sind; Ecklösung = eigenes Bild
   const pdfKey = c => c.type.toLowerCase() + (c.door === 'M' ? '3' : '24');
 
@@ -222,12 +225,12 @@
       id: 'kabelkanal', phase: 'frame', view: 'area', option: true,
       cond: c => c.cable && c.cc.length > 0,
       title: 'Kabelkanal einbauen (Option)',
-      parts: ['CCB', 'CCC'],
+      parts: c => CC(c).parts,
       text: [
-        c => ({ t: CC_TEXT[c.cc.length > 1 ? 'LR' : c.cc[0]], fig: [ccFig('cc80_schnitt')] }),
+        c => CC_TEXT(c, c.cc.length > 1 ? 'LR' : c.cc[0]),
         'Der Kabelkanal wird beim Zusammenbau des Rahmens gleich mit eingebaut: Er sitzt zwischen Türzargenprofil <b>(1)</b> und Basisrahmenprofil <b>(2)</b>.',
-        { t: 'Kabelkanal-Basisprofil <b>(24)</b> seitlich mit dem Türzargenprofil <b>(1)</b> und dem Basisrahmenprofil <b>(2)</b> verschrauben – mit selbstbohrenden Schrauben, verteilt über die ganze Höhe.', fig: [ccFig('cc80_schrauben')] },
-        'Nach der Elektroinstallation das Abdeckprofil <b>(25)</b> an die Gegebenheiten vor Ort anpassen (z. B. Aussparungen für Schalter und Steckdosen), auf Länge zuschneiden und einsetzen.'
+        c => ({ t: `Kabelkanal-Basisprofil <b>(${CC(c).b})</b> seitlich mit dem Türzargenprofil <b>(1)</b> und dem Basisrahmenprofil <b>(2)</b> verschrauben – mit selbstbohrenden Schrauben, verteilt über die ganze Höhe.`, fig: [f(CC(c).fig + '_schrauben')] }),
+        c => `Nach der Elektroinstallation das Abdeckprofil <b>(${CC(c).c})</b> an die Gegebenheiten vor Ort anpassen (z. B. Aussparungen für Schalter und Steckdosen), auf Länge zuschneiden und einsetzen.`
       ],
       notes: ['Selbstbohrende Schrauben (Profilverbindung inkl. Befestigungsmittel) werden bauseits beigestellt.'],
       spots: ['cc'], hl: ['cc']

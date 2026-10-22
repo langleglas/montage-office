@@ -81,6 +81,7 @@ document.querySelectorAll('.i18n').forEach(el => { if (!el.dataset.i18n) el.data
       swing: q.get('swing') === '1' && !(v.type === 'C' && q.get('toplight') === '1'),
       // Kabelkanal: Option + gewählte Positionen (L/R = links/rechts neben der Tür)
       cable: FEAT.cable && q.get('kabel') === '1',
+      ccSize: q.get('kanal') === '130' ? 130 : 80,   // Kabelkanal CC 80 oder CC 130
       cc: (q.get('kk') || '').split(',').filter((p, i, a) => ['L', 'R'].includes(p) && a.indexOf(p) === i).sort()
     }, q.get('schritt'));
   }
@@ -92,6 +93,7 @@ document.querySelectorAll('.i18n').forEach(el => { if (!el.dataset.i18n) el.data
     if (cfg.topLight) q.push('toplight=1');
     if (cfg.swing) q.push('swing=1');
     if (cfg.cable) q.push('kabel=1');
+    if (cfg.cable && cfg.ccSize === 130) q.push('kanal=130');
     if (cfg.cc && cfg.cc.length) q.push('kk=' + cfg.cc.join(','));
     if (step) q.push('schritt=' + step);
     return '#/' + RT + '/' + cfg.code + (q.length ? '?' + q.join('&') : '');
@@ -282,7 +284,8 @@ function rerender() {
   // Profilmaße (vereinfacht, für die Sichtbarkeit leicht verbreitert)
   const F = 0.032, FD = 0.034, DF = 0.048, DD = 0.05, GT = 0.01;
   const H = 2.70, PW = 0.95, DW = 0.90, HD = 2.15, R = 0.8, TL_BOTTOM = 2.17;
-  const CCW = 0.08, CCD = DD;      // Kabelkanal CC 80: 80 mm breit, Tiefe bündig mit dem Türzargenprofil (48 mm)
+  // Kabelkanal: CC 80 = 80 × 48 mm (Tiefe bündig mit dem Türzargenprofil), CC 130 = 130 × 62 mm
+  const ccDim = cfg => cfg.ccSize === 130 ? { w: 0.13, d: 0.062 } : { w: 0.08, d: DD };
 
   function box(group, x0, y0, z0, x1, y1, z1, mat, tags = []) {
     const g = new THREE.BoxGeometry(Math.abs(x1 - x0), Math.abs(y1 - y0), Math.abs(z1 - z0));
@@ -343,6 +346,7 @@ function cyl(group, r, len, axis, mat, tags, pos) {
     const tJ = [];   // Glasstoßprofile (für den Zuschnitt)
 
     const ccL = cfg.cable && cfg.cc.includes('L'), ccR = cfg.cable && cfg.cc.includes('R');
+    const { w: CCW, d: CCD } = ccDim(cfg);
     const segs = [];
     (cfg.door === 'L' ? ['door', 'panel'] : cfg.door === 'R' ? ['panel', 'door'] : ['panel', 'door', 'panel'])
       .forEach(t => { if (t === 'door' && ccL) segs.push('cc'); segs.push(t); if (t === 'door' && ccR) segs.push('cc'); });
@@ -1053,7 +1057,7 @@ activeSteps().forEach((step, i) => {
   }
 
   function cfgLabel(cfg) {
-    const o = [cfg.corner ? T('Ecklösung') : T('gerade'), cfg.frameT && T('Glasstoß'), cfg.topLight && 'Top Light', cfg.swing && 'Swing Door', cfg.cable && T('Kabelkanal')].filter(Boolean);
+    const o = [cfg.corner ? T('Ecklösung') : T('gerade'), cfg.frameT && T('Glasstoß'), cfg.topLight && 'Top Light', cfg.swing && 'Swing Door', cfg.cable && T('Kabelkanal') + ' CC ' + cfg.ccSize].filter(Boolean);
     return `${cfg.code} · ${o.join(' · ')}`;
   }
 
@@ -1159,6 +1163,7 @@ activeSteps().forEach((step, i) => {
       });
       content = `<div class="pad">
         <p class="config-line">${esc(cfgLabel(cfg))}</p>
+        ${cfg.cable ? `<div class="cc-size"><span>${T('Kabelkanal')}</span>${[80, 130].map(n => `<button data-ccsize="${n}" class="${cfg.ccSize === n ? 'active' : ''}">CC ${n}</button>`).join('')}</div>` : ''}
         ${cfg.cable && !cfg.cc.length ? `<p class="cc-hint">${T('Tippen Sie im 3D-Modell auf ＋ neben der Tür, um einen Kabelkanal zu setzen.')}</p>` : ''}
         <p class="intro">${list.length} ${T('Schritte. Klicken Sie auf einen Punkt im Modell oder einen Schritt – oder starten Sie mit <b>„Schritt für Schritt“</b>.')}</p>
         ${html}</ul></div>`;
@@ -1228,11 +1233,12 @@ activeSteps().forEach((step, i) => {
   }
 
   body.addEventListener('click', e => {
-    const t = e.target.closest('[data-sel],[data-tab],[data-act],[data-img],[data-cut]');
+    const t = e.target.closest('[data-sel],[data-tab],[data-act],[data-img],[data-cut],[data-ccsize]');
     if (!t) return;
     setCcEdit(false);
     if (t.dataset.sel) select(t.dataset.sel);
     else if (t.dataset.cut) selectCut(t.dataset.cut);
+    else if (t.dataset.ccsize) location.hash = guideHash(Object.assign({}, state.cfg, { ccSize: +t.dataset.ccsize }), state.sel);
     else if (t.dataset.tab) { const was = state.cutSel; state.tab = t.dataset.tab; state.cutSel = null; renderPanel(); if (was) flyHome(); }
     else if (t.dataset.act === 'back') deselect();
     else if (t.dataset.act === 'next') go(1);
