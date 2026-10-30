@@ -112,6 +112,8 @@
   };
 
   const B = c => c.type === 'B', C = c => c.type === 'C';
+  // Türzarge an Wand bzw. Decke befestigen: B3 gar nicht, B2/B4 an der Wand, C2/C4 an Wand und Decke, C3 an der Decke
+  const ZW = c => c.door !== 'M', ZD = c => c.type === 'C', ZB = c => ZW(c) || ZD(c);
   const f = n => 'img/fig/' + n + '.jpg';
   // Verbindungszeichnungen sind für Tür rechts/mittig gezeichnet – bei Tür links gespiegelt anzeigen (passend zum 3D-Modell)
   const fx = n => c => f(n) + (c.door === 'L' ? '#flip' : '');
@@ -137,11 +139,11 @@
     {
       id: 'vorbereiten', phase: 'prep', view: 'overview',
       title: 'Profile vorbereiten und Bohrungen setzen',
-      parts: [1, 2, 4, 'CS'],
+      parts: c => ZB(c) ? [1, 2, 4, 'CS'] : [2, 4, 'CS'],
       text: [
         'Profile auf einer weichen Unterlage am Boden auslegen, damit nichts verkratzt. Der Rahmen wird <b>liegend vormontiert</b>.',
         { t: 'In Basisrahmenprofil <b>(2)</b> und Deckenprofil <b>(4)</b> Befestigungslöcher bohren: an beiden Profilenden und entlang des Profils alle <b>30–60 cm</b>.', fig: [f('A_drill'), f('B_drill')] },
-        { t: 'Ebenso im Türzargenprofil <b>(1)</b> an der Wandseite.', fig: [f('E_drill')] },
+        c => !ZB(c) ? null : { t: ZW(c) && ZD(c) ? 'Ebenso im Türzargenprofil <b>(1)</b> an der Wandseite und oben zur Decke.' : ZW(c) ? 'Ebenso im Türzargenprofil <b>(1)</b> an der Wandseite.' : 'Ebenso im Türzargenprofil <b>(1)</b> oben zur Decke.', fig: [f('E_drill')] },
         'Lochgröße und Abstand richten sich nach Untergrund und Schrauben.'
       ],
       notes: ['Die Profile werden in der Regel fertig zugeschnitten geliefert. Bei eigenem Zuschnitt: siehe Reiter <a href="#" data-act="cut-tab">Zuschnitt</a>.', 'Profile (2) oder (4) länger als 6 m werden mit dem 180°-Verbinder 41AL-OFFICE-CS verbunden.'],
@@ -269,11 +271,11 @@
     {
       id: 'befestigen', phase: 'set', view: 'overview',
       title: 'Rahmen befestigen',
-      parts: [1, 2, 4],
+      parts: c => ZB(c) ? [1, 2, 4] : [2, 4],
       text: [
         { t: 'Deckenprofil <b>(4)</b> an der Decke verschrauben.', fig: [f('fasten_ceiling')] },
         { t: 'Basisrahmenprofile <b>(2)</b> an Wand und Boden verschrauben.', fig: [f('fasten2')] },
-        { t: 'Türzargenprofil <b>(1)</b> an der Wand verschrauben – die Zargendichtung deckt die Schrauben später ab.', fig: [f('fasten_frame'), { src: f('E_section'), size: 'sm', info: 'Nur zur Info: Die Zargendichtung (8) wird erst später ausgeklinkt und danach wieder eingedrückt.' }] },
+        c => !ZB(c) ? null : { t: ZW(c) && ZD(c) ? 'Türzargenprofil <b>(1)</b> an der Wand und oben an der Decke verschrauben – die Zargendichtung deckt die Schrauben später ab.' : ZW(c) ? 'Türzargenprofil <b>(1)</b> an der Wand verschrauben – die Zargendichtung deckt die Schrauben später ab.' : 'Türzargenprofil <b>(1)</b> oben an der Decke verschrauben – die Zargendichtung deckt die Schrauben später ab.', fig: [f('fasten_frame'), { src: f('E_section'), size: 'sm', info: 'Nur zur Info: Die Zargendichtung (8) wird erst später ausgeklinkt und danach wieder eingedrückt.' }] },
         'Befestigungspunkte alle <b>30–60 cm</b>; Schrauben und Dübel passend zum Untergrund wählen.'
       ],
       notes: ['Schraubenköpfe müssen bündig sitzen. Spalt zwischen Profil und Mauerwerk gegebenenfalls hinterfüllen. Im Bereich der Befestigungspunkte unterlegen.'],
@@ -312,7 +314,7 @@
         { t: 'Glas gerade einsetzen – nicht verkanten.', fig: [{ src: f('glass_bad'), size: 'sm' }, { src: f('glass_good'), size: 'sm' }], row: true },
         c => c.corner ? 'Ecklösung: Glasfuge an der 90°-Ecke mit Silikon oder dem CRL-Verbindungsstreifen <b>EZCL</b> (90° Ecke) schließen.' : null
       ],
-      notes: ['Nur ESG oder VSG aus ESG verwenden.', c => c.corner ? { t: 'Glasfuge an der Ecke: Silikonfuge oder CRL-Verbindungsstreifen (90° Ecke).', tools: [STRIP.c90] } : null],
+      notes: ['Nur ESG, VSG oder VSG aus ESG verwenden.', c => c.corner ? { t: 'Glasfuge an der Ecke: Silikonfuge oder CRL-Verbindungsstreifen (90° Ecke).', tools: [STRIP.c90] } : null],
       spots: ['glass'], hl: ['glass']
     },
     {
@@ -502,7 +504,7 @@
   <li>Nur mit von Längle für die Einbausituation geplanten und freigegebenen Komponenten montieren. Freigegebene Planung bzw. Systemzeichnung hat Vorrang.</li>
   <li>Montage ausschließlich durch Fachpersonal, nur unbeschädigte Produkte verwenden.</li>
   <li>Bauteile lotrecht, waagrecht und rechtwinklig montieren; nur die vorgesehenen Befestigungsmittel verwenden.</li>
-  <li>Nur ESG oder VSG aus ESG verwenden.</li>
+  <li>Nur ESG, VSG oder VSG aus ESG verwenden.</li>
   <li>Nur für den Innenbereich – nicht für Dusche, Sauna, Schwimm-/Solebad oder Räume mit Chemikalien (z. B. Chlor).</li>
   <li>Dichtstoffe müssen mit allen angrenzenden Materialien verträglich sein.</li>
 </ul>

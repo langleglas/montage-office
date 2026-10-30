@@ -44,13 +44,15 @@
       .replace(/(\d+)\s?Nm\b/g, (m, a) => `${a} Nm (${Math.round(+a * 8.85)} in-lb)`);
   }
 
-  const P = window.OFFICE && window.OFFICE.PARTS;
+  // Teile aus OFFICE und (falls vorhanden) OFFICE XL
+  const P = Object.assign({}, window.OFFICE_XL && window.OFFICE_XL.PARTS, window.OFFICE && window.OFFICE.PARTS);
   // Längle-Artikelnummern im Fließtext → CRL-Nummern
-  const NR_MAP = P ? Object.keys(P).map(k => P[k]).filter(p => p.crl && /^[\w-]+$/.test(p.nr)).map(p => [p.nr, p.crl])
+  const NR_MAP = Object.keys(P).length ? Object.values(window.OFFICE ? window.OFFICE.PARTS : {}).concat(Object.values(window.OFFICE_XL ? window.OFFICE_XL.PARTS : {})).filter(p => p.crl && /^[\w-]+$/.test(p.nr)).map(p => [p.nr, p.crl])
                          .sort((a, b) => b[0].length - a[0].length) : [];
 
   // Amerikanisches Englisch und US-Glasbezeichnungen (FALLBROOK)
   const US_EN = [
+    [/toughened safety glass \(ESG\), laminated safety glass \(VSG\) or laminated safety glass made of ESG \(VSG\)/g, 'tempered glass, laminated glass or laminated tempered glass'],
     [/toughened safety glass \(ESG\) or laminated safety glass made of ESG \(VSG\)/g, 'tempered glass or laminated tempered glass'],
     [/aluminium/g, 'aluminum'], [/stabilis/g, 'stabiliz'], [/([Cc])entre/g, '$1enter'], [/([Mm])itred/g, '$1itered'], [/([Mm])itre/g, '$1iter']
   ];
@@ -70,7 +72,7 @@
       hl3d: { mesh: 0x00b1eb, edge: 0x007fab },   // Hervorhebung im 3D-Modell in CRL-Blau
       langs: ['en', 'es'], storageKey: 'fallbrook-lang',
       nr: p => p.crl || p.nr,
-      img: src => src.replace('img/profiles/', 'img/profiles-in/'),   // Profilzeichnungen mit Zoll-Maßen (aus der CRL-Anleitung)
+      img: src => src.replace('img/profiles/', 'img/profiles-in/').replace('img/xl/parts/', 'img/xl/parts-in/'),   // Profilzeichnungen mit Zoll-Maßen (aus der CRL-Anleitung)
       text: s => {
         if (typeof s !== 'string' || !s) return s;
         let o = s;

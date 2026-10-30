@@ -4,14 +4,18 @@
 (function () {
   'use strict';
 
-const { PARTS, PART_ORDER, VARIANTS, PHASES, STEPS, GENERAL } = window.OFFICE;
+// Produkte: OFFICE (data.js) und OFFICE XL (data-xl.js, Entwurf). Streng getrennt: eigene Teile, Schritte, Abbildungen.
+// Aktives Produkt je Adresse: #/office/… bzw. #/officexl/… (FALLBROOK: #/fallbrook/… bzw. #/fallbrookxl/…)
+const DATA = { office: window.OFFICE, xl: window.OFFICE_XL };
+let PRODUCT = 'office';
+let { PARTS, PART_ORDER, VARIANTS, PHASES, STEPS, GENERAL } = DATA.office;
 
 // ================================================================ Sprache (je Marke: OFFICE de/en, FALLBROOK en/es)
 // Die Inhalte sind deutsch hinterlegt; T() liefert die Übersetzung aus en.js / es.js (Schlüssel = deutscher Text).
 // Fehlt eine spanische Übersetzung, gilt die englische.
 const I18N = {
-  en: { dict: window.I18N_EN, html: window.I18N_EN_HTML, general: window.I18N_EN_GENERAL },
-  es: { dict: window.I18N_ES, html: window.I18N_ES_HTML, general: window.I18N_ES_GENERAL }
+  en: { dict: window.I18N_EN, html: window.I18N_EN_HTML, general: window.I18N_EN_GENERAL, generalXL: window.I18N_EN_GENERAL_XL },
+  es: { dict: window.I18N_ES, html: window.I18N_ES_HTML, general: window.I18N_ES_GENERAL, generalXL: window.I18N_ES_GENERAL_XL }
 };
 let LANG = null;
 try { LANG = localStorage.getItem(BR.storageKey); } catch (e) { /* ohne Speicher */ }
@@ -21,9 +25,12 @@ if (!BR.langs.includes(LANG)) {
 }
 // BR.text: markenspezifische Anpassung (FALLBROOK: CRL-Artikelnummern, Zoll, Produktname)
 // Funktionen, die auf einer Seite ausgeblendet werden können (z. B. Kunden-Version: window.FEATURES = { cable: false })
-const FEAT = Object.assign({ cable: true }, window.FEATURES || {});
+const FEAT = Object.assign({ cable: true, xl: true }, window.FEATURES || {});
+if (!window.OFFICE_XL) FEAT.xl = false;   // ohne XL-Daten (Kunden-Version) gibt es kein XL
 if (!FEAT.cable) { const o = document.querySelector('#optCable'); if (o) o.remove(); }
-const RT = BR.product.toLowerCase();   // Adresse: #/office/… bzw. #/fallbrook/…
+const RT0 = BR.product.toLowerCase();   // Adresse: #/office/… bzw. #/fallbrook/…
+const rt = () => RT0 + (PRODUCT === 'xl' ? 'xl' : '');   // XL: #/officexl/… bzw. #/fallbrookxl/…
+const pname = () => BR.product + (PRODUCT === 'xl' ? ' XL' : '');
 const lookup = (l, s) => I18N[l] && I18N[l].dict && I18N[l].dict[s] != null ? I18N[l].dict[s] : null;
 const T = s => {
   if (s == null || LANG === 'de') return BR.text(s);
@@ -68,17 +75,22 @@ document.querySelectorAll('.i18n').forEach(el => { if (!el.dataset.i18n) el.data
     const [path, query] = h.split('?');
     const parts = path.split('/').filter(Boolean);
     const q = new URLSearchParams(query || '');
-    if (parts[0] !== RT && parts[0] !== 'office') return showStart();
+    const isXL = FEAT.xl && (parts[0] === RT0 + 'xl' || parts[0] === 'officexl');
+    if (!isXL && parts[0] !== RT0 && parts[0] !== 'office') return showStart();
+    useProduct(isXL ? 'xl' : 'office');
     const code = (parts[1] || '').toUpperCase();
     if (!VARIANTS[code]) return showVariants(q.get('ecke') === '1');
     const v = VARIANTS[code];
     showGuide({
       code, type: v.type, door: v.door,
       corner: q.get('ecke') === '1',
-      frameT: q.get('glasstoss') === '1',
-      topLight: v.type === 'C' && q.get('toplight') === '1',
+      xl: PRODUCT === 'xl',
+      // OFFICE: Option Glasstoß (Seitenteil zweiteilig). OFFICE XL: Seitenteile immer zweiteilig; frameT = Glasstoßprofil
+      // an allen Glasstößen (zwischen den Gläsern und zum Oberlicht) – standardmäßig an, abwählbar (glasstoss=0 → 3-mm-Fuge)
+      frameT: PRODUCT === 'xl' ? q.get('glasstoss') !== '0' : q.get('glasstoss') === '1',
+      topLight: PRODUCT !== 'xl' && v.type === 'C' && q.get('toplight') === '1',
       // Top Light und Swing Door sind nicht kombinierbar – Top Light hat Vorrang
-      swing: q.get('swing') === '1' && !(v.type === 'C' && q.get('toplight') === '1'),
+      swing: PRODUCT !== 'xl' && q.get('swing') === '1' && !(v.type === 'C' && q.get('toplight') === '1'),
       // Kabelkanal: Option + gewählte Positionen (L/R = links/rechts neben der Tür)
       cable: FEAT.cable && q.get('kabel') === '1',
       ccSize: q.get('kanal') === '130' ? 130 : 80,   // Kabelkanal CC 80 oder CC 130
@@ -86,17 +98,27 @@ document.querySelectorAll('.i18n').forEach(el => { if (!el.dataset.i18n) el.data
     }, q.get('schritt'));
   }
 
+  // Produkt wechseln: Daten, Positionsnummern und Profilmaße des 3D-Modells
+  function useProduct(p) {
+    if (p === PRODUCT) return;
+    PRODUCT = p;
+    ({ PARTS, PART_ORDER, VARIANTS, PHASES, STEPS, GENERAL } = DATA[p]);
+    buildPos();
+    setDims(p);
+    state.cfg = null; state.sel = null; state.cutSel = null; state.tab = 'steps';
+  }
+
   function guideHash(cfg, step) {
     const q = [];
     if (cfg.corner) q.push('ecke=1');
-    if (cfg.frameT) q.push('glasstoss=1');
+    if (cfg.xl ? !cfg.frameT : cfg.frameT) q.push(cfg.xl ? 'glasstoss=0' : 'glasstoss=1');
     if (cfg.topLight) q.push('toplight=1');
     if (cfg.swing) q.push('swing=1');
     if (cfg.cable) q.push('kabel=1');
     if (cfg.cable && cfg.ccSize === 130) q.push('kanal=130');
     if (cfg.cc && cfg.cc.length) q.push('kk=' + cfg.cc.join(','));
     if (step) q.push('schritt=' + step);
-    return '#/' + RT + '/' + cfg.code + (q.length ? '?' + q.join('&') : '');
+    return '#/' + rt() + '/' + cfg.code + (q.length ? '?' + q.join('&') : '');
   }
 
   // Adresse aktualisieren, ohne neu zu navigieren (in eingebetteten Ansichten ggf. nicht erlaubt – dann ignorieren)
@@ -105,7 +127,7 @@ document.querySelectorAll('.i18n').forEach(el => { if (!el.dataset.i18n) el.data
   function setView(id) {
     ['view-start', 'view-variants', 'view-guide'].forEach(v => { $('#' + v).hidden = v !== id; });
     $('#guideControls').hidden = id !== 'view-guide';
-    $('.brand').href = id === 'view-guide' ? '#/' + RT : '#/';
+    $('.brand').href = id === 'view-guide' ? '#/' + rt() : '#/';
   }
 
 // ================================================================ Sprachauswahl (klein auf der Startseite)
@@ -125,30 +147,35 @@ function rerender() {
     $('#crumb').textContent = T('Montageanleitungen');
     // Nur fertig ausgearbeitete Produkte
     $('#productTiles').innerHTML = `
-      <a class="tile" href="#/${RT}">
+      <a class="tile" href="#/${RT0}">
         <div class="art">${variantSVG('B4', false)}</div>
         <div class="cap"><b>${BR.product}</b><span>${T('Glastrennwand-System · 6 Varianten')}</span></div>
-      </a>`;
+      </a>${FEAT.xl ? `
+      <a class="tile" href="#/${RT0}xl">
+        <div class="art">${variantSVG('B4', false, true)}</div>
+        <div class="cap"><b>${BR.product} XL</b><span>${T('Glastrennwand-System XL · 6 Varianten')}</span></div>
+      </a>` : ''}`;
   }
 
   // ================================================================ Variantenwahl
   function showVariants(corner) {
     setView('view-variants');
     state.cornerPick = corner;
-    $('#crumb').textContent = BR.product;
+    $('#crumb').textContent = pname();
     document.querySelectorAll('#mountSeg button').forEach(b => b.classList.toggle('active', (b.dataset.corner === '1') === corner));
     $('#variantTiles').innerHTML = Object.keys(VARIANTS).map(code => `
-      <a class="tile" href="#/${RT}/${code}${corner ? '?ecke=1' : ''}">
-        <div class="art">${variantSVG(code, corner)}</div>
+      <a class="tile" href="#/${rt()}/${code}${corner ? '?ecke=1' : ''}">
+        <div class="art">${variantSVG(code, corner, PRODUCT === 'xl')}</div>
         <div class="cap"><b>${code}</b><span>${esc(T(VARIANTS[code].label))}</span></div>
       </a>`).join('');
   }
   document.querySelectorAll('#mountSeg button').forEach(b => b.addEventListener('click', () => {
-    location.hash = '#/' + RT + (b.dataset.corner === '1' ? '?ecke=1' : '');
+    location.hash = '#/' + rt() + (b.dataset.corner === '1' ? '?ecke=1' : '');
   }));
 
   // Schlichte Ansichtszeichnung einer Variante (Front, optional mit Rückwand der Ecklösung)
-  function variantSVG(code, corner) {
+  // xl: Seitenteile zweiteilig mit Glasstoßprofil
+  function variantSVG(code, corner, xl) {
     const v = VARIANTS[code];
     const top = 12, bot = 138, Hh = bot - top;
     const PW = 62, DW = 50, R = 34, skew = 16;
@@ -171,6 +198,7 @@ function rerender() {
       const w = s === 'd' ? DW : PW;
       if (s === 'p') {
         out += `<rect x="${x}" y="${top}" width="${w}" height="${Hh}" fill="#eef2f3" stroke="#000" stroke-width="1.5"/>`;
+        if (xl) out += `<line x1="${x + w / 2}" y1="${top}" x2="${x + w / 2}" y2="${bot}" stroke="#000" stroke-width="2.5"/>`;
       } else {
         if (v.type === 'B') out += `<rect x="${x}" y="${top}" width="${w}" height="${doorTop - top}" fill="#eef2f3" stroke="#000" stroke-width="1.5"/>`;
         out += `<rect x="${x}" y="${doorTop}" width="${w}" height="${bot - doorTop}" fill="#fff" stroke="#000" stroke-width="3"/>`;
@@ -282,7 +310,10 @@ function rerender() {
   }
 
   // Profilmaße (vereinfacht, für die Sichtbarkeit leicht verbreitert)
-  const F = 0.032, FD = 0.034, DF = 0.048, DD = 0.05, GT = 0.01;
+  // Profilmaße je Produkt (vereinfacht, leicht verbreitert); GT = Fixglas, GTD = Türglas
+  // XL: Rahmenprofile 43 mm tief, Türzarge 47 × 52 mm, Fixglas 20–28 mm, Türglas 10–12 mm
+  let F = 0.032, FD = 0.034, DF = 0.048, DD = 0.05, GT = 0.01, GTD = 0.01;
+  function setDims(p) { if (p === 'xl') { F = 0.032; FD = 0.045; DF = 0.048; DD = 0.054; GT = 0.024; GTD = 0.012; } else { F = 0.032; FD = 0.034; DF = 0.048; DD = 0.05; GT = 0.01; GTD = 0.01; } }
   const H = 2.70, PW = 0.95, DW = 0.90, HD = 2.15, R = 0.8, TL_BOTTOM = 2.17;
   // Kabelkanal: CC 80 = 80 × 48 mm (Tiefe bündig mit dem Türzargenprofil), CC 130 = 130 × 62 mm
   const ccDim = cfg => cfg.ccSize === 130 ? { w: 0.13, d: 0.062 } : { w: 0.08, d: DD };
@@ -352,7 +383,10 @@ function cyl(group, r, len, axis, mat, tags, pos) {
       .forEach(t => { if (t === 'door' && ccL) segs.push('cc'); segs.push(t); if (t === 'door' && ccR) segs.push('cc'); });
     let x = 0, firstPanel = true;
     // Option Glasstoß: im ersten Seitenteil zwei gleich große Gläser mit Glasstoßprofil dazwischen
-    const panelW = () => { const w = cfg.frameT && firstPanel ? 2 * PW + 0.048 : PW; firstPanel = false; return w; };
+    // Seitenteil aus zwei Gläsern mit Glasstoßprofil: OFFICE-Option Glasstoß (erstes Seitenteil), bei XL immer (jedes Seitenteil)
+    const twoPane = pi => cfg.xl || (cfg.frameT && pi === 0);
+    // XL ohne Glasstoßprofil: die beiden Gläser mit 3-mm-Fuge
+    const panelW = () => { const w = cfg.xl || (cfg.frameT && firstPanel) ? 2 * PW + (cfg.frameT ? 0.048 : 0.003) : PW; firstPanel = false; return w; };
     const S = segs.map(t => { const w = t === 'door' ? DW + 2 * DF : t === 'cc' ? CCW : panelW(); const s = { t, x0: x, x1: x + w }; x += w; return s; });
     const W = x;
     const cornerSide = cfg.corner ? (cfg.door === 'L' ? 'R' : 'L') : null;
@@ -379,8 +413,8 @@ function cyl(group, r, len, axis, mat, tags, pos) {
       const gx0 = doorL ? p.x0 - DF / 2 + jg : p.x0 + (p.x0 === 0 ? F * 0.5 : 0.015);
       const gx1 = doorR ? p.x1 + DF / 2 - jg : p.x1 - (p.x1 === W ? F * 0.5 : 0.015);
       // Mit Glasstoß wird das Seitenteilglas geteilt: links und rechts vom Glasstoßprofil je eine Scheibe
-      if (cfg.frameT && pi === 0) {
-        const mx = (p.x0 + p.x1) / 2, gap = 0.0105;
+      if (twoPane(pi)) {
+        const mx = (p.x0 + p.x1) / 2, gap = cfg.frameT ? 0.0105 : 0.0015;
         box(g, gx0, F, -GT / 2, mx - gap, H - F, GT / 2, M.glass, ['glass']);
         box(g, mx + gap, F, -GT / 2, gx1, H - F, GT / 2, M.glass, ['glass']);
       } else {
@@ -388,8 +422,8 @@ function cyl(group, r, len, axis, mat, tags, pos) {
       }
       A.glass.push([(p.x0 + p.x1) / 2, 1.35, zf]);
       const pm = (p.x0 + p.x1) / 2;
-      (cfg.frameT && pi === 0 ? [p.x0 + 0.12, pm - 0.12, pm + 0.12, p.x1 - 0.12] : [p.x0 + 0.12, p.x1 - 0.12]).forEach(bx => { box(g, bx - 0.04, F - 0.006, -0.01, bx + 0.04, F - 0.001, 0.01, M.wood, ['blocks']); A.blocks.push([bx, F, zf]); });
-      if (cfg.frameT && pi === 0) {
+      (twoPane(pi) ? [p.x0 + 0.12, pm - 0.12, pm + 0.12, p.x1 - 0.12] : [p.x0 + 0.12, p.x1 - 0.12]).forEach(bx => { box(g, bx - 0.04, F - 0.006, -0.01, bx + 0.04, F - 0.001, 0.01, M.wood, ['blocks']); A.blocks.push([bx, F, zf]); });
+      if (twoPane(pi) && cfg.frameT) {
         const mx = (p.x0 + p.x1) / 2;
         box(g, mx - 0.024, F, -FD / 2, mx + 0.024, H - F, FD / 2, M.alu, ['frameT']);
         tJ.push({ x: mx, y0: F, y1: H - F, door: false });
@@ -471,7 +505,7 @@ function cyl(group, r, len, axis, mat, tags, pos) {
     g.add(pivot);
     const off = cfg.swing ? -0.05 : 0;
     const lx0 = dir < 0 ? -leafW - off : off, lx1 = dir < 0 ? -off : leafW + off;
-    box(pivot, Math.min(lx0, lx1), 0.012, -GT / 2, Math.max(lx0, lx1), leafTop, GT / 2, M.glass, ['door']);
+    box(pivot, Math.min(lx0, lx1), 0.012, -GTD / 2, Math.max(lx0, lx1), leafTop, GTD / 2, M.glass, ['door']);
     const lockLocal = cfg.swing ? dir * (leafW - 0.07) : dir * (leafW - 0.122);
     if (cfg.swing) {
       box(pivot, lockLocal - 0.008, 0.75, 0.02, lockLocal + 0.008, 1.55, 0.035, M.steel, ['handle']);
@@ -480,8 +514,8 @@ function cyl(group, r, len, axis, mat, tags, pos) {
       // WSS Studio Alea: Schlosskasten auf beiden Glasseiten (150 × 55 mm), Drückerrosette + Schlüsselloch, L-Drücker
       const LY = 1.02, lockC = dir * (leafW - 0.075), roseX = dir * (leafW - 0.122), keyX = dir * (leafW - 0.06);
       [-1, 1].forEach(sd => {
-        roundPlate(pivot, 0.15, 0.055, 0.009, 0.006, M.hw, ['handle'], [lockC, LY, sd * (GT / 2 + 0.0045)]);
-        const zf0 = sd * (GT / 2 + 0.0115);   // Außenfläche des Schlosskastens
+        roundPlate(pivot, 0.15, 0.055, 0.009, 0.006, M.hw, ['handle'], [lockC, LY, sd * (GTD / 2 + 0.0045)]);
+        const zf0 = sd * (GTD / 2 + 0.0115);   // Außenfläche des Schlosskastens
         // Schlüsselloch (Profilzylinder angedeutet)
         box(pivot, keyX - 0.007, LY - 0.011, zf0 - sd * 0.001, keyX + 0.007, LY + 0.011, zf0 + sd * 0.0012, M.hwDark, ['handle']);
         // Rosette und Drücker: Hals senkrecht zum Glas, Griff parallel zum Glas Richtung Band
@@ -509,8 +543,8 @@ function cyl(group, r, len, axis, mat, tags, pos) {
         const fx = hingeRight ? d.x1 - DF : d.x0 + DF;
         box(g, hingeRight ? fx - 0.004 : fx, y - 0.045, -0.018, hingeRight ? fx : fx + 0.004, y + 0.045, 0.022, M.hw, ['hinge']);
         // Bandrolle an der Drehachse und Glasklemmplatten (60 × 90 mm) auf beiden Glasseiten
-        cyl(pivot, 0.0135, 0.09, 'y', M.hw, ['hinge'], [-dir * 0.002, y, GT / 2 + 0.009]);
-        [-1, 1].forEach(sd => roundPlate(pivot, 0.06, 0.09, 0.008, 0.006, M.hw, ['hinge'], [dir * 0.042, y, sd * (GT / 2 + 0.004)]));
+        cyl(pivot, 0.0135, 0.09, 'y', M.hw, ['hinge'], [-dir * 0.002, y, GTD / 2 + 0.009]);
+        [-1, 1].forEach(sd => roundPlate(pivot, 0.06, 0.09, 0.008, 0.006, M.hw, ['hinge'], [dir * 0.042, y, sd * (GTD / 2 + 0.004)]));
         A.hinge.push([hingeFrameX, y, zf]);
       });
       A.notch.push([hingeFrameX, (ys[0] + ys[1]) / 2, zf]);
@@ -720,8 +754,9 @@ activeSteps().forEach((step, i) => {
     return state.cfg ? STEPS.filter(s => !s.cond || s.cond(state.cfg)) : [];
   }
   // Positionsnummer → Bauteil (für Tooltips an den Nummern in den Zeichnungen)
-  const POS = {};
-  Object.keys(PARTS).forEach(k => { const n = PARTS[k].pos || (/^\d+$/.test(k) ? +k : null); if (n) POS[n] = PARTS[k]; });
+  let POS = {};
+  function buildPos() { POS = {}; Object.keys(PARTS).forEach(k => { const n = PARTS[k].pos || (/^\d+$/.test(k) ? +k : null); if (n) POS[n] = PARTS[k]; }); }
+  buildPos();
   const posTitle = n => String(n).split('/').map(x => POS[x] ? `${x} = ${T(POS[x].name)}` : x).join(' · ');
 
   // Zeichnung mit eigener Beschriftung: Positionsnummern, Führungslinien, Hinweise, Richtig/Falsch.
@@ -822,25 +857,25 @@ activeSteps().forEach((step, i) => {
       { part: 8, poly: [[-54, 0], [-48, 0], [-48, L], [-54, L]], z: Z.gasket, cut: 'SC', e: [0, 1], dir: [0, 1] },
       { part: 2, poly: [[0, 0], [L, 0], [L, PB], [0, PB]], z: Z.base, cut: 'SC', e: [3, 0], dir: [1, 0] },
       { part: 3, poly: [[0, 0], [L, 0], [L, PB], [0, PB]], z: Z.clip, cut: 'SC', e: [3, 0], dir: [1, 0] },
-      { part: 3, poly: [[0, PB], [PC, PB], [PC, L], [0, L]], z: Z.clip, cut: 'SC', e: [0, 1], dir: [0, 1], note: 'endet 26 mm über dem Boden', dim: { t: '26 mm', ax: 'v', a: [-45, 0], b: [0, PB], at: PC + 14 } }
+      { part: 3, poly: [[0, PB], [PC, PB], [PC, L], [0, L]], z: Z.clip, cut: 'SC', e: [0, 1], dir: [0, 1], note: 'endet 26 mm über dem Boden', dim: { t: '26 mm', ax: 'v', a: [-45, 0], b: [0, PB], at: PC + 14 }, office: true }
     ] },
     // B: Türzarge oben zum Seitenteil (Oberlicht darüber)
     k: { title: 'Türzarge oben – Seite Seitenteil', pieces: DOOR_L([
-      { part: 3, poly: [[-PC, -PC], [L, -PC], [L, 0], [0, 0]], z: Z.dclip, cut: 'MC', e: [3, 0], dir: [1, 0], note: 'Gehrung 17 mm außerhalb der Türzarge', dim: { t: '17 mm', ax: 'u', a: [-PC, -PC], b: [0, 30], at: -PC - 14 } },
-      { part: 3, poly: [[-PC, -PC], [0, 0], [0, L], [-PC, L]], z: Z.dclip, cut: 'MC', e: [0, 1], dir: [0, 1], note: 'Gehrung 17 mm außerhalb der Türzarge', dim: { t: '17 mm', ax: 'v', a: [-PC, -PC], b: [30, 0], at: -PC - 14 } }
+      { part: 3, poly: [[-PC, -PC], [L, -PC], [L, 0], [0, 0]], z: Z.dclip, cut: 'MC', e: [3, 0], dir: [1, 0], note: 'Gehrung 17 mm außerhalb der Türzarge', dim: { t: '17 mm', ax: 'u', a: [-PC, -PC], b: [0, 30], at: -PC - 14 }, office: true },
+      { part: 3, poly: [[-PC, -PC], [0, 0], [0, L], [-PC, L]], z: Z.dclip, cut: 'MC', e: [0, 1], dir: [0, 1], note: 'Gehrung 17 mm außerhalb der Türzarge', dim: { t: '17 mm', ax: 'v', a: [-PC, -PC], b: [30, 0], at: -PC - 14 }, office: true }
     ]) },
     // B: Türzarge oben an der Wand, Fixrahmen darüber
     n: { title: 'Türzarge oben – Seite Wand', pieces: DOOR_L([
       { part: 2, poly: [[0, 0], [PB, 0], [PB, -L], [0, -L]], z: Z.base, cut: 'SC', e: [0, 1], dir: [0, -1] },
       { part: 3, poly: [[0, 0], [PB, 0], [PB, -L], [0, -L]], z: Z.clip, cut: 'SC', e: [0, 1], dir: [0, -1] },
-      { part: 3, poly: [[PB, -PC], [L, -PC], [L, 0], [PB, 0]], z: Z.dclip, cut: 'SC', e: [3, 0], dir: [1, 0], note: 'endet 26 mm vor der Ecke', dim: { t: '26 mm', ax: 'u', a: [0, 30], b: [PB, -PC], at: -PC - 14 } }
+      { part: 3, poly: [[PB, -PC], [L, -PC], [L, 0], [PB, 0]], z: Z.dclip, cut: 'SC', e: [3, 0], dir: [1, 0], note: 'endet 26 mm vor der Ecke', dim: { t: '26 mm', ax: 'u', a: [0, 30], b: [PB, -PC], at: -PC - 14 }, office: true }
     ]) },
     // C: Türzarge bis zur Decke, an der Wand
     kc: { title: 'Türzarge oben – Seite Wand', pieces: DOOR_L([]) },
     // C: Türzarge oben zum Seitenteil – Deckenprofil des Seitenteils stößt gerade an die Türzarge
     l: { title: 'Türzarge oben / Decke – Seite Seitenteil', pieces: DOOR_L([
       { part: 4, poly: [[-L, 0], [0, 0], [0, PT], [-L, PT]], z: Z.top, cut: 'SC', e: [1, 2], dir: [-1, 0], note: 'stößt gerade an die Türzarge' },
-      { part: 3, poly: [[-PC, PT], [0, PT], [0, L], [-PC, L]], z: Z.dclip, cut: 'SC', e: [0, 1], dir: [0, 1], note: 'endet 35 mm unter der Decke', dim: { t: '35 mm', ax: 'v', a: [30, 0], b: [0, PT], at: -PC - 14 } }
+      { part: 3, poly: [[-PC, PT], [0, PT], [0, L], [-PC, L]], z: Z.dclip, cut: 'SC', e: [0, 1], dir: [0, 1], note: 'endet 35 mm unter der Decke', dim: { t: '35 mm', ax: 'v', a: [30, 0], b: [0, PT], at: -PC - 14 }, office: true }
     ]) },
     // Ecklösung (Grundriss): Deckenprofil oben, Basisrahmen- und Clipprofil unten auf Gehrung
     mT: { title: 'Ecke oben (Decke)', plan: true, pieces: [
@@ -857,7 +892,9 @@ activeSteps().forEach((step, i) => {
   // Glasstoßprofil (5): stößt gerade (90°) auf das durchlaufende Profil (Basisrahmen-, Decken- oder Türzargenprofil)
   const TJ = (title, part, thk) => ({ title, focus: [0, 0.07], pieces: [
     { part, poly: [[-95, 0], [95, 0], [95, -thk], [-95, -thk]], z: part === 1 ? Z.door : Z.top, cut: null, dir: [0, 0] },
-    { part: 5, poly: [[-24, 0], [24, 0], [24, L], [-24, L]], z: Z.top, cut: 'SC', e: [0, 1], dir: [0, 1], note: 'stößt gerade (90°) auf das durchlaufende Profil' }
+    { part: 5, poly: [[-24, 0], [24, 0], [24, L], [-24, L]], z: Z.top, cut: 'SC', e: [0, 1], dir: [0, 1], note: 'stößt gerade (90°) auf das durchlaufende Profil' },
+    { part: 3, poly: [[-38, 0], [-26, 0], [-26, L], [-38, L]], z: Z.dclip, cut: 'SC', e: [0, 1], dir: [0, 1], xl: true },
+    { part: 3, poly: [[26, 0], [38, 0], [38, L], [26, L]], z: Z.dclip, cut: 'SC', e: [0, 1], dir: [0, 1], xl: true }
   ] });
   Object.assign(CORNERS, {
     tB: TJ('Glasstoßprofil unten', 2, PB), tT: TJ('Glasstoßprofil oben', 4, PT),
@@ -867,7 +904,9 @@ activeSteps().forEach((step, i) => {
       { part: 1, poly: [[-24, 0], [24, -48], [24, -L], [-24, -L]], z: Z.door, cut: 'MC', e: [0, 1], dir: [0, -1] },
       { part: 8, poly: [[24, -48], [L, -48], [L, -54], [30, -54]], z: Z.gasket, cut: 'MC', e: [3, 0], dir: [1, 0] },
       { part: 8, poly: [[24, -48], [30, -54], [30, -L], [24, -L]], z: Z.gasket, cut: 'MC', e: [0, 1], dir: [0, -1] },
-      { part: 5, poly: [[-24, 0], [24, 0], [24, L], [-24, L]], z: Z.top, cut: 'SC', e: [0, 1], dir: [0, 1], note: 'stößt gerade (90°) auf die Gehrungsecke der Türzarge' }
+      { part: 5, poly: [[-24, 0], [24, 0], [24, L], [-24, L]], z: Z.top, cut: 'SC', e: [0, 1], dir: [0, 1], note: 'stößt gerade (90°) auf die Gehrungsecke der Türzarge' },
+      { part: 3, poly: [[-38, 0], [-26, 0], [-26, L], [-38, L]], z: Z.dclip, cut: 'SC', e: [0, 1], dir: [0, 1], xl: true },
+      { part: 3, poly: [[26, 0], [38, 0], [38, L], [26, L]], z: Z.dclip, cut: 'SC', e: [0, 1], dir: [0, 1], xl: true }
     ] }, tDT: TJ('Glasstoßprofil über der Tür oben', 4, PT)
   });
   let G = null;                                          // Eckpunkte des aktuellen Modells (aus buildModel)
@@ -906,6 +945,9 @@ activeSteps().forEach((step, i) => {
       add('tB' + i, 'glasstoss', [t.x, t.y0, 0], [t.side || 1, 1], t.door ? 'tDB' : 'tB');
       add('tT' + i, 'glasstoss', [t.x, t.y1, 0], [1, -1], t.door ? 'tDT' : 'tT');
     });
+    // OFFICE XL: eigene Positionsnummern (Basisrahmen 3, Clip 4, Decke 5, Glasstoß 6, Zargendichtung 11) und XL-eigene Stücke
+    const XMAP = { 2: 3, 3: 4, 4: 5, 5: 6, 8: 11 };
+    out.forEach(c => { c.pieces = c.pieces.filter(p => cfg.xl ? !p.office : !p.xl).map(p => cfg.xl ? Object.assign({}, p, { role: p.part, part: XMAP[p.part] || p.part }) : p); });
     // Reihenfolge wie die Montageschritte
     const ids = activeSteps().map(s => s.id);
     return out.sort((a, b) => ids.indexOf(a.step) - ids.indexOf(b.step) || (a.key < b.key ? -1 : 1));
@@ -924,7 +966,7 @@ activeSteps().forEach((step, i) => {
   const cutMode = () => state.tab === 'cut' && !state.sel && CUT3D(state.cfg);
   // Stückfarbe nach Schnittart, je Profil leicht abgestuft (Türzarge dunkler, Clipprofil heller)
   const CUT_COL = { MC: { 1: 0xd06614, 2: 0xe8822a, 3: 0xf4b072, 4: 0xe8822a, 5: 0xe8822a }, SC: { 1: 0x2a64b4, 2: 0x4a86d6, 3: 0x8bb4e8, 4: 0x3a78cc, 5: 0x3a78cc } }, cutMats = {};
-  const cutMat = p => !p.cut ? M.alu : cutMats[p.cut + p.part] || (cutMats[p.cut + p.part] = new THREE.MeshStandardMaterial({ color: CUT_COL[p.cut][p.part], roughness: 0.6 }));
+  const cutMat = p => { const k = p.role || p.part; return !p.cut ? M.alu : cutMats[p.cut + k] || (cutMats[p.cut + k] = new THREE.MeshStandardMaterial({ color: CUT_COL[p.cut][k], roughness: 0.6 })); };
   // Linie als schmaler Streifen (1,2 mm) in der Ebene z = const – gut sichtbar, immer vorne
   function stripTo(parent, p0, p1) {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(p0.distanceTo(p1), 0.0012), M.dimLine);
@@ -967,12 +1009,12 @@ activeSteps().forEach((step, i) => {
       const A = (q, z) => new THREE.Vector3(q.x + nx * k, q.y + ny * k, z);
       const qg = new THREE.BufferGeometry().setFromPoints([A(a, fz0), A(b, fz0), A(b, fz1), A(a, fz0), A(b, fz1), A(a, fz1)]);
       if (c.plan) { geo.rotateX(Math.PI / 2); qg.rotateX(Math.PI / 2); }
-      addMesh(grp, geo, p.part === 8 ? M.gasket : cutMat(p), [], off);
+      addMesh(grp, geo, (p.role || p.part) === 8 ? M.gasket : cutMat(p), [], off);
       const face = new THREE.Mesh(qg, p.cut === 'MC' ? M.cutMC : M.cutSC);
       face.position.set(...off);
       grp.add(face);
       // Gradzahl am Gehrungsschnitt (wie in der Zeichnung): Bogen an der spitzen Ecke + „45°“
-      if (p.cut === 'MC' && p.part !== 8) {
+      if (p.cut === 'MC' && (p.role || p.part) !== 8) {
         const n = pts.length, [ia, ib] = p.e;
         const inner = i => { const q = pts[i], a1 = pts[(i + n - 1) % n].clone().sub(q), a2 = pts[(i + 1) % n].clone().sub(q);
           return Math.abs(Math.atan2(a1.x * a2.y - a1.y * a2.x, a1.dot(a2))); };
@@ -1051,6 +1093,13 @@ activeSteps().forEach((step, i) => {
   }
 
   // Im Montageschritt: Knopf zur passenden Ecke im Reiter Zuschnitt
+  // Option mit eigenen Arbeitsschritten zum Aufklappen (z. B. Adapterprofil XL)
+  function moreHTML(step, cfg) {
+    const m = val(step.more, cfg);
+    if (!m) return '';
+    const items = m.items.map(t => val(t, cfg)).filter(Boolean);
+    return `<details class="opt-block"><summary>${T(m.title)}</summary><ol class="steps">${items.map(t => workStep(t, cfg)).join('')}</ol></details>`;
+  }
   function cutDetail(step, cfg) {
     const c = cutCorners(cfg).find(c => c.step === step.id);
     return c ? `<button class="btn cut-3d" data-cut="${c.key}">✂ ${T('So ist diese Ecke geschnitten')} – ${T('im 3D-Modell zeigen')}</button>` : '';
@@ -1071,11 +1120,16 @@ activeSteps().forEach((step, i) => {
   function showGuide(cfg, stepId) {
     setView('view-guide');
     if (!renderer) initScene();
-    $('#crumb').textContent = BR.product + ' ' + cfg.code;
-    $('#variantLink').href = '#/' + RT + (cfg.corner ? '?ecke=1' : '');
+    $('#crumb').textContent = pname() + ' ' + cfg.code;
+    $('#variantLink').href = '#/' + rt() + (cfg.corner ? '?ecke=1' : '');
     document.querySelectorAll('[data-opt]').forEach(inp => { inp.checked = !!cfg[inp.dataset.opt]; });
     // Top Light nur bei C; Top Light und Swing Door schließen sich gegenseitig aus
     $('#optTopLight').classList.toggle('off', cfg.type !== 'C' || cfg.swing);
+    // OFFICE XL: kein Top Light, keine Swing Door; Schalter Glasstoß = Glasstoßprofil an allen Glasstößen
+    ['#optTopLight', '#optSwing'].forEach(id => { $(id).hidden = !!cfg.xl; });
+    const ftLabel = $('[data-opt="frameT"]').closest('label');
+    ftLabel.hidden = false;
+    ftLabel.title = cfg.xl ? T('Glasstoßprofil an allen Glasstößen – abgewählt: 3-mm-Fuge mit Silikon oder EZCC') : '';
     updateGuideTexts(cfg);
     $('#optSwing').classList.toggle('off', cfg.topLight);
     ['#optTopLight', '#optSwing'].forEach(id => { $(id + ' input').disabled = $(id).classList.contains('off'); });
@@ -1151,7 +1205,7 @@ activeSteps().forEach((step, i) => {
       <div class="tabs">
         <button data-tab="steps" class="${state.tab === 'steps' ? 'active' : ''}">${T('Montageablauf')}</button>
         <button data-tab="parts" class="${state.tab === 'parts' ? 'active' : ''}">${T('Bauteile')}</button>
-        <button data-tab="cut" class="${state.tab === 'cut' ? 'active' : ''}">${T('Zuschnitt')}</button>
+        ${CUT3D(cfg) ? `<button data-tab="cut" class="${state.tab === 'cut' ? 'active' : ''}">${T('Zuschnitt')}</button>` : ''}
         <button data-tab="info" class="${state.tab === 'info' ? 'active' : ''}">${T('Hinweise')}</button>
       </div>`;
     let content = '';
@@ -1187,7 +1241,7 @@ activeSteps().forEach((step, i) => {
               ${st >= 0 ? `<button class="link" data-sel="${c.step}">${T('Zum Montageschritt')} ${st + 1} →</button>` : ''}` : ''}</li>`;
         }).join('')}</ul></div>`;
     } else {
-      content = `<div class="pad general">${BR.text(LANG !== 'de' && I18N[LANG] && I18N[LANG].general ? I18N[LANG].general : GENERAL)}</div>`;
+      content = `<div class="pad general">${BR.text(LANG !== 'de' && I18N[LANG] && I18N[LANG][PRODUCT === 'xl' ? 'generalXL' : 'general'] ? I18N[LANG][PRODUCT === 'xl' ? 'generalXL' : 'general'] : GENERAL)}</div>`;
     }
     body.innerHTML = tabs + content;
     syncCut();
@@ -1220,6 +1274,7 @@ activeSteps().forEach((step, i) => {
         <h3>${T('Montage')}</h3>
         <ol class="steps">${text.map(s => workStep(s, cfg)).join('')}</ol>
         ${cutDetail(step, cfg)}
+        ${moreHTML(step, cfg)}
       </div>
 
       ${step.extraHtml ? `<div class="section"><h3>${esc(T(step.extraTitle || ''))}</h3>${THtml(val(step.extraHtml, cfg))}</div>` : ''}

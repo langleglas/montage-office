@@ -436,3 +436,9 @@ i.none { background: #c9ccd0; }
 .cc-size span { color: var(--ink-2); margin-right: 4px; }
 .cc-size button { border: 1px solid var(--line); background: #fff; border-radius: 16px; padding: 3px 12px; font: inherit; font-size: 13px; cursor: pointer; }
 .cc-size button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+/* Option mit eigenen Schritten zum Aufklappen */
+.opt-block { margin: 10px 0 6px; border: 1px solid var(--line); border-radius: 8px; padding: 0 12px; background: #fff; }
+.opt-block summary { cursor: pointer; padding: 10px 0; font-size: 14px; font-weight: 600; list-style: none; }
+.opt-block summary::-webkit-details-marker { display: none; }
+.opt-block summary::before { content: "▸"; display: inline-block; width: 16px; transition: transform .15s; }
+.opt-block[open] summary::before { transform: rotate(90deg); }
