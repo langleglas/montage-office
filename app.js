@@ -25,9 +25,11 @@ if (!BR.langs.includes(LANG)) {
 }
 // BR.text: markenspezifische Anpassung (FALLBROOK: CRL-Artikelnummern, Zoll, Produktname)
 // Funktionen, die auf einer Seite ausgeblendet werden können (z. B. Kunden-Version: window.FEATURES = { cable: false })
-const FEAT = Object.assign({ cable: true, xl: true }, window.FEATURES || {});
+// Eckpfosten (Option bei Ecklösung): OFFICE und FALLBROOK (auch für die USA, Lena 11.11.2026)
+const FEAT = Object.assign({ cable: true, xl: true, post: true }, window.FEATURES || {});
 if (!window.OFFICE_XL) FEAT.xl = false;   // ohne XL-Daten (Kunden-Version) gibt es kein XL
 if (!FEAT.cable) { const o = document.querySelector('#optCable'); if (o) o.remove(); }
+if (!FEAT.post) { const o = document.querySelector('#optPost'); if (o) o.remove(); }
 const RT0 = BR.product.toLowerCase();   // Adresse: #/office/… bzw. #/fallbrook/…
 const rt = () => RT0 + (PRODUCT === 'xl' ? 'xl' : '');   // XL: #/officexl/… bzw. #/fallbrookxl/…
 const pname = () => BR.product + (PRODUCT === 'xl' ? ' XL' : '');
@@ -84,6 +86,8 @@ document.querySelectorAll('.i18n').forEach(el => { if (!el.dataset.i18n) el.data
     showGuide({
       code, type: v.type, door: v.door,
       corner: q.get('ecke') === '1',
+      // Eckpfosten statt Gehrungsecke (nur mit Ecklösung)
+      post: FEAT.post && q.get('ecke') === '1' && q.get('eckpfosten') === '1',
       xl: PRODUCT === 'xl',
       // OFFICE: Option Glasstoß (Seitenteil zweiteilig). OFFICE XL: Seitenteile immer zweiteilig; frameT = Glasstoßprofil
       // an allen Glasstößen (zwischen den Gläsern und zum Oberlicht) – standardmäßig an, abwählbar (glasstoss=0 → 3-mm-Fuge)
@@ -111,6 +115,7 @@ document.querySelectorAll('.i18n').forEach(el => { if (!el.dataset.i18n) el.data
   function guideHash(cfg, step) {
     const q = [];
     if (cfg.corner) q.push('ecke=1');
+    if (cfg.corner && cfg.post) q.push('eckpfosten=1');
     if (cfg.xl ? !cfg.frameT : cfg.frameT) q.push(cfg.xl ? 'glasstoss=0' : 'glasstoss=1');
     if (cfg.topLight) q.push('toplight=1');
     if (cfg.swing) q.push('swing=1');
@@ -580,6 +585,8 @@ function cyl(group, r, len, axis, mat, tags, pos) {
       A.H.push([xe + s * FD / 2, 0.02, -R + F / 2]);
       A.J.push([xe + s * FD / 2, H - 0.02, -R + F / 2]);
       A.glass.push([xe - s * 0.03, 1.35, -R / 2]);
+      // Option Eckpfosten: vom Boden bis zur Decke in der Ecke (OFFICE 37 × 37 mm, XL 49 × 49 mm)
+      if (cfg.post) { const P = cfg.xl ? 0.049 : 0.037; box(g, Math.min(xe, xe + s * P), 0, FD / 2 - P, Math.max(xe, xe + s * P), H, FD / 2, M.alu, ['cpost']); }
       [-0.12, -R + 0.12].forEach(bz => { box(g, xe + s * FD / 2 - 0.01, F - 0.006, bz - 0.04, xe + s * FD / 2 + 0.01, F - 0.001, bz + 0.04, M.wood, ['blocks']); A.blocks.push([xe - s * 0.03, F, bz]); });
     }
 
@@ -889,6 +896,20 @@ activeSteps().forEach((step, i) => {
       { part: 3, poly: [[8, 8], [26, 26], [26, L], [8, L]], h: [PB, PB + 8], lift: 0.04, cut: 'MC', e: [0, 1], dir: [0, 1] }
     ] }
   };
+  // Option Eckpfosten (Grundriss): Pfosten läuft vom Boden bis zur Decke durch, Basisrahmen-/Decken- und Clipprofile
+  // stoßen gerade (90°) an; Seitenlänge OFFICE 37 mm, XL 49 mm
+  const POST = (part, h, clip) => [[37, { office: true }], [49, { xl: true }]].flatMap(([P, only]) => [
+    { part: 'FC', poly: [[0, 0], [P, 0], [P, P], [0, P]], h: [0, L], cut: null, cutText: 'gerade (90°), vom Boden bis zur Decke', dir: [0, 0], note: 'Clipprofile und Dichtungen am Eckpfosten: Länge des Eckpfostens minus Basisrahmen- und Deckenprofil' },
+    { part, poly: [[P, 0], [L, 0], [L, 34], [P, 34]], h: [0, h], cut: 'SC', e: [3, 0], dir: [1, 0], note: 'stößt gerade (90°) an den Eckpfosten' },
+    { part, poly: [[0, P], [34, P], [34, L], [0, L]], h: [0, h], cut: 'SC', e: [0, 1], dir: [0, 1], note: 'stößt gerade (90°) an den Eckpfosten' }
+  ].concat(clip ? [
+    { part: 3, poly: [[P, 8], [L, 8], [L, 26], [P, 26]], h: [h, h + 8], lift: 0.04, cut: 'SC', e: [3, 0], dir: [1, 0] },
+    { part: 3, poly: [[8, P], [26, P], [26, L], [8, L]], h: [h, h + 8], lift: 0.04, cut: 'SC', e: [0, 1], dir: [0, 1] }
+  ] : []).map(p => Object.assign(p, only)));
+  Object.assign(CORNERS, {
+    pT: { title: 'Eckpfosten oben (Decke)', plan: true, pieces: POST(4, PT, false) },
+    pB: { title: 'Eckpfosten unten (Boden)', plan: true, pieces: POST(2, PB, true) }
+  });
   // Glasstoßprofil (5): stößt gerade (90°) auf das durchlaufende Profil (Basisrahmen-, Decken- oder Türzargenprofil)
   const TJ = (title, part, thk) => ({ title, focus: [0, 0.07], pieces: [
     { part, poly: [[-95, 0], [95, 0], [95, -thk], [-95, -thk]], z: part === 1 ? Z.door : Z.top, cut: null, dir: [0, 0] },
@@ -934,8 +955,13 @@ activeSteps().forEach((step, i) => {
     // Ecklösung: Gehrung im Grundriss + Wandanschluss am Ende der Rückseite
     if (cornerSide) {
       const sL = cornerSide === 'L', xe = sL ? 0 : W, sx = sL ? 1 : -1;
-      add('mT', 'm', [xe, H, FD / 2], [sx, -1], 'mT');
-      add('mB', 'm', [xe, 0, FD / 2], [sx, 1], 'mB');
+      if (cfg.post) {
+        add('mT', 'cp-anschluss', [xe, H, FD / 2], [sx, -1], 'pT');
+        add('mB', 'cp-anschluss', [xe, 0, FD / 2], [sx, 1], 'pB');
+      } else {
+        add('mT', 'm', [xe, H, FD / 2], [sx, -1], 'mT');
+        add('mB', 'm', [xe, 0, FD / 2], [sx, 1], 'mB');
+      }
       const bx = xe + sx * FD / 2, rot = sL ? Math.PI / 2 : -Math.PI / 2, su = sL ? -1 : 1;
       add('jB', 'j', [bx, H, -R], [su, -1], 'j', rot);
       add('hB', 'h', [bx, 0, -R], [su, 1], 'h', rot);
@@ -994,12 +1020,20 @@ activeSteps().forEach((step, i) => {
         // Clipprofil liegt vor dem Basisprofil: in der Explosionsansicht daneben gezeichnet (wie in der Zuschnittzeichnung),
         // Clipprofil an der Türzarge (außen) entsprechend nach außen
         const cl = p.z === Z.clip, dc = p.z === Z.dclip, side = cl ? 0.045 : dc ? -0.03 : 0;
-        const pu = p.dir[0] === 0 ? side : 0, pv = p.dir[1] === 0 ? side : 0;
-        off = [sx * (p.dir[0] * E + pu), sy * (p.dir[1] * E + pv), cl ? 0.02 : 0];
+        // Clipprofile an Türzarge/Glasstoßprofil immer nach außen (weg von der Profilmitte), sonst liegt z. B. beim
+        // Glasstoßprofil XL das rechte Clipprofil im Glasstoßprofil (Lena 12.11.2026: Clipprofile überlappen)
+        const outw = i => dc ? Math.abs(side) * (Math.sign(p.poly.reduce((s, q) => s + q[i], 0)) || -1) : side;
+        const pu = p.dir[0] === 0 ? outw(0) : 0, pv = p.dir[1] === 0 ? outw(1) : 0;
+        // Clipprofile (vor dem Basisprofil) einer Ecke rücken gemeinsam um 45 mm weg: Sie bleiben untereinander in Einbaulage,
+        // überlappen sich nicht und die Maße zwischen ihnen (9 mm, 26 mm) stimmen genau (Lena 12.11.2026)
+        const CO = 0.045;
+        off = cl ? [sx * (p.dir[0] ? p.dir[0] * CO : CO), sy * (p.dir[1] ? p.dir[1] * CO : CO), 0.02]
+                 : [sx * (p.dir[0] * E + pu), sy * (p.dir[1] * E + pv), 0];
       }
       const geo = new THREE.ExtrudeGeometry(new THREE.Shape(pts), { depth: zB - zA, bevelEnabled: false });
       geo.translate(0, 0, zA);
-      if (!p.cut) { addMesh(grp, geo, cutMat(p), [], off); return; }
+      // ungeschnittene Stücke (z. B. Eckpfosten) im Grundriss ebenfalls aufrichten
+      if (!p.cut) { if (c.plan) geo.rotateX(Math.PI / 2); addMesh(grp, geo, cutMat(p), [], off); return; }
       // Schnittfläche farbig
       const [a, b] = p.e.map(i => pts[i]);
       const cx = pts.reduce((s, q) => s + q.x, 0) / pts.length, cy = pts.reduce((s, q) => s + q.y, 0) / pts.length;
@@ -1106,7 +1140,7 @@ activeSteps().forEach((step, i) => {
   }
 
   function cfgLabel(cfg) {
-    const o = [cfg.corner ? T('Ecklösung') : T('gerade'), cfg.frameT && T('Glasstoß'), cfg.topLight && 'Top Light', cfg.swing && 'Swing Door', cfg.cable && T('Kabelkanal') + ' CC ' + cfg.ccSize].filter(Boolean);
+    const o = [cfg.corner ? T('Ecklösung') : T('gerade'), cfg.post && T('Eckpfosten'), cfg.frameT && T('Glasstoß'), cfg.topLight && 'Top Light', cfg.swing && 'Swing Door', cfg.cable && T('Kabelkanal') + ' CC ' + cfg.ccSize].filter(Boolean);
     return `${cfg.code} · ${o.join(' · ')}`;
   }
 
@@ -1127,6 +1161,8 @@ activeSteps().forEach((step, i) => {
     $('#optTopLight').classList.toggle('off', cfg.type !== 'C' || cfg.swing);
     // OFFICE XL: kein Top Light, keine Swing Door; Schalter Glasstoß = Glasstoßprofil an allen Glasstößen
     ['#optTopLight', '#optSwing'].forEach(id => { $(id).hidden = !!cfg.xl; });
+    // Eckpfosten nur bei Ecklösung
+    if ($('#optPost')) $('#optPost').hidden = !cfg.corner;
     const ftLabel = $('[data-opt="frameT"]').closest('label');
     ftLabel.hidden = false;
     ftLabel.title = cfg.xl ? T('Glasstoßprofil an allen Glasstößen – abgewählt: 3-mm-Fuge mit Silikon oder EZCC') : '';
@@ -1230,7 +1266,7 @@ activeSteps().forEach((step, i) => {
         <div class="parts">${used.map(partRow).join('')}</div></div>`;
     } else if (state.tab === 'cut') {
       const cs = cutCorners(cfg);
-      const piece = p => `<li><i class="${p.cut === 'MC' ? 'mc' : p.cut ? 'sc' : 'none'}"></i><span><b>${esc(T(PARTS[p.part].name))}</b> – ${T(p.cut === 'MC' ? 'Gehrung 45°' : p.cut ? 'gerade (90°)' : 'läuft durch, nicht geschnitten')}${p.note ? `<small>${esc(T(p.note))}</small>` : ''}</span></li>`;
+      const piece = p => `<li><i class="${p.cut === 'MC' ? 'mc' : p.cut ? 'sc' : 'none'}"></i><span><b>${esc(T(PARTS[p.part].name))}</b> – ${T(p.cutText || (p.cut === 'MC' ? 'Gehrung 45°' : p.cut ? 'gerade (90°)' : 'läuft durch, nicht geschnitten'))}${p.note ? `<small>${esc(T(p.note))}</small>` : ''}</span></li>`;
       const merge = ps => ps.filter((p, i) => ps.findIndex(q => q.part === p.part && q.cut === p.cut && q.note === p.note) === i);
       content = `<div class="pad cut-tab"><p class="intro">${T('Die Profile werden in der Regel fertig zugeschnitten geliefert. Bei eigenem Zuschnitt: Ecke im Modell oder in der Liste antippen.')}</p>
         <div class="cut-key"><span><i class="mc"></i>${T('Gehrungsschnitt 45°')}</span><span><i class="sc"></i>${T('gerader Schnitt (90°)')}</span></div>

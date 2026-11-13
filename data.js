@@ -45,11 +45,14 @@
     TL4:    { pos: 20, name: 'Clipprofil Oberlicht für 10 mm Glas', nr: '41AL-CLIP-TL-10',  crl: 'FCLPT3SA / FCLPT3MBL', img: 'TL4' },
     TL5:    { pos: 21, name: 'Clipprofil Oberlicht für 8 mm Glas',  nr: '41AL-CLIP-TL-8',   crl: 'FCLPT3SA / FCLPT3MBL', img: 'TL5' },
     SDBL:   { pos: 22, name: 'Block für Pendeltüre',        nr: '41AL-OFFICE-SD-BL',         crl: 'FCPDB1SA / FCPDB1MBL', img: 'SDBL' },
-    CLIPSD: { pos: 23, name: 'Clipprofil Pendeltür',        nr: '41AL-CLIP-SD',              crl: 'FCLPCP6SA / FCLPCP6MBL', img: 'CLIPSD' }
+    CLIPSD: { pos: 23, name: 'Clipprofil Pendeltür',        nr: '41AL-CLIP-SD',              crl: 'FCLPCP6SA / FCLPCP6MBL', img: 'CLIPSD' },
+    // Option Eckpfosten (Lena, 11.11.2026): Einzelprofil ohne Clips und Dichtungen (Kombinationsprofil inkl. Clips und Dichtungen:
+    // 41AL-FRAME-C). CRL-Nummer noch offen – vorerst die Längle-Nummer.
+    FC:     { pos: 28, name: 'Eckpfosten',                  nr: '41AL-FRAME-C-D',            crl: '41AL-FRAME-C-D', img: 'FC' }
   };
   Object.keys(PARTS).forEach(k => { if (PARTS[k].img !== false) PARTS[k].img = 'img/profiles/' + (PARTS[k].img || 'p' + k) + '.jpg'; });
   // Reihenfolge in der Teileliste (Lena, 21.10.2026): erst alle Profile (Kabelkanal zuletzt), dann Dichtungen, dann Kleinteile – je aufsteigend
-  const PART_ORDER = [1, 2, 3, 4, 5, 'TL4', 'TL5', 'CLIPSD', 'CCB', 'CCC', 'CC130B', 'CC130C',
+  const PART_ORDER = [1, 2, 3, 4, 5, 'FC', 'TL4', 'TL5', 'CLIPSD', 'CCB', 'CCC', 'CC130B', 'CC130C',
     6, 7, 8, 9, 'EP14',
     10, 11, 12, 13, 'CS', 14, 15, 16, 'CP', 'TL3L', 'TL3R', 'TL3', 'SDBL'];
 
@@ -141,12 +144,12 @@
       title: 'Profile vorbereiten und Bohrungen setzen',
       parts: c => ZB(c) ? [1, 2, 4, 'CS'] : [2, 4, 'CS'],
       text: [
-        'Profile auf einer weichen Unterlage am Boden auslegen, damit nichts verkratzt. Der Rahmen wird <b>liegend vormontiert</b>.',
+        'Profile auf einer weichen Unterlage am Boden auslegen. Der Rahmen wird <b>liegend vormontiert</b>, um Kratzer zu vermeiden.',
         { t: 'In Basisrahmenprofil <b>(2)</b> und Deckenprofil <b>(4)</b> Befestigungslöcher bohren: an beiden Profilenden und entlang des Profils alle <b>30–60 cm</b>.', fig: [f('A_drill'), f('B_drill')] },
         c => !ZB(c) ? null : { t: ZW(c) && ZD(c) ? 'Ebenso im Türzargenprofil <b>(1)</b> an der Wandseite und oben zur Decke.' : ZW(c) ? 'Ebenso im Türzargenprofil <b>(1)</b> an der Wandseite.' : 'Ebenso im Türzargenprofil <b>(1)</b> oben zur Decke.', fig: [f('E_drill')] },
         'Lochgröße und Abstand richten sich nach Untergrund und Schrauben.'
       ],
-      notes: ['Die Profile werden in der Regel fertig zugeschnitten geliefert. Bei eigenem Zuschnitt: siehe Reiter <a href="#" data-act="cut-tab">Zuschnitt</a>.', 'Profile (2) oder (4) länger als 6 m werden mit dem 180°-Verbinder 41AL-OFFICE-CS verbunden.'],
+      notes: ['Der erforderliche Befestigungsabstand ist abhängig von den jeweiligen Gegebenheiten, insbesondere vom Untergrund und den auftretenden Belastungen, und ist bauseits festzulegen.', 'Die Profile werden in der Regel fertig zugeschnitten geliefert. Bei eigenem Zuschnitt: siehe Reiter <a href="#" data-act="cut-tab">Zuschnitt</a>.', 'Profile (2) oder (4) länger als 6 m werden mit dem 180°-Verbinder 41AL-OFFICE-CS verbunden.'],
       hl: ['p1', 'p2floor', 'p2wall', 'p4']
     },
     {
@@ -221,6 +224,30 @@
       ],
       spots: ['H'], hl: ['p2floor', 'p2wall']
     },
+    // Option Eckpfosten (Lena, 11.11.2026): ersetzt die Gehrungsecke – Eckpfosten vom Boden bis zur Decke.
+    // Er wird wie die übrigen Profile im Liegen an den Hauptrahmen angeschlossen; die Rückwand folgt nach dem Aufstellen.
+    {
+      id: 'cp-winkel', phase: 'frame', view: 'detail', cond: c => c.corner && c.post, option: true,
+      title: 'Eckpfosten vorbereiten',
+      parts: ['FC', 11, 13],
+      text: [
+        'Der Eckpfosten <b>(28)</b> reicht vom Boden bis zur Decke.',
+        { t: 'Oben zwei CL-Verbinder <b>(11)</b> und unten zwei C-Verbinder <b>(13)</b> in den Eckpfosten <b>(28)</b> einschieben.', fig: ['img/fig/CP_post_t.jpg', 'img/fig/CP_post_b.jpg'], row: true },
+        'Madenschrauben erst nach dem Anschließen der Profile festziehen.'
+      ],
+      spots: ['M'], hl: ['cpost']
+    },
+    {
+      id: 'cp-haupt', phase: 'frame', view: 'detail', cond: c => c.corner && c.post, option: true,
+      title: 'Eckpfosten an den Hauptrahmen anschließen',
+      parts: ['FC', 2, 4, 11, 13],
+      text: [
+        'Den Eckpfosten noch im Liegen – wie zuvor die Basisrahmenprofile – am Ende des Hauptrahmens zur Ecke anschließen.',
+        { t: 'Basisrahmenprofil <b>(2)</b> unten auf einen C-Verbinder <b>(13)</b> und Deckenprofil <b>(4)</b> oben auf einen CL-Verbinder <b>(11)</b> schieben und stumpf (90°) an den Eckpfosten <b>(28)</b> stoßen.', fig: ['img/fig/CP_join.jpg'] },
+        'Ausrichten und die Madenschrauben dieser beiden Verbinder festziehen. Die zweiten Verbinder bleiben für die Rückwand frei.'
+      ],
+      spots: ['M'], hl: ['cpost', 'p4', 'p2floor']
+    },
     {
       // Option Kabelkanal (Lena, 21.10.2026): wird beim Zusammenbau des Rahmens vor Ort mit eingebaut,
       // Befestigung mit bauseits beigestellten selbstbohrenden Schrauben (Zeichnung 007JH026.015B)
@@ -243,12 +270,13 @@
       parts: [],
       text: [
         'Den vormontierten Rahmen zu zweit (bei Bedarf mit mehreren Personen) gleichmäßig vom Boden aufheben.',
-        'An der vorgesehenen Position aufstellen.'
+        'An der vorgesehenen Position aufstellen.',
+        c => c.corner && c.post ? 'Der Eckpfosten ist bereits am Hauptrahmen angeschlossen und wird mit aufgestellt.' : null
       ],
       hl: ['p1', 'p2floor', 'p2wall', 'p4']
     },
     {
-      id: 'm', phase: 'set', view: 'detail', cond: c => c.corner,
+      id: 'm', phase: 'set', view: 'detail', cond: c => c.corner && !c.post,
       title: 'Ecke 90° verbinden (Ecklösung)',
       parts: [4, 2, 12],
       text: [
@@ -257,6 +285,18 @@
         'Je Verbinder die vier Madenschrauben festziehen.'
       ],
       spots: ['M'], hl: ['p4', 'p2floor']
+    },
+    {
+      id: 'cp-anschluss', phase: 'set', view: 'detail', cond: c => c.corner && c.post, option: true,
+      title: 'Rückwand an den Eckpfosten anschließen',
+      parts: ['FC', 2, 4, 11, 13],
+      text: [
+        'Rahmen der Rückwand an den aufgestellten Hauptrahmen mit Eckpfosten heranführen.',
+        { t: 'Basisrahmenprofil <b>(2)</b> der Rückwand unten auf den zweiten C-Verbinder <b>(13)</b> und Deckenprofil <b>(4)</b> oben auf den zweiten CL-Verbinder <b>(11)</b> schieben und stumpf (90°) an den Eckpfosten <b>(28)</b> stoßen.', fig: ['img/fig/CP_join.jpg'] },
+        'Madenschrauben der Verbinder festziehen.'
+      ],
+      notes: ['Der Eckpfosten wird nicht zusätzlich an Boden oder Decke verschraubt: Er ist nur über die Verbinder mit den Basisrahmen- und Deckenprofilen verbunden und über die Clipprofile mit den Gläsern.'],
+      spots: ['M'], hl: ['cpost', 'p4', 'p2floor']
     },
     {
       id: 'ausrichten', phase: 'set', view: 'overview',
@@ -278,17 +318,18 @@
         c => !ZB(c) ? null : { t: ZW(c) && ZD(c) ? 'Türzargenprofil <b>(1)</b> an der Wand und oben an der Decke verschrauben – die Zargendichtung deckt die Schrauben später ab.' : ZW(c) ? 'Türzargenprofil <b>(1)</b> an der Wand verschrauben – die Zargendichtung deckt die Schrauben später ab.' : 'Türzargenprofil <b>(1)</b> oben an der Decke verschrauben – die Zargendichtung deckt die Schrauben später ab.', fig: [f('fasten_frame'), { src: f('E_section'), size: 'sm', info: 'Nur zur Info: Die Zargendichtung (8) wird erst später ausgeklinkt und danach wieder eingedrückt.' }] },
         'Befestigungspunkte alle <b>30–60 cm</b>; Schrauben und Dübel passend zum Untergrund wählen.'
       ],
-      notes: ['Schraubenköpfe müssen bündig sitzen. Spalt zwischen Profil und Mauerwerk gegebenenfalls hinterfüllen. Im Bereich der Befestigungspunkte unterlegen.'],
+      notes: ['Der erforderliche Befestigungsabstand ist abhängig von den jeweiligen Gegebenheiten, insbesondere vom Untergrund und den auftretenden Belastungen, und ist bauseits festzulegen.', 'Schraubenköpfe müssen bündig sitzen. Spalt zwischen Profil und Mauerwerk gegebenenfalls hinterfüllen. Im Bereich der Befestigungspunkte unterlegen.'],
       hl: ['p1', 'p2floor', 'p2wall', 'p4']
     },
     {
       id: 'anschlag', phase: 'glass', view: 'overview',
       title: 'Anschlagdichtung einsetzen',
-      parts: [9, 'EP14', 7],
+      parts: c => c.post ? [9, 'EP14', 7, 3] : [9, 'EP14', 7],
       notes: ['<b>Option dickeres Glas:</b> Bei <b>14 mm</b> Glas die Anschlagdichtung 14 mm <b>(17)</b>, bei <b>16 mm</b> Glas die Anschlagdichtung 16 mm <b>(7)</b> anstelle der Anschlagdichtung <b>(9)</b> verwenden.'],
       text: [
         { t: 'Lippen der Anschlagdichtung <b>(9)</b> je nach Glasdicke der Fixverglasung entfernen: <b>8 mm</b> komplett verwenden · <b>10 mm</b> eine Lippe abziehen · <b>12 mm</b> beide Lippen abziehen.', fig: [f('gp_a'), f('gp_b')], row: true },
-        { t: 'Anschlagdichtung in Deckenprofil <b>(4)</b> und Basisrahmenprofile <b>(2)</b> einziehen. Beim Türzargenprofil <b>(1)</b> die Anschlagdichtung in das Clipprofil <b>(3)</b> einziehen.', fig: c => [{ src: f('g9_4'), size: 'md' }, { src: f('g9_2'), size: 'md' }, { src: f('g9_1'), size: 'md' }] }
+        { t: 'Anschlagdichtung in Deckenprofil <b>(4)</b> und Basisrahmenprofile <b>(2)</b> einziehen. Beim Türzargenprofil <b>(1)</b> die Anschlagdichtung in das Clipprofil <b>(3)</b> einziehen.', fig: c => [{ src: f('g9_4'), size: 'md' }, { src: f('g9_2'), size: 'md' }, { src: f('g9_1'), size: 'md' }] },
+        c => c.post ? { t: '<b>Eckpfosten (28):</b> Anschlagdichtung <b>(9)</b> in die Glasnut einziehen. Für die zweite Glasseite zuerst die Anschlagdichtung <b>(9)</b> in das Clipprofil <b>(3)</b> einziehen (1), dann das Clipprofil in den Eckpfosten einclipsen (2). Clipprofile und Dichtungen am Eckpfosten auf Länge schneiden: Länge des Eckpfostens minus Basisrahmen- und Deckenprofil.', fig: ['img/fig/CP_sec_a.jpg'] } : null
       ],
       extraTitle: 'Anschlagdichtung nach Glasdicke', extraHtml: TABLE_LIPPEN,
       hl: ['p1', 'p2floor', 'p2wall', 'p4']
@@ -312,9 +353,10 @@
         { t: 'Glas zuerst <b>oben</b> in das Deckenprofil <b>(4)</b> einführen und bis an die Anschlagdichtung schieben.', fig: [f('glass_up')] },
         { t: 'Dann <b>unten</b> in das Basisrahmenprofil <b>(2)</b> einschwenken und auf die Verglasungsblöcke absetzen.', fig: [f('glass_down'), f('A_glass')] },
         { t: 'Glas gerade einsetzen – nicht verkanten.', fig: [{ src: f('glass_bad'), size: 'sm' }, { src: f('glass_good'), size: 'sm' }], row: true },
-        c => c.corner ? 'Ecklösung: Glasfuge an der 90°-Ecke mit Silikon oder dem CRL-Verbindungsstreifen <b>EZCL</b> (90° Ecke) schließen.' : null
+        c => c.corner && !c.post ? 'Ecklösung: Glasfuge an der 90°-Ecke mit Silikon oder dem CRL-Verbindungsstreifen <b>EZCL</b> (90° Ecke) schließen.' : null,
+        c => c.post ? 'Eckpfosten: Beide Gläser an der Ecke sitzen im Eckpfosten <b>(28)</b> und werden mit Anschlag- und Fixierdichtung abgedichtet – Silikonfuge bzw. Verbindungsstreifen EZCL entfallen.' : null
       ],
-      notes: ['Nur ESG, VSG oder VSG aus ESG verwenden.', c => c.corner ? { t: 'Glasfuge an der Ecke: Silikonfuge oder CRL-Verbindungsstreifen (90° Ecke).', tools: [STRIP.c90] } : null],
+      notes: ['Nur ESG, VSG oder VSG aus ESG verwenden.', c => c.corner && !c.post ? { t: 'Glasfuge an der Ecke: Silikonfuge oder CRL-Verbindungsstreifen (90° Ecke).', tools: [STRIP.c90] } : null],
       spots: ['glass'], hl: ['glass']
     },
     {
@@ -349,11 +391,12 @@
     {
       id: 'fixierung', phase: 'glass', view: 'overview',
       title: 'Fixierdichtung und Clipprofil einsetzen',
-      parts: [6, 3],
+      parts: c => c.post ? [6, 3, 'FC'] : [6, 3],
       text: [
         { t: '<b>Deckenprofil (4):</b> Fixierdichtung <b>(6)</b> von unten zwischen Glas und Profil eindrücken.', fig: [f('B_fix'), f('B_section')] },
         { t: '<b>Basisrahmenprofil (2):</b> zuerst Clipprofil <b>(3)</b> einclipsen, dann Fixierdichtung <b>(6)</b> zwischen Glas und Clipprofil eindrücken.', fig: [f('A_clip'), f('A_section')] },
-        { t: '<b>Türzargenprofil (1):</b> ebenso Clipprofil <b>(3)</b> und Fixierdichtung <b>(6)</b>.', fig: [f('D_2'), f('D_3')] }
+        { t: '<b>Türzargenprofil (1):</b> ebenso Clipprofil <b>(3)</b> und Fixierdichtung <b>(6)</b>.', fig: [f('D_2'), f('D_3')] },
+        c => c.post ? { t: '<b>Eckpfosten (28):</b> Fixierdichtung <b>(6)</b> zwischen Glas und Profil eindrücken. Auf der zweiten Glasseite zuerst das Clipprofil <b>(3)</b> einclipsen (1), dann die Fixierdichtung <b>(6)</b> zwischen Glas und Clipprofil eindrücken (2).', fig: ['img/fig/CP_sec_b1.jpg', 'img/fig/CP_sec_b2.jpg'] } : null
       ],
       notes: [{ t: 'Tipp: Glasreiniger und Vinylroller erleichtern das Einsetzen der Dichtung.', tools: [
         { img: 'img/tools/glasreiniger.jpg', name: 'Glasreiniger', nr: 'EB1701', crl: 'EB1701' },
